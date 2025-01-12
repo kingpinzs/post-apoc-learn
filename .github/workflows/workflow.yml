@@ -2,6 +2,7 @@ name: Deploy React App
 permissions:
   id-token: write
   contents: read
+  pages: write
 on:
   push:
     branches: [ main ]
