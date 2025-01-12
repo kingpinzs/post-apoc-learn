@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/post-apoc-learn/static/css/main.f5e67ca1.css",
-    "main.js": "/post-apoc-learn/static/js/main.65f7ccc4.js",
+    "main.js": "/post-apoc-learn/static/js/main.621f267c.js",
     "index.html": "/post-apoc-learn/index.html",
     "main.f5e67ca1.css.map": "/post-apoc-learn/static/css/main.f5e67ca1.css.map",
-    "main.65f7ccc4.js.map": "/post-apoc-learn/static/js/main.65f7ccc4.js.map"
+    "main.621f267c.js.map": "/post-apoc-learn/static/js/main.621f267c.js.map"
   },
   "entrypoints": [
     "static/css/main.f5e67ca1.css",
-    "static/js/main.65f7ccc4.js"
+    "static/js/main.621f267c.js"
   ]
 }
