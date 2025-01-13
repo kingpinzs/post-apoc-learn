@@ -1,0 +1,109 @@
+{
+    "levels": [
+      {
+        "id": "pattern_matrix",
+        "scenario": "[ PATTERN ANALYSIS REQUIRED ]\nQuantum encryption matrix detected. Decode the pattern to bypass.",
+        "question": "SELECT THE NEXT SEQUENCE IN THE PATTERN:",
+        "type": "pattern",
+        "pattern": {
+          "type": "matrix",
+          "data": [
+            [1, 0, 1],
+            [0, 1, 0],
+            [1, 0, "?"]
+          ],
+          "options": ["0", "1"],
+          "correct": "1"
+        },
+        "explanation": "Binary alternating pattern detected and bypassed.",
+        "iconType": "Binary",
+        "hints": [
+          "Look for alternating patterns",
+          "Check diagonally and horizontally",
+          "The pattern completes a binary sequence"
+        ]
+      },
+      {
+        "id": "sequence_hack",
+        "scenario": "[ NEURAL SEQUENCE DETECTED ]\nAI defense system requires pattern validation.",
+        "question": "COMPLETE THE SEQUENCE: 2, 6, 12, 20, ?",
+        "type": "pattern",
+        "pattern": {
+          "type": "sequence",
+          "data": [2, 6, 12, 20],
+          "options": ["28", "30", "32", "36"],
+          "correct": "30",
+          "rule": "Add next even number (4,6,8,10)"
+        },
+        "explanation": "Neural sequence decoded. Each step adds the next even number.",
+        "iconType": "Brain",
+        "hints": [
+          "Look at the differences between numbers",
+          "Each step increases by a pattern",
+          "The pattern involves even numbers"
+        ]
+      },
+      {
+        "id": "symbol_pattern",
+        "scenario": "[ CRYPTOGRAPHIC PATTERN BREACH ]\nSymbol-based encryption detected.",
+        "question": "DECODE THE NEXT SYMBOL:",
+        "type": "pattern",
+        "pattern": {
+          "type": "symbol",
+          "data": ["△○", "○□", "□△", "△○", "○□", "?"],
+          "options": ["△△", "□△", "□□", "○△"],
+          "correct": "□△",
+          "rule": "Symbols rotate in sequence △→○→□"
+        },
+        "explanation": "Symbol rotation pattern successfully decrypted.",
+        "iconType": "Workflow",
+        "hints": [
+          "Symbols follow a rotation pattern",
+          "Look at how pairs of symbols change",
+          "The sequence repeats every three symbols"
+        ]
+      },
+      {
+        "id": "radiation",
+        "scenario": "[ SECURITY BREACH DETECTED ]\nRadiation firewall compromised. Hack the system to restore protection.",
+        "question": "SELECT CORRECT RADIATION MEASUREMENT PROTOCOL:",
+        "type": "multiple-choice",
+        "options": ["EXECUTE Gray.protocol", "RUN Volt.exe", "LOAD Pascal.sys", "START Candela.bin"],
+        "correct": 0,
+        "explanation": "Gray.protocol successfully loaded. System calibrated to measure absorbed radiation dose at 1 joule/kg.",
+        "iconType": <Radio className="w-8 h-8 text-green-500" />,
+        "hints": [
+          "Look for radiation measurement units",
+          "Check for radiation protocols",
+          "The correct protocol measures absorbed radiation"
+        ]
+      },
+      {
+        id: 'binary',
+        scenario: "[ BINARY SEQUENCE REQUIRED ]\nNeural firewall requires binary authentication.",
+        question: "CONVERT DECIMAL 13 TO BINARY:",
+        type: 'command',
+        correct: "1101",
+        explanation: "Binary conversion verified. Neural firewall updated.",
+        icon: <Binary className="w-8 h-8 text-green-500" />
+      },
+      {
+        id: 'sequence',
+        scenario: "[ SECURITY PATTERN DETECTED ]\nBypass quantum encryption using the correct sequence.",
+        question: "ENTER THE DISPLAYED SEQUENCE: 1-2-3-4",
+        type: 'sequence',
+        correct: "1234",
+        explanation: "Sequence accepted. Quantum encryption bypassed.",
+        icon: <Lock className="w-8 h-8 text-green-500" />
+      },
+      {
+        id: 'database',
+        scenario: "[ DATABASE INFILTRATION REQUIRED ]\nChemical formula database locked. Execute SQL injection.",
+        question: "COMPLETE THE QUERY:\nSELECT * FROM compounds WHERE",
+        type: 'command',
+        correct: "type='organic'",
+        explanation: "SQL injection successful. Chemical database accessed.",
+        icon: <Database className="w-8 h-8 text-green-500" />
+      }
+    ]
+  }
