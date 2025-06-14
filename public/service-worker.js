@@ -1,41 +1,19 @@
-// service-worker.js
-const CACHE_NAME = 'hack-learn-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/static/js/main.bundle.js',
-  '/static/css/main.css',
-  '/manifest.json',
-  '/logo192.png',
-  '/logo512.png'
-];
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js');
 
-self.addEventListener('install', event => {
+workbox.core.skipWaiting();
+workbox.core.clientsClaim();
+
+workbox.precaching.precacheAndRoute(self.__WB_MANIFEST || []);
+
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
+    caches.keys().then(cacheNames =>
+      Promise.all(
+        cacheNames
+          .filter(name => name !== workbox.core.cacheNames.precache)
+          .map(name => caches.delete(name))
+      )
+    )
   );
 });
 
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request)
-          .then(response => {
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-            return response;
-          });
-      })
-  );
-});
