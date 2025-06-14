@@ -105,6 +105,42 @@ const ApocalypseGame = () => {
       'Firewalls protect systems rather than attack.',
       'Identify the defensive software.',
       'Use number keys 1-4.'
+    ],
+    protocol: [
+      'Used by HTTPS to secure connections.',
+      'It replaced the older SSL standard.',
+      'Stands for Transport Layer Security.',
+      'Use number keys 1-4.'
+    ],
+    base64: [
+      'Base64 groups characters into sets of four.',
+      'Padding often appears as = at the end.',
+      'U1VSVklWRQ== decodes to a single word.',
+      'Type the decoded text.'
+    ],
+    override: [
+      'Digits flash briefly on the keypad.',
+      'Enter them exactly in that order.',
+      'DELETE removes the last digit.',
+      'Use on-screen buttons or keyboard.'
+    ],
+    firewall: [
+      'Standard web traffic uses a common port.',
+      'Blocking that port stops HTTP requests.',
+      'HTTPS typically uses port 443 instead.',
+      'Use number keys 1-4.'
+    ],
+    network: [
+      'Multicast addresses begin with 224.',
+      'They are reserved for one-to-many traffic.',
+      'Class D is set aside for this purpose.',
+      'Use number keys 1-4.'
+    ],
+    hash: [
+      'Look for a hashing algorithm, not encryption.',
+      'It outputs 64 hexadecimal characters.',
+      'Part of the SHA-2 family.',
+      'Use number keys 1-4.'
     ]
   };
 
@@ -160,6 +196,30 @@ TIPS FOR THIS CHALLENGE:
     'logic': {
       title: "Malware Types",
       content: "Trojans, worms and spyware are malicious software. Firewalls, on the other hand, defend systems against attacks."
+    },
+    'protocol': {
+      title: "Secure Protocols",
+      content: "TLS (Transport Layer Security) establishes encrypted connections and is widely used to secure web traffic."
+    },
+    'base64': {
+      title: "Base64 Encoding",
+      content: "Base64 converts binary data into ASCII characters. Example: 'U1VSVklWRQ==' decodes to 'SURVIVE'."
+    },
+    'override': {
+      title: "Keypad Overrides",
+      content: "Security keypads use numeric codes. Entering the correct sequence disables locks while mistakes can trigger alarms."
+    },
+    'firewall': {
+      title: "Firewall Ports",
+      content: "Firewalls filter traffic by port number. Blocking port 80 stops standard HTTP traffic while HTTPS uses 443."
+    },
+    'network': {
+      title: "IP Address Classes",
+      content: "Class D addresses (224.0.0.0–239.255.255.255) are reserved for multicast, enabling one-to-many communication."
+    },
+    'hash': {
+      title: "Cryptographic Hashes",
+      content: "SHA-256 generates a 256-bit digest used to verify data integrity. It is part of the SHA-2 family."
     }
   };
 
@@ -219,6 +279,64 @@ TIPS FOR THIS CHALLENGE:
       correct: 2,
       explanation: "Correct. Firewalls are defensive software.",
       icon: <Shield className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'protocol',
+      scenario: "[ SECURE CHANNEL INITIATION ]\nEstablish a protected data link.",
+      question: "SELECT HANDSHAKE FOR ENCRYPTED COMMUNICATION:",
+      type: 'multiple-choice',
+      options: ['TLS', 'FTP', 'SMTP', 'IRC'],
+      correct: 0,
+      explanation: "TLS handshake complete. Channel encrypted.",
+      icon: <Workflow className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'base64',
+      scenario: "[ ENCODED DATA BLOCK ]\nA message was captured in Base64.",
+      question: "DECODE 'U1VSVklWRQ==' :",
+      type: 'command',
+      correct: 'SURVIVE',
+      explanation: "Message decoded. Hidden directive obtained.",
+      icon: <Terminal className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'override',
+      scenario: "[ DOOR OVERRIDE ]\nSequence required to unlock the blast door.",
+      question: "INPUT OVERRIDE CODE 4-2-0-3",
+      type: 'sequence',
+      correct: '4203',
+      explanation: "Override accepted. Door unlocked.",
+      icon: <Lock className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'firewall',
+      scenario: "[ FIREWALL RECONFIGURATION ]\nMalicious traffic on port 80.",
+      question: "WHICH PORT SHOULD BE BLOCKED TO STOP HTTP?",
+      type: 'multiple-choice',
+      options: ['80', '22', '53', '443'],
+      correct: 0,
+      explanation: "Port 80 blocked. Firewall updated.",
+      icon: <Shield className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'network',
+      scenario: "[ NETWORK SCAN ]\nIdentify the multicast IP class.",
+      question: "WHICH IP CLASS IS USED FOR MULTICASTING?\n1. Class A\n2. Class B\n3. Class D\n4. Class E",
+      type: 'multiple-choice',
+      options: ['Class A', 'Class B', 'Class D', 'Class E'],
+      correct: 2,
+      explanation: "Class D reserved for multicast groups.",
+      icon: <Wifi className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'hash',
+      scenario: "[ DATA INTEGRITY CHECK ]\nCompute the SHA-256 digest.",
+      question: "WHICH ALGORITHM CREATES A 256-BIT HASH?\n1. MD5\n2. SHA-256\n3. AES\n4. RSA",
+      type: 'multiple-choice',
+      options: ['MD5', 'SHA-256', 'AES', 'RSA'],
+      correct: 1,
+      explanation: "SHA-256 selected. Data integrity verified.",
+      icon: <Beaker className="w-8 h-8 text-green-500" />
     }
   ];
 
