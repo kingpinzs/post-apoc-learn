@@ -292,6 +292,97 @@ TIPS FOR THIS CHALLENGE:
       diagram: `${process.env.PUBLIC_URL}/diagrams/traceroute.svg`,
       example: "Example: traceroute 8.8.8.8 displays hops to Google's DNS server.",
       resource: "surviv-os://docs/traceroute"
+    },
+    'infiltration': {
+      title: "Process Enumeration",
+      content: "The `ps` command lists active processes on Unix-like systems and is useful for spotting rogue tasks.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/infiltration.svg`,
+      example: "Example: ps aux | grep httpd shows running web server processes.",
+      resource: "surviv-os://docs/ps"
+    },
+    'relay': {
+      title: "File Retrieval",
+      content: "`wget` downloads files from the web via HTTP, HTTPS or FTP protocols.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/relay.svg`,
+      example: "Example: wget http://example.com/file.txt",
+      resource: "surviv-os://docs/wget"
+    },
+    'dataleak': {
+      title: "Secure Copy",
+      content: "SCP securely transfers files between hosts using SSH for encryption.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/dataleak.svg`,
+      example: "Example: scp user@host:/path/file ./",
+      resource: "surviv-os://docs/scp"
+    },
+    'aiHub': {
+      title: "Access Codes",
+      content: "Critical systems often require numeric sequences for entry. Memorize the digits to proceed.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/aihub.svg`,
+      example: "Example: Access panels frequently use 4-digit pins.",
+      resource: "surviv-os://docs/access"
+    },
+    'rootkit': {
+      title: "Permission Changes",
+      content: "The `chmod +x` command sets the executable bit on a file so it can run as a program.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/rootkit.svg`,
+      example: "Example: chmod +x exploit.sh",
+      resource: "surviv-os://docs/chmod"
+    },
+    'isolate': {
+      title: "Firewall Defaults",
+      content: "Setting a firewall's default policy to deny blocks all unsolicited incoming traffic.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/isolate.svg`,
+      example: "Example: ufw default deny",
+      resource: "surviv-os://docs/ufw"
+    },
+    'emp': {
+      title: "EMP Deployment",
+      content: "Electromagnetic pulses can temporarily disable electronics and weaken defenses.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/emp.svg`,
+      example: "Example: Tactical EMP grenades are used to disrupt drones.",
+      resource: "surviv-os://docs/emp"
+    },
+    'mainframe': {
+      title: "Recursive Removal",
+      content: "Use `rm -r` with caution to delete directories and their contents recursively.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/mainframe.svg`,
+      example: "Example: rm -r /tmp/old_logs",
+      resource: "surviv-os://docs/rm"
+    },
+    'shutdown': {
+      title: "System Halt",
+      content: "`shutdown -h now` immediately powers down a Unix-like system.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/shutdown.svg`,
+      example: "Example: sudo shutdown -h now",
+      resource: "surviv-os://docs/shutdown"
+    },
+    'reboot': {
+      title: "Restart Sequence",
+      content: "A final reboot brings systems back under human control after the AI is disabled.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/reboot.svg`,
+      example: "Example: reboot",
+      resource: "surviv-os://docs/reboot"
+    },
+    'salvage': {
+      title: "Disk Usage",
+      content: "Use `df` to display disk space statistics on connected filesystems.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/salvage.svg`,
+      example: "Example: df -h",
+      resource: "surviv-os://docs/df"
+    },
+    'decode': {
+      title: "Base64 Practice",
+      content: "Decoding Base64 strings reveals their original text data.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/decode.svg`,
+      example: "Example: echo SGVsbG8= | base64 -d",
+      resource: "surviv-os://docs/base64"
+    },
+    'patch': {
+      title: "Applying Fixes",
+      content: "Security patches often require inputting specific verification codes before deployment.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/patch.svg`,
+      example: "Example: patch < fix.diff",
+      resource: "surviv-os://docs/patch"
     }
   };
 
@@ -420,6 +511,131 @@ TIPS FOR THIS CHALLENGE:
       explanation: "Traceroute executed. Attacker route mapped.",
       icon: <Signal className="w-8 h-8 text-green-500" />
     },
+    {
+      id: 'infiltration',
+      scenario: "[ AI OUTPOST DETECTED ]\\nInfiltrate the data center to locate AI core.",
+      question: "WHICH COMMAND LISTS ACTIVE PROCESSES ON LINUX?",
+      type: 'multiple-choice',
+      options: ['ps', 'ls', 'grep', 'kill'],
+      correct: 0,
+      explanation: "Processes listed. AI activities identified.",
+      icon: <Cpu className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'relay',
+      scenario: "[ SIGNAL INTERCEPTION ]\\nConnect to remote relay.",
+      question: "ENTER COMMAND TO DOWNLOAD FILE FROM URL:",
+      type: 'command',
+      correct: 'wget',
+      explanation: "File retrieved from remote relay.",
+      icon: <Wifi className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'dataleak',
+      scenario: "[ DATA LEAK ]\\nExfiltrate logs from compromised server.",
+      question: "WHICH PROTOCOL TRANSFERS FILES SECURELY?",
+      type: 'multiple-choice',
+      options: ['FTP', 'HTTP', 'SCP', 'TELNET'],
+      correct: 2,
+      explanation: "Secure copy engaged. Logs extracted.",
+      icon: <Database className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'aiHub',
+      scenario: "[ AI HUB FOUND ]\\nAccess panel requires numeric code.",
+      question: "INPUT ACCESS CODE 9-7-1-5",
+      type: 'sequence',
+      correct: '9715',
+      explanation: "Access granted to inner hub.",
+      icon: <Lock className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'rootkit',
+      scenario: "[ ROOTKIT DEPLOYMENT ]\\nInsert malicious module.",
+      question: "TYPE COMMAND TO CHANGE FILE PERMISSIONS TO EXECUTABLE:",
+      type: 'command',
+      correct: 'chmod +x',
+      explanation: "Permissions modified. Module armed.",
+      icon: <Binary className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'isolate',
+      scenario: "[ CONTAINMENT PROTOCOL ]\\nIsolate AI network channels.",
+      question: "WHICH FIREWALL COMMAND BLOCKS ALL INCOMING TRAFFIC?",
+      type: 'multiple-choice',
+      options: ['ufw enable', 'ufw default deny', 'ufw allow 22', 'ufw status'],
+      correct: 1,
+      explanation: "Incoming traffic blocked. AI quarantined.",
+      icon: <Shield className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'emp',
+      scenario: "[ POWER GRID DISRUPTION ]\\nDeploy EMP to weaken defenses.",
+      question: "INPUT DEPLOY CODE 0-0-9-8",
+      type: 'sequence',
+      correct: '0098',
+      explanation: "EMP triggered. Defenses weakened.",
+      icon: <Battery className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'mainframe',
+      scenario: "[ MAINFRAME BREACH ]\\nAccess AI core nodes.",
+      question: "WHICH COMMAND REMOVES A DIRECTORY RECURSIVELY?",
+      type: 'multiple-choice',
+      options: ['rm -r', 'mkdir', 'cp -r', 'ls'],
+      correct: 0,
+      explanation: "Core directories purged.",
+      icon: <Workflow className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'shutdown',
+      scenario: "[ FINAL OVERRIDE ]\\nIssue the shutdown directive.",
+      question: "TYPE THE COMMAND TO SHUTDOWN LINUX IMMEDIATELY:",
+      type: 'command',
+      correct: 'shutdown -h now',
+      explanation: "AI processes terminated. System offline.",
+      icon: <Terminal className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'reboot',
+      scenario: "[ SYSTEM REBOOT ]\\nRestart human-controlled network.",
+      question: "ENTER RESTART SEQUENCE 5-4-3-2",
+      type: 'sequence',
+      correct: '5432',
+      explanation: "Network rebooted. AI defeated.",
+      icon: <Radio className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'salvage',
+      sideQuest: true,
+      scenario: "[ SIDE QUEST ]\\nRecover server hardware for trade.",
+      question: "WHICH TOOL CHECKS DISK USAGE?",
+      type: 'multiple-choice',
+      options: ['df', 'top', 'who', 'ping'],
+      correct: 0,
+      explanation: "Disk usage displayed. Salvage successful.",
+      icon: <Database className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'decode',
+      sideQuest: true,
+      scenario: "[ SIDE QUEST ]\\nDecode a scrambled message.",
+      question: "DECODE BASE64 'Q09OVEFJTg=='",
+      type: 'command',
+      correct: 'CONTAIN',
+      explanation: "Message decoded for survivors.",
+      icon: <Cpu className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'patch',
+      sideQuest: true,
+      scenario: "[ SIDE QUEST ]\\nPatch security hole on ally server.",
+      question: "ENTER PATCH CODE 8-1-4-6",
+      type: 'sequence',
+      correct: '8146',
+      explanation: "Patch applied. Ally systems secure.",
+      icon: <Lock className="w-8 h-8 text-green-500" />
+    },
   ];
 
   const handleAnswer = (selectedIndex) => {
@@ -473,7 +689,7 @@ TIPS FOR THIS CHALLENGE:
         }
         return {
           ...prev,
-          message: "[ TRAINING COMPLETE ]\nAll security protocols mastered. Full access granted.",
+          message: "[ AI TERMINATED ]\nMainframe disabled and network restored.",
           showQuestion: false,
           gameCompleted: true,
           transitioning: false
