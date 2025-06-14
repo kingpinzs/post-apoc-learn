@@ -20,7 +20,8 @@ const initialState = {
     bootUp: true,
     inputCommand: '',
     sequenceInput: '',
-    correctSequence: '1234'
+    correctSequence: '1234',
+    gameCompleted: false
 };
 
 const ApocalypseGame = () => {
@@ -386,9 +387,15 @@ TIPS FOR THIS CHALLENGE:
       setGameState(prev => ({
         ...prev,
         message: "[ TRAINING COMPLETE ]\nAll security protocols mastered. Full access granted.",
-        showQuestion: false
+        showQuestion: false,
+        gameCompleted: true
       }));
     }
+  };
+
+  const restartGame = () => {
+    setGameState(initialState);
+    localStorage.removeItem('gameState');
   };
 
   const renderChallenge = () => {
@@ -623,6 +630,17 @@ TIPS FOR THIS CHALLENGE:
                 className="bg-red-900/30 border border-red-500 text-red-400 font-mono py-2 px-4 rounded-lg hover:bg-red-900/50 transition-colors"
               >
                 SYSTEM REBOOT
+              </button>
+            </div>
+          )}
+
+          {gameState.gameCompleted && (
+            <div className="text-center border border-green-500 rounded-lg p-4 mt-4">
+              <button
+                onClick={restartGame}
+                className="bg-green-900/30 border border-green-500 text-green-400 font-mono py-2 px-4 rounded-lg hover:bg-green-900/50 transition-colors"
+              >
+                RESTART TRAINING
               </button>
             </div>
           )}
