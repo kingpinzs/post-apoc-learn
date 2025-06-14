@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Card } from '../components/ui/card';
+import Particles from './Particles';
 import { 
   AlertCircle, Brain, Cpu, Beaker, Radio, Battery, Wifi, Signal,
   Lock, Shield, Database, Workflow, Terminal, Binary
@@ -21,7 +22,10 @@ const initialState = {
     inputCommand: '',
     sequenceInput: '',
     correctSequence: '1234',
-    gameCompleted: false
+    gameCompleted: false,
+    glitch: false,
+    showParticles: false,
+    transitioning: false
 };
 
 const ApocalypseGame = () => {
@@ -69,6 +73,24 @@ const ApocalypseGame = () => {
   useEffect(() => {
     localStorage.setItem('gameState', JSON.stringify(gameState));
   }, [gameState]);
+
+  useEffect(() => {
+    if (gameState.glitch) {
+      const t = setTimeout(() => {
+        setGameState(prev => ({ ...prev, glitch: false }));
+      }, 500);
+      return () => clearTimeout(t);
+    }
+  }, [gameState.glitch]);
+
+  useEffect(() => {
+    if (gameState.showParticles) {
+      const t = setTimeout(() => {
+        setGameState(prev => ({ ...prev, showParticles: false }));
+      }, 800);
+      return () => clearTimeout(t);
+    }
+  }, [gameState.showParticles]);
 
   const hints = {
     radiation: [
@@ -363,34 +385,42 @@ TIPS FOR THIS CHALLENGE:
       ...prev,
       health: correct ? prev.health : Math.max(0, prev.health - 20),
       knowledge: correct ? prev.knowledge + 25 : prev.knowledge,
-      message: correct ? 
-        `[ HACK SUCCESSFUL ]\n${currentLevel.explanation}` : 
-        "[ HACK FAILED ]\nSystem integrity compromised. Retry sequence...",
+      message: correct
+        ? `[ HACK SUCCESSFUL ]\n${currentLevel.explanation}`
+        : "[ HACK FAILED ]\nSystem integrity compromised. Retry sequence...",
       answeredCorrectly: correct,
       inputCommand: '',
-      sequenceInput: ''
+      sequenceInput: '',
+      glitch: !correct,
+      showParticles: correct
     }));
   };
 
   const nextLevel = () => {
-    if (gameState.currentLevel < levels.length - 1) {
-      setGameState(prev => ({
-        ...prev,
-        currentLevel: prev.currentLevel + 1,
-        message: levels[prev.currentLevel + 1].scenario,
-        answeredCorrectly: false,
-        showQuestion: false,
-        inputCommand: '',
-        sequenceInput: ''
-      }));
-    } else {
-      setGameState(prev => ({
-        ...prev,
-        message: "[ TRAINING COMPLETE ]\nAll security protocols mastered. Full access granted.",
-        showQuestion: false,
-        gameCompleted: true
-      }));
-    }
+    setGameState(prev => ({ ...prev, transitioning: true }));
+    setTimeout(() => {
+      setGameState(prev => {
+        if (prev.currentLevel < levels.length - 1) {
+          return {
+            ...prev,
+            currentLevel: prev.currentLevel + 1,
+            message: levels[prev.currentLevel + 1].scenario,
+            answeredCorrectly: false,
+            showQuestion: false,
+            inputCommand: '',
+            sequenceInput: '',
+            transitioning: false
+          };
+        }
+        return {
+          ...prev,
+          message: "[ TRAINING COMPLETE ]\nAll security protocols mastered. Full access granted.",
+          showQuestion: false,
+          gameCompleted: true,
+          transitioning: false
+        };
+      });
+    }, 300);
   };
 
   const restartGame = () => {
@@ -488,7 +518,9 @@ TIPS FOR THIS CHALLENGE:
 
   return (
     <div className="min-h-screen bg-black p-4 flex items-center justify-center">
+      <div className="matrix-bg" />
       <div className="w-full max-w-md relative">
+        <Particles trigger={gameState.showParticles} />
         {/* Device Frame */}
         <div className="absolute inset-0 border-2 border-green-500 rounded-3xl pointer-events-none"></div>
         
@@ -505,7 +537,7 @@ TIPS FOR THIS CHALLENGE:
           <Battery className="w-4 h-4 text-green-500" />
         </div>
 
-        <div className="p-6 bg-black rounded-b-3xl">
+        <div className={`p-6 bg-black rounded-b-3xl transition-opacity duration-500 ${gameState.transitioning ? 'opacity-0' : 'opacity-100'}`}>
           {/* System Stats */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="border border-green-500/30 rounded-lg p-2">
@@ -573,7 +605,7 @@ TIPS FOR THIS CHALLENGE:
               <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
             </div>
             
-            <pre className="text-green-400 font-mono text-sm mb-4 whitespace-pre-wrap">
+            <pre className={`text-green-400 font-mono text-sm mb-4 whitespace-pre-wrap ${gameState.glitch ? 'glitch' : ''}`}>
               {gameState.message}
             </pre>
 
