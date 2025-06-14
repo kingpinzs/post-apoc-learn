@@ -516,7 +516,7 @@ TIPS FOR THIS CHALLENGE:
               ))}
             </div>
             <div className="grid grid-cols-3 gap-2">
-              {[1,2,3,4,5,6,7,8,9].map(num => (
+              {[1,2,3,4,5,6,7,8,9,0].map(num => (
                 <button
                   key={num}
                   onClick={() => setGameState(prev => ({
@@ -706,7 +706,7 @@ TIPS FOR THIS CHALLENGE:
             <div className="text-center border border-red-500 rounded-lg p-4">
               <p className="text-red-500 font-mono mb-4">[ CRITICAL SYSTEM FAILURE ]</p>
               <button
-                onClick={() => window.location.reload()}
+                onClick={restartGame}
                 className="bg-red-900/30 border border-red-500 text-red-400 font-mono py-2 px-4 rounded-lg hover:bg-red-900/50 transition-colors"
               >
                 SYSTEM REBOOT
