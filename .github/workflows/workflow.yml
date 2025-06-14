@@ -15,29 +15,30 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    deployment: github-pages
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '21.x'
+          node-version: '21'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build
+      - name: Build React App
         run: npm run build
         env:
           CI: false
 
-      - name: Upload pages artifact
+      - name: Upload build directory to GitHub Pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
           path: ./build
 
       - name: Deploy to GitHub Pages
-        id: github-pages
+        id: deployment
         uses: actions/deploy-pages@v2
