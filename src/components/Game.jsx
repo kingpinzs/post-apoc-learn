@@ -1,36 +1,49 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import PropTypes from 'prop-types';
-import { Card } from '../components/ui/card';
-import Particles from './Particles';
-import { 
-  AlertCircle, Brain, Cpu, Beaker, Radio, Battery, Wifi, Signal,
-  Lock, Shield, Database, Workflow, Terminal, Binary
-} from 'lucide-react';
+import React, { useState, useEffect, useCallback } from "react";
+import PropTypes from "prop-types";
+import { Card } from "../components/ui/card";
+import Particles from "./Particles";
+import {
+  AlertCircle,
+  Brain,
+  Cpu,
+  Beaker,
+  Radio,
+  Battery,
+  Wifi,
+  Signal,
+  Lock,
+  Shield,
+  Database,
+  Workflow,
+  Terminal,
+  Binary,
+} from "lucide-react";
 
 const initialState = {
-    hintsAvailable: 3,
-    showHint: false,
-    currentHint: '',
-    showLearningModule: false,
-    health: 100,
-    knowledge: 0,
-    currentLevel: 0,
-    message: "INITIATING NEURAL INTERFACE...",
-    showQuestion: false,
-    answeredCorrectly: false,
-    bootUp: true,
-    inputCommand: '',
-    sequenceInput: '',
-    correctSequence: '1234',
-    gameCompleted: false,
-    glitch: false,
-    showParticles: false,
-    transitioning: false
+  hintsAvailable: 3,
+  showHint: false,
+  currentHint: "",
+  showLearningModule: false,
+  health: 100,
+  knowledge: 0,
+  currentLevel: 0,
+  message: "INITIATING NEURAL INTERFACE...",
+  showQuestion: false,
+  answeredCorrectly: false,
+  bootUp: true,
+  inputCommand: "",
+  sequenceInput: "",
+  blankInput: "",
+  correctSequence: "1234",
+  gameCompleted: false,
+  glitch: false,
+  showParticles: false,
+  transitioning: false,
 };
 
 const ApocalypseGame = () => {
   const [gameState, setGameState] = useState(() => {
-    const saved = localStorage.getItem('gameState');
+    const saved = localStorage.getItem("gameState");
     return saved ? JSON.parse(saved) : initialState;
   });
 
@@ -38,7 +51,7 @@ const ApocalypseGame = () => {
     (e) => {
       if (
         gameState.showQuestion &&
-        levels[gameState.currentLevel].type === 'sequence'
+        levels[gameState.currentLevel].type === "sequence"
       ) {
         if (/^\d$/.test(e.key)) {
           setGameState((prev) => ({
@@ -48,7 +61,7 @@ const ApocalypseGame = () => {
         }
       }
     },
-    [gameState.showQuestion, gameState.currentLevel]
+    [gameState.showQuestion, gameState.currentLevel],
   );
 
   useEffect(() => {
@@ -57,27 +70,27 @@ const ApocalypseGame = () => {
       bootTimeout = setTimeout(() => {
         setGameState((prev) => ({
           ...prev,
-          message: 'Welcome to SURVIV-OS v2.0. Commence hacking training...',
+          message: "Welcome to SURVIV-OS v2.0. Commence hacking training...",
           bootUp: false,
         }));
       }, 2000);
     }
 
-    window.addEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
     return () => {
       clearTimeout(bootTimeout);
-      window.removeEventListener('keydown', handleKeyPress);
+      window.removeEventListener("keydown", handleKeyPress);
     };
   }, [gameState.showQuestion, gameState.currentLevel, handleKeyPress]);
 
   useEffect(() => {
-    localStorage.setItem('gameState', JSON.stringify(gameState));
+    localStorage.setItem("gameState", JSON.stringify(gameState));
   }, [gameState]);
 
   useEffect(() => {
     if (gameState.glitch) {
       const t = setTimeout(() => {
-        setGameState(prev => ({ ...prev, glitch: false }));
+        setGameState((prev) => ({ ...prev, glitch: false }));
       }, 500);
       return () => clearTimeout(t);
     }
@@ -86,7 +99,7 @@ const ApocalypseGame = () => {
   useEffect(() => {
     if (gameState.showParticles) {
       const t = setTimeout(() => {
-        setGameState(prev => ({ ...prev, showParticles: false }));
+        setGameState((prev) => ({ ...prev, showParticles: false }));
       }, 800);
       return () => clearTimeout(t);
     }
@@ -94,108 +107,125 @@ const ApocalypseGame = () => {
 
   const hints = {
     radiation: [
-      'Think about the units used to measure absorbed radiation energy.',
-      'The Gray (Gy) measures energy absorbed per kilogram.',
-      '1 Gray = 1 joule per kilogram of absorbed radiation.',
-      'Use number keys 1-4 to select an option.'
+      "Think about the units used to measure absorbed radiation energy.",
+      "The Gray (Gy) measures energy absorbed per kilogram.",
+      "1 Gray = 1 joule per kilogram of absorbed radiation.",
+      "Use number keys 1-4 to select an option.",
     ],
     binary: [
-      'Break down the number into powers of 2.',
-      '13 = 8 + 4 + 1.',
-      '8 = 2³, 4 = 2², 1 = 2⁰.',
-      'You can type directly into the input field.'
+      "Break down the number into powers of 2.",
+      "13 = 8 + 4 + 1.",
+      "8 = 2³, 4 = 2², 1 = 2⁰.",
+      "You can type directly into the input field.",
     ],
     sequence: [
-      'Watch for patterns in the numbers.',
-      'Try entering the numbers in order.',
-      'The sequence follows a simple ascending pattern.',
-      'Use keyboard digits or on-screen buttons.'
+      "Watch for patterns in the numbers.",
+      "Try entering the numbers in order.",
+      "The sequence follows a simple ascending pattern.",
+      "Use keyboard digits or on-screen buttons.",
     ],
     database: [
-      'SQL queries filter data using WHERE clause.',
+      "SQL queries filter data using WHERE clause.",
       "The syntax should be: column='value'.",
       "We're looking for organic compounds.",
-      'Press Enter or VERIFY to submit.'
+      "Press Enter or VERIFY to submit.",
     ],
     cipher: [
-      'Shift each letter back by 3.',
-      'K -> H is your first clue.',
-      'Think of the alphabet looping around.',
-      'Type the decoded word.'
+      "Shift each letter back by 3.",
+      "K -> H is your first clue.",
+      "Think of the alphabet looping around.",
+      "Type the decoded word.",
     ],
     logic: [
-      'Three options are harmful programs.',
-      'Firewalls protect systems rather than attack.',
-      'Identify the defensive software.',
-      'Use number keys 1-4.'
+      "Three options are harmful programs.",
+      "Firewalls protect systems rather than attack.",
+      "Identify the defensive software.",
+      "Use number keys 1-4.",
     ],
     protocol: [
-      'Used by HTTPS to secure connections.',
-      'It replaced the older SSL standard.',
-      'Stands for Transport Layer Security.',
-      'Use number keys 1-4.'
+      "Used by HTTPS to secure connections.",
+      "It replaced the older SSL standard.",
+      "Stands for Transport Layer Security.",
+      "Use number keys 1-4.",
     ],
     base64: [
-      'Base64 groups characters into sets of four.',
-      'Padding often appears as = at the end.',
-      'U1VSVklWRQ== decodes to a single word.',
-      'Type the decoded text.'
+      "Base64 groups characters into sets of four.",
+      "Padding often appears as = at the end.",
+      "U1VSVklWRQ== decodes to a single word.",
+      "Type the decoded text.",
     ],
     override: [
-      'Digits flash briefly on the keypad.',
-      'Enter them exactly in that order.',
-      'DELETE removes the last digit.',
-      'Use on-screen buttons or keyboard.'
+      "Digits flash briefly on the keypad.",
+      "Enter them exactly in that order.",
+      "DELETE removes the last digit.",
+      "Use on-screen buttons or keyboard.",
     ],
     firewall: [
-      'Standard web traffic uses a common port.',
-      'Blocking that port stops HTTP requests.',
-      'HTTPS typically uses port 443 instead.',
-      'Use number keys 1-4.'
+      "Standard web traffic uses a common port.",
+      "Blocking that port stops HTTP requests.",
+      "HTTPS typically uses port 443 instead.",
+      "Use number keys 1-4.",
     ],
     network: [
-      'Multicast addresses begin with 224.',
-      'They are reserved for one-to-many traffic.',
-      'Class D is set aside for this purpose.',
-      'Use number keys 1-4.'
+      "Multicast addresses begin with 224.",
+      "They are reserved for one-to-many traffic.",
+      "Class D is set aside for this purpose.",
+      "Use number keys 1-4.",
     ],
     hash: [
-      'Look for a hashing algorithm, not encryption.',
-      'It outputs 64 hexadecimal characters.',
-      'Part of the SHA-2 family.',
-      'Use number keys 1-4.'
+      "Look for a hashing algorithm, not encryption.",
+      "It outputs 64 hexadecimal characters.",
+      "Part of the SHA-2 family.",
+      "Use number keys 1-4.",
     ],
     counterhack: [
-      'This command reveals each hop to a destination.',
-      'Useful when tracking adversaries across the net.',
-      'Often installed by default on Unix systems.',
-      'Use number keys 1-4.'
-    ]
+      "This command reveals each hop to a destination.",
+      "Useful when tracking adversaries across the net.",
+      "Often installed by default on Unix systems.",
+      "Use number keys 1-4.",
+    ],
+    ufwScript: [
+      "Set default policies before enabling the firewall.",
+      "Deny unsolicited incoming connections.",
+      "Allow SSH on port 22 so you do not lock yourself out.",
+      "Type the missing command in lowercase.",
+    ],
+    fail2ban: [
+      "Fail2ban monitors logs for repeated failures.",
+      "Start it as a system service with sufficient privileges.",
+      "Use systemctl with sudo to enable it at boot.",
+      "Type the full command.",
+    ],
   };
 
   const learningModules = {
-    'radiation': {
+    radiation: {
       title: "Radiation Measurement",
-      content: "Radiation dose is measured in Gray (Gy), which quantifies absorbed energy. 1 Gy equals 1 joule of radiation energy absorbed per kilogram of matter. This is crucial for radiation protection and medical applications.",
+      content:
+        "Radiation dose is measured in Gray (Gy), which quantifies absorbed energy. 1 Gy equals 1 joule of radiation energy absorbed per kilogram of matter. This is crucial for radiation protection and medical applications.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/radiation.svg`,
-      example: "Example: Dosimeters in nuclear facilities report exposure in Gray.",
-      resource: "surviv-os://docs/radiation"
+      example:
+        "Example: Dosimeters in nuclear facilities report exposure in Gray.",
+      resource: "surviv-os://docs/radiation",
     },
-    'binary': {
+    binary: {
       title: "Binary Conversion",
-      content: "To convert decimal to binary:\n1. Find the largest power of 2 that fits\n2. Subtract it and mark 1\n3. Repeat for remainder\n4. Mark 0 for missing powers\nExample: 13\n8(1) + 4(1) + 2(0) + 1(1) = 1101",
+      content:
+        "To convert decimal to binary:\n1. Find the largest power of 2 that fits\n2. Subtract it and mark 1\n3. Repeat for remainder\n4. Mark 0 for missing powers\nExample: 13\n8(1) + 4(1) + 2(0) + 1(1) = 1101",
       diagram: `${process.env.PUBLIC_URL}/diagrams/binary.svg`,
       example: "Example: Microcontrollers process instructions in binary form.",
-      resource: "surviv-os://docs/binary"
+      resource: "surviv-os://docs/binary",
     },
-    'sequence': {
+    sequence: {
       title: "Pattern Recognition",
-      content: "Sequences often follow patterns like:\n- Counting up/down\n- Mathematical operations\n- Repeating cycles\nLook for the simplest explanation first!",
+      content:
+        "Sequences often follow patterns like:\n- Counting up/down\n- Mathematical operations\n- Repeating cycles\nLook for the simplest explanation first!",
       diagram: `${process.env.PUBLIC_URL}/diagrams/sequence.svg`,
-      example: "Example: Authentication tokens often rely on numeric sequences.",
-      resource: "surviv-os://docs/sequences"
+      example:
+        "Example: Authentication tokens often rely on numeric sequences.",
+      resource: "surviv-os://docs/sequences",
     },
-    'database': {
+    database: {
       title: "SQL Injection & Database Hacking",
       content: `DATABASE FUNDAMENTALS:
 1. Tables store data in rows and columns.
@@ -227,414 +257,496 @@ TIPS FOR THIS CHALLENGE:
  3. Match the exact value (organic).
 4. Don't forget the = operator.`,
       diagram: `${process.env.PUBLIC_URL}/diagrams/database.svg`,
-      example: "Example: Querying customers WHERE active='true' fetches valid accounts.",
-      resource: "surviv-os://docs/database"
+      example:
+        "Example: Querying customers WHERE active='true' fetches valid accounts.",
+      resource: "surviv-os://docs/database",
     },
-    'cipher': {
+    cipher: {
       title: "Caesar Cipher",
-      content: "A Caesar cipher shifts letters by a fixed number. To decode, shift each letter backwards. Example: KHOOR shifted back by 3 becomes HELLO.",
+      content:
+        "A Caesar cipher shifts letters by a fixed number. To decode, shift each letter backwards. Example: KHOOR shifted back by 3 becomes HELLO.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/cipher.svg`,
-      example: "Example: Julius Caesar used a 3-letter shift to encrypt messages.",
-      resource: "surviv-os://docs/caesar"
+      example:
+        "Example: Julius Caesar used a 3-letter shift to encrypt messages.",
+      resource: "surviv-os://docs/caesar",
     },
-    'logic': {
+    logic: {
       title: "Malware Types",
-      content: "Trojans, worms and spyware are malicious software. Firewalls, on the other hand, defend systems against attacks.",
+      content:
+        "Trojans, worms and spyware are malicious software. Firewalls, on the other hand, defend systems against attacks.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/logic.svg`,
-      example: "Example: Firewalls act as gatekeepers to block malicious traffic.",
-      resource: "surviv-os://docs/malware"
+      example:
+        "Example: Firewalls act as gatekeepers to block malicious traffic.",
+      resource: "surviv-os://docs/malware",
     },
-    'protocol': {
+    protocol: {
       title: "Secure Protocols",
-      content: "TLS (Transport Layer Security) establishes encrypted connections and is widely used to secure web traffic.",
+      content:
+        "TLS (Transport Layer Security) establishes encrypted connections and is widely used to secure web traffic.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/protocol.svg`,
-      example: "Example: Websites like banks use TLS to protect data in transit.",
-      resource: "surviv-os://docs/tls"
+      example:
+        "Example: Websites like banks use TLS to protect data in transit.",
+      resource: "surviv-os://docs/tls",
     },
-    'base64': {
+    base64: {
       title: "Base64 Encoding",
-      content: "Base64 converts binary data into ASCII characters. Example: 'U1VSVklWRQ==' decodes to 'SURVIVE'.",
+      content:
+        "Base64 converts binary data into ASCII characters. Example: 'U1VSVklWRQ==' decodes to 'SURVIVE'.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/base64.svg`,
       example: "Example: Images in emails are often encoded in Base64.",
-      resource: "surviv-os://docs/base64"
+      resource: "surviv-os://docs/base64",
     },
-    'override': {
+    override: {
       title: "Keypad Overrides",
-      content: "Security keypads use numeric codes. Entering the correct sequence disables locks while mistakes can trigger alarms.",
+      content:
+        "Security keypads use numeric codes. Entering the correct sequence disables locks while mistakes can trigger alarms.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/override.svg`,
-      example: "Example: Keypads for secure doors can be overridden by entering master codes.",
-      resource: "surviv-os://docs/override"
+      example:
+        "Example: Keypads for secure doors can be overridden by entering master codes.",
+      resource: "surviv-os://docs/override",
     },
-    'firewall': {
+    firewall: {
       title: "Firewall Ports",
-      content: "Firewalls filter traffic by port number. Blocking port 80 stops standard HTTP traffic while HTTPS uses 443.",
+      content:
+        "Firewalls filter traffic by port number. Blocking port 80 stops standard HTTP traffic while HTTPS uses 443.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/firewall.svg`,
-      example: "Example: Administrators block port 80 to disable standard web access.",
-      resource: "surviv-os://docs/firewall"
+      example:
+        "Example: Administrators block port 80 to disable standard web access.",
+      resource: "surviv-os://docs/firewall",
     },
-    'network': {
+    network: {
       title: "IP Address Classes",
-      content: "Class D addresses (224.0.0.0–239.255.255.255) are reserved for multicast, enabling one-to-many communication.",
+      content:
+        "Class D addresses (224.0.0.0–239.255.255.255) are reserved for multicast, enabling one-to-many communication.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/network.svg`,
       example: "Example: IPTV streaming uses Class D multicast addresses.",
-      resource: "surviv-os://docs/multicast"
+      resource: "surviv-os://docs/multicast",
     },
-    'hash': {
+    hash: {
       title: "Cryptographic Hashes",
-      content: "SHA-256 generates a 256-bit digest used to verify data integrity. It is part of the SHA-2 family.",
+      content:
+        "SHA-256 generates a 256-bit digest used to verify data integrity. It is part of the SHA-2 family.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/hash.svg`,
-      example: "Example: Downloads often provide a SHA-256 checksum for verification.",
-      resource: "surviv-os://docs/sha256"
+      example:
+        "Example: Downloads often provide a SHA-256 checksum for verification.",
+      resource: "surviv-os://docs/sha256",
     },
-    'counterhack': {
+    counterhack: {
       title: "Traceroute Command",
-      content: "Traceroute maps the path packets take to a destination by sending packets with increasing TTL values. It helps reveal each intermediary hop and diagnose network issues.",
+      content:
+        "Traceroute maps the path packets take to a destination by sending packets with increasing TTL values. It helps reveal each intermediary hop and diagnose network issues.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/traceroute.svg`,
-      example: "Example: traceroute 8.8.8.8 displays hops to Google's DNS server.",
-      resource: "surviv-os://docs/traceroute"
+      example:
+        "Example: traceroute 8.8.8.8 displays hops to Google's DNS server.",
+      resource: "surviv-os://docs/traceroute",
     },
-    'infiltration': {
+    infiltration: {
       title: "Process Enumeration",
-      content: "The `ps` command lists active processes on Unix-like systems and is useful for spotting rogue tasks.",
+      content:
+        "The `ps` command lists active processes on Unix-like systems and is useful for spotting rogue tasks.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/infiltration.svg`,
-      example: "Example: ps aux | grep httpd shows running web server processes.",
-      resource: "surviv-os://docs/ps"
+      example:
+        "Example: ps aux | grep httpd shows running web server processes.",
+      resource: "surviv-os://docs/ps",
     },
-    'relay': {
+    relay: {
       title: "File Retrieval",
-      content: "`wget` downloads files from the web via HTTP, HTTPS or FTP protocols.",
+      content:
+        "`wget` downloads files from the web via HTTP, HTTPS or FTP protocols.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/relay.svg`,
       example: "Example: wget http://example.com/file.txt",
-      resource: "surviv-os://docs/wget"
+      resource: "surviv-os://docs/wget",
     },
-    'dataleak': {
+    dataleak: {
       title: "Secure Copy",
-      content: "SCP securely transfers files between hosts using SSH for encryption.",
+      content:
+        "SCP securely transfers files between hosts using SSH for encryption.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/dataleak.svg`,
       example: "Example: scp user@host:/path/file ./",
-      resource: "surviv-os://docs/scp"
+      resource: "surviv-os://docs/scp",
     },
-    'aiHub': {
+    aiHub: {
       title: "Access Codes",
-      content: "Critical systems often require numeric sequences for entry. Memorize the digits to proceed.",
+      content:
+        "Critical systems often require numeric sequences for entry. Memorize the digits to proceed.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/aihub.svg`,
       example: "Example: Access panels frequently use 4-digit pins.",
-      resource: "surviv-os://docs/access"
+      resource: "surviv-os://docs/access",
     },
-    'rootkit': {
+    rootkit: {
       title: "Permission Changes",
-      content: "The `chmod +x` command sets the executable bit on a file so it can run as a program.",
+      content:
+        "The `chmod +x` command sets the executable bit on a file so it can run as a program.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/rootkit.svg`,
       example: "Example: chmod +x exploit.sh",
-      resource: "surviv-os://docs/chmod"
+      resource: "surviv-os://docs/chmod",
     },
-    'isolate': {
+    isolate: {
       title: "Firewall Defaults",
-      content: "Setting a firewall's default policy to deny blocks all unsolicited incoming traffic.",
+      content:
+        "Setting a firewall's default policy to deny blocks all unsolicited incoming traffic.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/isolate.svg`,
       example: "Example: ufw default deny",
-      resource: "surviv-os://docs/ufw"
+      resource: "surviv-os://docs/ufw",
     },
-    'emp': {
+    ufwScript: {
+      title: "UFW Setup",
+      content:
+        "UFW (Uncomplicated Firewall) simplifies firewall configuration. Setting `default deny incoming` blocks unsolicited traffic while `ufw allow 22` permits SSH access before enabling the firewall.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/firewall.svg`,
+      example: "Example: ufw default deny incoming",
+      resource: "surviv-os://docs/ufw",
+    },
+    fail2ban: {
+      title: "Fail2ban Defense",
+      content:
+        "Fail2ban scans log files and bans IPs that show malicious signs, such as too many password failures. Running it as a service provides continual protection.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/firewall.svg`,
+      example: "Example: sudo systemctl enable --now fail2ban",
+      resource: "surviv-os://docs/fail2ban",
+    },
+    emp: {
       title: "EMP Deployment",
-      content: "Electromagnetic pulses can temporarily disable electronics and weaken defenses.",
+      content:
+        "Electromagnetic pulses can temporarily disable electronics and weaken defenses.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/emp.svg`,
       example: "Example: Tactical EMP grenades are used to disrupt drones.",
-      resource: "surviv-os://docs/emp"
+      resource: "surviv-os://docs/emp",
     },
-    'mainframe': {
+    mainframe: {
       title: "Recursive Removal",
-      content: "Use `rm -r` with caution to delete directories and their contents recursively.",
+      content:
+        "Use `rm -r` with caution to delete directories and their contents recursively.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/mainframe.svg`,
       example: "Example: rm -r /tmp/old_logs",
-      resource: "surviv-os://docs/rm"
+      resource: "surviv-os://docs/rm",
     },
-    'shutdown': {
+    shutdown: {
       title: "System Halt",
       content: "`shutdown -h now` immediately powers down a Unix-like system.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/shutdown.svg`,
       example: "Example: sudo shutdown -h now",
-      resource: "surviv-os://docs/shutdown"
+      resource: "surviv-os://docs/shutdown",
     },
-    'reboot': {
+    reboot: {
       title: "Restart Sequence",
-      content: "A final reboot brings systems back under human control after the AI is disabled.",
+      content:
+        "A final reboot brings systems back under human control after the AI is disabled.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/reboot.svg`,
       example: "Example: reboot",
-      resource: "surviv-os://docs/reboot"
+      resource: "surviv-os://docs/reboot",
     },
-    'salvage': {
+    salvage: {
       title: "Disk Usage",
-      content: "Use `df` to display disk space statistics on connected filesystems.",
+      content:
+        "Use `df` to display disk space statistics on connected filesystems.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/salvage.svg`,
       example: "Example: df -h",
-      resource: "surviv-os://docs/df"
+      resource: "surviv-os://docs/df",
     },
-    'decode': {
+    decode: {
       title: "Base64 Practice",
       content: "Decoding Base64 strings reveals their original text data.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/decode.svg`,
       example: "Example: echo SGVsbG8= | base64 -d",
-      resource: "surviv-os://docs/base64"
+      resource: "surviv-os://docs/base64",
     },
-    'patch': {
+    patch: {
       title: "Applying Fixes",
-      content: "Security patches often require inputting specific verification codes before deployment.",
+      content:
+        "Security patches often require inputting specific verification codes before deployment.",
       diagram: `${process.env.PUBLIC_URL}/diagrams/patch.svg`,
       example: "Example: patch < fix.diff",
-      resource: "surviv-os://docs/patch"
-    }
+      resource: "surviv-os://docs/patch",
+    },
   };
 
   const levels = [
     {
-      id: 'radiation',
-      scenario: "[ SECURITY BREACH DETECTED ]\nRadiation firewall compromised. Hack the system to restore protection.",
+      id: "radiation",
+      scenario:
+        "[ SECURITY BREACH DETECTED ]\nRadiation firewall compromised. Hack the system to restore protection.",
       question: "SELECT CORRECT RADIATION MEASUREMENT PROTOCOL:",
-      type: 'multiple-choice',
-      options: ["EXECUTE Gray.protocol", "RUN Volt.exe", "LOAD Pascal.sys", "START Candela.bin"],
+      type: "multiple-choice",
+      options: [
+        "EXECUTE Gray.protocol",
+        "RUN Volt.exe",
+        "LOAD Pascal.sys",
+        "START Candela.bin",
+      ],
       correct: 0,
-      explanation: "Gray.protocol successfully loaded. System calibrated to measure absorbed radiation dose at 1 joule/kg.",
-      icon: <Radio className="w-8 h-8 text-green-500" />
+      explanation:
+        "Gray.protocol successfully loaded. System calibrated to measure absorbed radiation dose at 1 joule/kg.",
+      icon: <Radio className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'binary',
-      scenario: "[ BINARY SEQUENCE REQUIRED ]\nNeural firewall requires binary authentication.",
+      id: "binary",
+      scenario:
+        "[ BINARY SEQUENCE REQUIRED ]\nNeural firewall requires binary authentication.",
       question: "CONVERT DECIMAL 13 TO BINARY:",
-      type: 'command',
+      type: "command",
       correct: "1101",
       explanation: "Binary conversion verified. Neural firewall updated.",
-      icon: <Binary className="w-8 h-8 text-green-500" />
+      icon: <Binary className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'sequence',
-      scenario: "[ SECURITY PATTERN DETECTED ]\nBypass quantum encryption using the correct sequence.",
+      id: "sequence",
+      scenario:
+        "[ SECURITY PATTERN DETECTED ]\nBypass quantum encryption using the correct sequence.",
       question: "ENTER THE DISPLAYED SEQUENCE: 1-2-3-4",
-      type: 'sequence',
+      type: "sequence",
       correct: "1234",
       explanation: "Sequence accepted. Quantum encryption bypassed.",
-      icon: <Lock className="w-8 h-8 text-green-500" />
+      icon: <Lock className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'database',
-      scenario: "[ DATABASE INFILTRATION REQUIRED ]\nChemical formula database locked. Execute SQL injection.",
+      id: "database",
+      scenario:
+        "[ DATABASE INFILTRATION REQUIRED ]\nChemical formula database locked. Execute SQL injection.",
       question: "COMPLETE THE QUERY:\nSELECT * FROM compounds WHERE",
-      type: 'command',
+      type: "command",
       correct: "type='organic'",
       explanation: "SQL injection successful. Chemical database accessed.",
-      icon: <Database className="w-8 h-8 text-green-500" />
+      icon: <Database className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'cipher',
-      scenario: "[ ENCRYPTED TRANSMISSION ]\nA short message was intercepted. Decrypt it.",
+      id: "cipher",
+      scenario:
+        "[ ENCRYPTED TRANSMISSION ]\nA short message was intercepted. Decrypt it.",
       question: "DECRYPT 'KHOOR' WITH CAESAR SHIFT 3:",
-      type: 'command',
-      correct: 'HELLO',
+      type: "command",
+      correct: "HELLO",
       explanation: "Message decrypted. Coordinates acquired.",
-      icon: <Cpu className="w-8 h-8 text-green-500" />
+      icon: <Cpu className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'logic',
+      id: "logic",
       scenario: "[ SECURITY AI CHALLENGE ]\nIdentify the non-malware item.",
-      question: "WHICH ITEM IS NOT MALICIOUS?\n1. Trojans\n2. Worms\n3. Firewalls\n4. Spyware",
-      type: 'multiple-choice',
-      options: ['Trojans', 'Worms', 'Firewalls', 'Spyware'],
+      question:
+        "WHICH ITEM IS NOT MALICIOUS?\n1. Trojans\n2. Worms\n3. Firewalls\n4. Spyware",
+      type: "multiple-choice",
+      options: ["Trojans", "Worms", "Firewalls", "Spyware"],
       correct: 2,
       explanation: "Correct. Firewalls are defensive software.",
-      icon: <Shield className="w-8 h-8 text-green-500" />
+      icon: <Shield className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'protocol',
-      scenario: "[ SECURE CHANNEL INITIATION ]\nEstablish a protected data link.",
+      id: "protocol",
+      scenario:
+        "[ SECURE CHANNEL INITIATION ]\nEstablish a protected data link.",
       question: "SELECT HANDSHAKE FOR ENCRYPTED COMMUNICATION:",
-      type: 'multiple-choice',
-      options: ['TLS', 'FTP', 'SMTP', 'IRC'],
+      type: "multiple-choice",
+      options: ["TLS", "FTP", "SMTP", "IRC"],
       correct: 0,
       explanation: "TLS handshake complete. Channel encrypted.",
-      icon: <Workflow className="w-8 h-8 text-green-500" />
+      icon: <Workflow className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'base64',
+      id: "base64",
       scenario: "[ ENCODED DATA BLOCK ]\nA message was captured in Base64.",
       question: "DECODE 'U1VSVklWRQ==' :",
-      type: 'command',
-      correct: 'SURVIVE',
+      type: "command",
+      correct: "SURVIVE",
       explanation: "Message decoded. Hidden directive obtained.",
-      icon: <Terminal className="w-8 h-8 text-green-500" />
+      icon: <Terminal className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'override',
-      scenario: "[ DOOR OVERRIDE ]\nSequence required to unlock the blast door.",
+      id: "override",
+      scenario:
+        "[ DOOR OVERRIDE ]\nSequence required to unlock the blast door.",
       question: "INPUT OVERRIDE CODE 4-2-0-3",
-      type: 'sequence',
-      correct: '4203',
+      type: "sequence",
+      correct: "4203",
       explanation: "Override accepted. Door unlocked.",
-      icon: <Lock className="w-8 h-8 text-green-500" />
+      icon: <Lock className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'firewall',
+      id: "firewall",
       scenario: "[ FIREWALL RECONFIGURATION ]\nMalicious traffic on port 80.",
       question: "WHICH PORT SHOULD BE BLOCKED TO STOP HTTP?",
-      type: 'multiple-choice',
-      options: ['80', '22', '53', '443'],
+      type: "multiple-choice",
+      options: ["80", "22", "53", "443"],
       correct: 0,
       explanation: "Port 80 blocked. Firewall updated.",
-      icon: <Shield className="w-8 h-8 text-green-500" />
+      icon: <Shield className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'network',
+      id: "network",
       scenario: "[ NETWORK SCAN ]\nIdentify the multicast IP class.",
-      question: "WHICH IP CLASS IS USED FOR MULTICASTING?\n1. Class A\n2. Class B\n3. Class D\n4. Class E",
-      type: 'multiple-choice',
-      options: ['Class A', 'Class B', 'Class D', 'Class E'],
+      question:
+        "WHICH IP CLASS IS USED FOR MULTICASTING?\n1. Class A\n2. Class B\n3. Class D\n4. Class E",
+      type: "multiple-choice",
+      options: ["Class A", "Class B", "Class D", "Class E"],
       correct: 2,
       explanation: "Class D reserved for multicast groups.",
-      icon: <Wifi className="w-8 h-8 text-green-500" />
+      icon: <Wifi className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'hash',
+      id: "hash",
       scenario: "[ DATA INTEGRITY CHECK ]\nCompute the SHA-256 digest.",
-      question: "WHICH ALGORITHM CREATES A 256-BIT HASH?\n1. MD5\n2. SHA-256\n3. AES\n4. RSA",
-      type: 'multiple-choice',
-      options: ['MD5', 'SHA-256', 'AES', 'RSA'],
+      question:
+        "WHICH ALGORITHM CREATES A 256-BIT HASH?\n1. MD5\n2. SHA-256\n3. AES\n4. RSA",
+      type: "multiple-choice",
+      options: ["MD5", "SHA-256", "AES", "RSA"],
       correct: 1,
       explanation: "SHA-256 selected. Data integrity verified.",
-      icon: <Beaker className="w-8 h-8 text-green-500" />
+      icon: <Beaker className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'counterhack',
-      scenario: "[ COUNTER-HACK OPERATION ]\nRival intruders detected on a government node. Trace their network path.",
+      id: "counterhack",
+      scenario:
+        "[ COUNTER-HACK OPERATION ]\nRival intruders detected on a government node. Trace their network path.",
       question: "SELECT THE COMMAND THAT TRACES HOPS TO AN IP:",
-      type: 'multiple-choice',
-      options: ['traceroute', 'wget', 'scp', 'netstat'],
+      type: "multiple-choice",
+      options: ["traceroute", "wget", "scp", "netstat"],
       correct: 0,
       explanation: "Traceroute executed. Attacker route mapped.",
-      icon: <Signal className="w-8 h-8 text-green-500" />
+      icon: <Signal className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'infiltration',
-      scenario: "[ AI OUTPOST DETECTED ]\\nInfiltrate the data center to locate AI core.",
+      id: "infiltration",
+      scenario:
+        "[ AI OUTPOST DETECTED ]\\nInfiltrate the data center to locate AI core.",
       question: "WHICH COMMAND LISTS ACTIVE PROCESSES ON LINUX?",
-      type: 'multiple-choice',
-      options: ['ps', 'ls', 'grep', 'kill'],
+      type: "multiple-choice",
+      options: ["ps", "ls", "grep", "kill"],
       correct: 0,
       explanation: "Processes listed. AI activities identified.",
-      icon: <Cpu className="w-8 h-8 text-green-500" />
+      icon: <Cpu className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'relay',
+      id: "relay",
       scenario: "[ SIGNAL INTERCEPTION ]\\nConnect to remote relay.",
       question: "ENTER COMMAND TO DOWNLOAD FILE FROM URL:",
-      type: 'command',
-      correct: 'wget',
+      type: "command",
+      correct: "wget",
       explanation: "File retrieved from remote relay.",
-      icon: <Wifi className="w-8 h-8 text-green-500" />
+      icon: <Wifi className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'dataleak',
+      id: "dataleak",
       scenario: "[ DATA LEAK ]\\nExfiltrate logs from compromised server.",
       question: "WHICH PROTOCOL TRANSFERS FILES SECURELY?",
-      type: 'multiple-choice',
-      options: ['FTP', 'HTTP', 'SCP', 'TELNET'],
+      type: "multiple-choice",
+      options: ["FTP", "HTTP", "SCP", "TELNET"],
       correct: 2,
       explanation: "Secure copy engaged. Logs extracted.",
-      icon: <Database className="w-8 h-8 text-green-500" />
+      icon: <Database className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'aiHub',
+      id: "aiHub",
       scenario: "[ AI HUB FOUND ]\\nAccess panel requires numeric code.",
       question: "INPUT ACCESS CODE 9-7-1-5",
-      type: 'sequence',
-      correct: '9715',
+      type: "sequence",
+      correct: "9715",
       explanation: "Access granted to inner hub.",
-      icon: <Lock className="w-8 h-8 text-green-500" />
+      icon: <Lock className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'rootkit',
+      id: "rootkit",
       scenario: "[ ROOTKIT DEPLOYMENT ]\\nInsert malicious module.",
       question: "TYPE COMMAND TO CHANGE FILE PERMISSIONS TO EXECUTABLE:",
-      type: 'command',
-      correct: 'chmod +x',
+      type: "command",
+      correct: "chmod +x",
       explanation: "Permissions modified. Module armed.",
-      icon: <Binary className="w-8 h-8 text-green-500" />
+      icon: <Binary className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'isolate',
+      id: "isolate",
       scenario: "[ CONTAINMENT PROTOCOL ]\\nIsolate AI network channels.",
       question: "WHICH FIREWALL COMMAND BLOCKS ALL INCOMING TRAFFIC?",
-      type: 'multiple-choice',
-      options: ['ufw enable', 'ufw default deny', 'ufw allow 22', 'ufw status'],
+      type: "multiple-choice",
+      options: ["ufw enable", "ufw default deny", "ufw allow 22", "ufw status"],
       correct: 1,
       explanation: "Incoming traffic blocked. AI quarantined.",
-      icon: <Shield className="w-8 h-8 text-green-500" />
+      icon: <Shield className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'emp',
+      id: "ufwScript",
+      scenario: "[ SYSTEM HARDENING ]\\nConfigure firewall rules with UFW.",
+      question: "COMPLETE THE SETUP SCRIPT:",
+      type: "script",
+      script: `ufw ____\nufw allow 22\nufw enable`,
+      correct: "default deny incoming",
+      explanation: "Firewall active with SSH access only.",
+      icon: <Shield className="w-8 h-8 text-green-500" />,
+    },
+    {
+      id: "fail2ban",
+      scenario: "[ INTRUSION PREVENTION ]\\nActivate fail2ban protection.",
+      question: "TYPE COMMAND TO ENABLE FAIL2BAN SERVICE:",
+      type: "command",
+      correct: "sudo systemctl enable --now fail2ban",
+      explanation: "Fail2ban running and enabled at boot.",
+      icon: <Lock className="w-8 h-8 text-green-500" />,
+    },
+    {
+      id: "emp",
       scenario: "[ POWER GRID DISRUPTION ]\\nDeploy EMP to weaken defenses.",
       question: "INPUT DEPLOY CODE 0-0-9-8",
-      type: 'sequence',
-      correct: '0098',
+      type: "sequence",
+      correct: "0098",
       explanation: "EMP triggered. Defenses weakened.",
-      icon: <Battery className="w-8 h-8 text-green-500" />
+      icon: <Battery className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'mainframe',
+      id: "mainframe",
       scenario: "[ MAINFRAME BREACH ]\\nAccess AI core nodes.",
       question: "WHICH COMMAND REMOVES A DIRECTORY RECURSIVELY?",
-      type: 'multiple-choice',
-      options: ['rm -r', 'mkdir', 'cp -r', 'ls'],
+      type: "multiple-choice",
+      options: ["rm -r", "mkdir", "cp -r", "ls"],
       correct: 0,
       explanation: "Core directories purged.",
-      icon: <Workflow className="w-8 h-8 text-green-500" />
+      icon: <Workflow className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'shutdown',
+      id: "shutdown",
       scenario: "[ FINAL OVERRIDE ]\\nIssue the shutdown directive.",
       question: "TYPE THE COMMAND TO SHUTDOWN LINUX IMMEDIATELY:",
-      type: 'command',
-      correct: 'shutdown -h now',
+      type: "command",
+      correct: "shutdown -h now",
       explanation: "AI processes terminated. System offline.",
-      icon: <Terminal className="w-8 h-8 text-green-500" />
+      icon: <Terminal className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'reboot',
+      id: "reboot",
       scenario: "[ SYSTEM REBOOT ]\\nRestart human-controlled network.",
       question: "ENTER RESTART SEQUENCE 5-4-3-2",
-      type: 'sequence',
-      correct: '5432',
+      type: "sequence",
+      correct: "5432",
       explanation: "Network rebooted. AI defeated.",
-      icon: <Radio className="w-8 h-8 text-green-500" />
+      icon: <Radio className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'salvage',
+      id: "salvage",
       sideQuest: true,
       scenario: "[ SIDE QUEST ]\\nRecover server hardware for trade.",
       question: "WHICH TOOL CHECKS DISK USAGE?",
-      type: 'multiple-choice',
-      options: ['df', 'top', 'who', 'ping'],
+      type: "multiple-choice",
+      options: ["df", "top", "who", "ping"],
       correct: 0,
       explanation: "Disk usage displayed. Salvage successful.",
-      icon: <Database className="w-8 h-8 text-green-500" />
+      icon: <Database className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'decode',
+      id: "decode",
       sideQuest: true,
       scenario: "[ SIDE QUEST ]\\nDecode a scrambled message.",
       question: "DECODE BASE64 'Q09OVEFJTg=='",
-      type: 'command',
-      correct: 'CONTAIN',
+      type: "command",
+      correct: "CONTAIN",
       explanation: "Message decoded for survivors.",
-      icon: <Cpu className="w-8 h-8 text-green-500" />
+      icon: <Cpu className="w-8 h-8 text-green-500" />,
     },
     {
-      id: 'patch',
+      id: "patch",
       sideQuest: true,
       scenario: "[ SIDE QUEST ]\\nPatch security hole on ally server.",
       question: "ENTER PATCH CODE 8-1-4-6",
-      type: 'sequence',
-      correct: '8146',
+      type: "sequence",
+      correct: "8146",
       explanation: "Patch applied. Ally systems secure.",
-      icon: <Lock className="w-8 h-8 text-green-500" />
+      icon: <Lock className="w-8 h-8 text-green-500" />,
     },
   ];
 
@@ -643,20 +755,27 @@ TIPS FOR THIS CHALLENGE:
     let correct = false;
 
     switch (currentLevel.type) {
-      case 'multiple-choice':
+      case "multiple-choice":
         correct = selectedIndex === currentLevel.correct;
         break;
-      case 'command':
-        correct = gameState.inputCommand.toLowerCase() === currentLevel.correct.toLowerCase();
+      case "command":
+        correct =
+          gameState.inputCommand.toLowerCase() ===
+          currentLevel.correct.toLowerCase();
         break;
-      case 'sequence':
+      case "sequence":
         correct = gameState.sequenceInput === currentLevel.correct;
+        break;
+      case "script":
+        correct =
+          gameState.blankInput.toLowerCase() ===
+          currentLevel.correct.toLowerCase();
         break;
       default:
         correct = false;
     }
-    
-    setGameState(prev => ({
+
+    setGameState((prev) => ({
       ...prev,
       health: correct ? prev.health : Math.max(0, prev.health - 20),
       knowledge: correct ? prev.knowledge + 25 : prev.knowledge,
@@ -664,17 +783,18 @@ TIPS FOR THIS CHALLENGE:
         ? `[ HACK SUCCESSFUL ]\n${currentLevel.explanation}`
         : "[ HACK FAILED ]\nSystem integrity compromised. Retry sequence...",
       answeredCorrectly: correct,
-      inputCommand: '',
-      sequenceInput: '',
+      inputCommand: "",
+      sequenceInput: "",
+      blankInput: "",
       glitch: !correct,
-      showParticles: correct
+      showParticles: correct,
     }));
   };
 
   const nextLevel = () => {
-    setGameState(prev => ({ ...prev, transitioning: true }));
+    setGameState((prev) => ({ ...prev, transitioning: true }));
     setTimeout(() => {
-      setGameState(prev => {
+      setGameState((prev) => {
         if (prev.currentLevel < levels.length - 1) {
           return {
             ...prev,
@@ -682,17 +802,20 @@ TIPS FOR THIS CHALLENGE:
             message: levels[prev.currentLevel + 1].scenario,
             answeredCorrectly: false,
             showQuestion: false,
-            inputCommand: '',
-            sequenceInput: '',
-            transitioning: false
+            inputCommand: "",
+            sequenceInput: "",
+            blankInput: "",
+            transitioning: false,
           };
         }
         return {
           ...prev,
-          message: "[ AI TERMINATED ]\nMainframe disabled and network restored.",
+          message:
+            "[ AI TERMINATED ]\nMainframe disabled and network restored.",
           showQuestion: false,
           gameCompleted: true,
-          transitioning: false
+          transitioning: false,
+          blankInput: "",
         };
       });
     }, 300);
@@ -700,14 +823,14 @@ TIPS FOR THIS CHALLENGE:
 
   const restartGame = () => {
     setGameState(initialState);
-    localStorage.removeItem('gameState');
+    localStorage.removeItem("gameState");
   };
 
   const renderChallenge = () => {
     const currentLevel = levels[gameState.currentLevel];
 
     switch (currentLevel.type) {
-      case 'multiple-choice':
+      case "multiple-choice":
         return (
           <div className="grid gap-3">
             {currentLevel.options.map((option, index) => (
@@ -721,8 +844,8 @@ TIPS FOR THIS CHALLENGE:
             ))}
           </div>
         );
-      
-      case 'command':
+
+      case "command":
         return (
           <div className="space-y-4">
             <div className="flex items-center border border-green-500/30 rounded-lg overflow-hidden">
@@ -730,7 +853,12 @@ TIPS FOR THIS CHALLENGE:
               <input
                 type="text"
                 value={gameState.inputCommand}
-                onChange={(e) => setGameState(prev => ({...prev, inputCommand: e.target.value}))}
+                onChange={(e) =>
+                  setGameState((prev) => ({
+                    ...prev,
+                    inputCommand: e.target.value,
+                  }))
+                }
                 className="flex-1 bg-transparent border-none text-green-400 font-mono p-2 focus:outline-none"
                 placeholder="Enter command..."
               />
@@ -744,34 +872,71 @@ TIPS FOR THIS CHALLENGE:
           </div>
         );
 
-      case 'sequence':
+      case "script":
+        return (
+          <div className="space-y-4">
+            <pre className="text-green-400 font-mono text-sm whitespace-pre-wrap border border-green-500/30 p-2 rounded">
+              {currentLevel.script}
+            </pre>
+            <div className="flex items-center border border-green-500/30 rounded-lg overflow-hidden">
+              <span className="text-green-500 px-2">&gt;</span>
+              <input
+                type="text"
+                value={gameState.blankInput}
+                onChange={(e) =>
+                  setGameState((prev) => ({
+                    ...prev,
+                    blankInput: e.target.value,
+                  }))
+                }
+                className="flex-1 bg-transparent border-none text-green-400 font-mono p-2 focus:outline-none"
+                placeholder="Fill the blank..."
+              />
+            </div>
+            <button
+              onClick={() => handleAnswer()}
+              className="w-full bg-green-900/30 border border-green-500 text-green-400 font-mono py-2 px-4 rounded-lg hover:bg-green-900/50 transition-colors"
+            >
+              EXECUTE
+            </button>
+          </div>
+        );
+
+      case "sequence":
         return (
           <div className="space-y-4">
             <div className="text-center text-green-400 font-mono">
-              {gameState.sequenceInput.split('').map((num, i) => (
-                <span key={i} className="mx-1 px-2 py-1 border border-green-500/30 rounded">
+              {gameState.sequenceInput.split("").map((num, i) => (
+                <span
+                  key={i}
+                  className="mx-1 px-2 py-1 border border-green-500/30 rounded"
+                >
                   {num}
                 </span>
               ))}
             </div>
             <div className="grid grid-cols-3 gap-2">
-              {[1,2,3,4,5,6,7,8,9,0].map(num => (
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((num) => (
                 <button
                   key={num}
-                  onClick={() => setGameState(prev => ({
-                    ...prev,
-                    sequenceInput: prev.sequenceInput + num
-                  }))}
+                  onClick={() =>
+                    setGameState((prev) => ({
+                      ...prev,
+                      sequenceInput: prev.sequenceInput + num,
+                    }))
+                  }
                   className="bg-black border border-green-500/30 text-green-400 font-mono p-2 rounded-lg hover:bg-green-900/30 transition-colors"
                 >
                   {num}
                 </button>
               ))}
               <button
-                onClick={() => setGameState(prev => ({
-                  ...prev,
-                  sequenceInput: prev.sequenceInput.slice(0, -1)
-                }))}
+                onClick={() =>
+                  setGameState((prev) => ({
+                    ...prev,
+                    sequenceInput: prev.sequenceInput.slice(0, -1),
+                  }))
+                }
                 className="col-span-2 bg-black border border-green-500/30 text-green-400 font-mono p-2 rounded-lg hover:bg-green-900/30 transition-colors"
               >
                 DELETE
@@ -798,7 +963,7 @@ TIPS FOR THIS CHALLENGE:
         <Particles trigger={gameState.showParticles} />
         {/* Device Frame */}
         <div className="absolute inset-0 border-2 border-green-500 rounded-3xl pointer-events-none"></div>
-        
+
         {/* Status Bar */}
         <div className="flex justify-between items-center p-4 border-b border-green-500/30">
           <div className="flex space-x-2">
@@ -812,7 +977,9 @@ TIPS FOR THIS CHALLENGE:
           <Battery className="w-4 h-4 text-green-500" />
         </div>
 
-        <div className={`p-6 bg-black rounded-b-3xl transition-opacity duration-500 ${gameState.transitioning ? 'opacity-0' : 'opacity-100'}`}>
+        <div
+          className={`p-6 bg-black rounded-b-3xl transition-opacity duration-500 ${gameState.transitioning ? "opacity-0" : "opacity-100"}`}
+        >
           {/* System Stats */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="border border-green-500/30 rounded-lg p-2">
@@ -820,7 +987,9 @@ TIPS FOR THIS CHALLENGE:
                 <AlertCircle className="w-4 h-4" />
                 <span className="text-xs">SYSTEM HEALTH</span>
               </div>
-              <div className="text-green-400 font-mono mt-1">{gameState.health}%</div>
+              <div className="text-green-400 font-mono mt-1">
+                {gameState.health}%
+              </div>
               <div className="h-2 bg-green-900 rounded overflow-hidden mt-1">
                 <div
                   className="h-full bg-green-500"
@@ -833,7 +1002,9 @@ TIPS FOR THIS CHALLENGE:
                 <Brain className="w-4 h-4" />
                 <span className="text-xs">NEURAL LINK</span>
               </div>
-              <div className="text-green-400 font-mono mt-1">{gameState.knowledge}%</div>
+              <div className="text-green-400 font-mono mt-1">
+                {gameState.knowledge}%
+              </div>
               <div className="h-2 bg-green-900 rounded overflow-hidden mt-1">
                 <div
                   className="h-full bg-green-500"
@@ -848,12 +1019,15 @@ TIPS FOR THIS CHALLENGE:
             <button
               onClick={() => {
                 if (gameState.hintsAvailable > 0) {
-                  setGameState(prev => ({
+                  setGameState((prev) => ({
                     ...prev,
                     hintsAvailable: prev.hintsAvailable - 1,
                     showHint: true,
-                    currentHint: hints[levels[gameState.currentLevel].id][2 - prev.hintsAvailable],
-                    showLearningModule: false
+                    currentHint:
+                      hints[levels[gameState.currentLevel].id][
+                        2 - prev.hintsAvailable
+                      ],
+                    showLearningModule: false,
                   }));
                 }
               }}
@@ -862,11 +1036,13 @@ TIPS FOR THIS CHALLENGE:
               HINT ({gameState.hintsAvailable})
             </button>
             <button
-              onClick={() => setGameState(prev => ({
-                ...prev,
-                showLearningModule: !prev.showLearningModule,
-                showHint: false
-              }))}
+              onClick={() =>
+                setGameState((prev) => ({
+                  ...prev,
+                  showLearningModule: !prev.showLearningModule,
+                  showHint: false,
+                }))
+              }
               className="bg-black border border-blue-500/30 text-blue-400 font-mono px-3 py-1 rounded-lg hover:bg-blue-900/30 transition-colors text-sm"
             >
               LEARN MORE
@@ -879,8 +1055,10 @@ TIPS FOR THIS CHALLENGE:
               {levels[gameState.currentLevel].icon}
               <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
             </div>
-            
-            <pre className={`text-green-400 font-mono text-sm mb-4 whitespace-pre-wrap ${gameState.glitch ? 'glitch' : ''}`}>
+
+            <pre
+              className={`text-green-400 font-mono text-sm mb-4 whitespace-pre-wrap ${gameState.glitch ? "glitch" : ""}`}
+            >
               {gameState.message}
             </pre>
 
@@ -892,47 +1070,60 @@ TIPS FOR THIS CHALLENGE:
               </div>
             )}
 
-            {gameState.showLearningModule && (
+            {gameState.showLearningModule &&
               (() => {
-                const module = learningModules[levels[gameState.currentLevel].id];
+                const module =
+                  learningModules[levels[gameState.currentLevel].id];
                 return (
                   <div className="border border-blue-500/30 rounded-lg p-3 mb-4 bg-blue-900/10">
                     <h3 className="text-blue-400 font-mono text-sm font-bold mb-2">
                       {module.title}
                     </h3>
-                    <img src={module.diagram} alt={`${module.title} diagram`} className="w-full h-auto mb-2" />
+                    <img
+                      src={module.diagram}
+                      alt={`${module.title} diagram`}
+                      className="w-full h-auto mb-2"
+                    />
                     <p className="text-blue-400 font-mono text-sm whitespace-pre-wrap">
                       {module.content}
                     </p>
                     <p className="text-blue-400 font-mono text-xs mt-2 italic">
                       {module.example}
                     </p>
-                    <a href={module.resource} className="text-blue-300 underline text-xs block mt-1">
+                    <a
+                      href={module.resource}
+                      className="text-blue-300 underline text-xs block mt-1"
+                    >
                       Additional resource
                     </a>
                   </div>
                 );
-              })()
-            )}
-            
-            {!gameState.showQuestion && !gameState.answeredCorrectly && !gameState.bootUp && (
-              <button 
-                onClick={() => setGameState(prev => ({...prev, showQuestion: true}))}
-                className="w-full bg-green-900/30 border border-green-500 text-green-400 font-mono py-2 px-4 rounded-lg hover:bg-green-900/50 transition-colors"
-              >
-                INITIATE HACK
-              </button>
-            )}
+              })()}
+
+            {!gameState.showQuestion &&
+              !gameState.answeredCorrectly &&
+              !gameState.bootUp && (
+                <button
+                  onClick={() =>
+                    setGameState((prev) => ({ ...prev, showQuestion: true }))
+                  }
+                  className="w-full bg-green-900/30 border border-green-500 text-green-400 font-mono py-2 px-4 rounded-lg hover:bg-green-900/50 transition-colors"
+                >
+                  INITIATE HACK
+                </button>
+              )}
 
             {gameState.showQuestion && !gameState.answeredCorrectly && (
               <div className="space-y-4">
-                <div className="text-green-400 font-mono mb-4">{levels[gameState.currentLevel].question}</div>
+                <div className="text-green-400 font-mono mb-4">
+                  {levels[gameState.currentLevel].question}
+                </div>
                 {renderChallenge()}
               </div>
             )}
 
             {gameState.answeredCorrectly && (
-              <button 
+              <button
                 onClick={nextLevel}
                 className="w-full bg-green-900/30 border border-green-500 text-green-400 font-mono py-2 px-4 rounded-lg hover:bg-green-900/50 transition-colors"
               >
@@ -943,7 +1134,9 @@ TIPS FOR THIS CHALLENGE:
 
           {gameState.health <= 0 && (
             <div className="text-center border border-red-500 rounded-lg p-4">
-              <p className="text-red-500 font-mono mb-4">[ CRITICAL SYSTEM FAILURE ]</p>
+              <p className="text-red-500 font-mono mb-4">
+                [ CRITICAL SYSTEM FAILURE ]
+              </p>
               <button
                 onClick={restartGame}
                 className="bg-red-900/30 border border-red-500 text-red-400 font-mono py-2 px-4 rounded-lg hover:bg-red-900/50 transition-colors"
