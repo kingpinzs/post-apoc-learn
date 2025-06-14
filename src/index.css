@@ -1,3 +1,47 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Matrix-style background */
+.matrix-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image: linear-gradient(180deg, rgba(0,255,0,0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
+  background-size: 4px 4px;
+  animation: matrix-fall 12s linear infinite;
+}
+
+@keyframes matrix-fall {
+  from { background-position-y: 0; }
+  to { background-position-y: 100%; }
+}
+
+/* Glitch effect */
+.glitch {
+  animation: glitch-skew 0.3s steps(2, end) 3;
+}
+
+@keyframes glitch-skew {
+  0% { transform: skew(0deg); }
+  50% { transform: skew(10deg); }
+  100% { transform: skew(0deg); }
+}
+
+/* Particle effects */
+.particle {
+  position: absolute;
+  bottom: 0;
+  width: 4px;
+  height: 4px;
+  background: #00ff00;
+  border-radius: 50%;
+  animation: particle-rise 0.8s linear forwards;
+}
+
+@keyframes particle-rise {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-150px); opacity: 0; }
+}
+
