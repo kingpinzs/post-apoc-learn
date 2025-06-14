@@ -170,15 +170,24 @@ const ApocalypseGame = () => {
   const learningModules = {
     'radiation': {
       title: "Radiation Measurement",
-      content: "Radiation dose is measured in Gray (Gy), which quantifies absorbed energy. 1 Gy equals 1 joule of radiation energy absorbed per kilogram of matter. This is crucial for radiation protection and medical applications."
+      content: "Radiation dose is measured in Gray (Gy), which quantifies absorbed energy. 1 Gy equals 1 joule of radiation energy absorbed per kilogram of matter. This is crucial for radiation protection and medical applications.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/radiation.svg`,
+      example: "Example: Dosimeters in nuclear facilities report exposure in Gray.",
+      resource: "surviv-os://docs/radiation"
     },
     'binary': {
       title: "Binary Conversion",
-      content: "To convert decimal to binary:\n1. Find the largest power of 2 that fits\n2. Subtract it and mark 1\n3. Repeat for remainder\n4. Mark 0 for missing powers\nExample: 13\n8(1) + 4(1) + 2(0) + 1(1) = 1101"
+      content: "To convert decimal to binary:\n1. Find the largest power of 2 that fits\n2. Subtract it and mark 1\n3. Repeat for remainder\n4. Mark 0 for missing powers\nExample: 13\n8(1) + 4(1) + 2(0) + 1(1) = 1101",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/binary.svg`,
+      example: "Example: Microcontrollers process instructions in binary form.",
+      resource: "surviv-os://docs/binary"
     },
     'sequence': {
       title: "Pattern Recognition",
-      content: "Sequences often follow patterns like:\n- Counting up/down\n- Mathematical operations\n- Repeating cycles\nLook for the simplest explanation first!"
+      content: "Sequences often follow patterns like:\n- Counting up/down\n- Mathematical operations\n- Repeating cycles\nLook for the simplest explanation first!",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/sequence.svg`,
+      example: "Example: Authentication tokens often rely on numeric sequences.",
+      resource: "surviv-os://docs/sequences"
     },
     'database': {
       title: "SQL Injection & Database Hacking",
@@ -209,40 +218,67 @@ Only use these techniques on authorized systems!
 TIPS FOR THIS CHALLENGE:
 1. Use single quotes around text values.
 2. Match the exact column name (type).
-3. Match the exact value (organic).
-4. Don't forget the = operator.`
+ 3. Match the exact value (organic).
+4. Don't forget the = operator.`,
+      diagram: `${process.env.PUBLIC_URL}/diagrams/database.svg`,
+      example: "Example: Querying customers WHERE active='true' fetches valid accounts.",
+      resource: "surviv-os://docs/database"
     },
     'cipher': {
       title: "Caesar Cipher",
-      content: "A Caesar cipher shifts letters by a fixed number. To decode, shift each letter backwards. Example: KHOOR shifted back by 3 becomes HELLO."
+      content: "A Caesar cipher shifts letters by a fixed number. To decode, shift each letter backwards. Example: KHOOR shifted back by 3 becomes HELLO.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/cipher.svg`,
+      example: "Example: Julius Caesar used a 3-letter shift to encrypt messages.",
+      resource: "surviv-os://docs/caesar"
     },
     'logic': {
       title: "Malware Types",
-      content: "Trojans, worms and spyware are malicious software. Firewalls, on the other hand, defend systems against attacks."
+      content: "Trojans, worms and spyware are malicious software. Firewalls, on the other hand, defend systems against attacks.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/logic.svg`,
+      example: "Example: Firewalls act as gatekeepers to block malicious traffic.",
+      resource: "surviv-os://docs/malware"
     },
     'protocol': {
       title: "Secure Protocols",
-      content: "TLS (Transport Layer Security) establishes encrypted connections and is widely used to secure web traffic."
+      content: "TLS (Transport Layer Security) establishes encrypted connections and is widely used to secure web traffic.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/protocol.svg`,
+      example: "Example: Websites like banks use TLS to protect data in transit.",
+      resource: "surviv-os://docs/tls"
     },
     'base64': {
       title: "Base64 Encoding",
-      content: "Base64 converts binary data into ASCII characters. Example: 'U1VSVklWRQ==' decodes to 'SURVIVE'."
+      content: "Base64 converts binary data into ASCII characters. Example: 'U1VSVklWRQ==' decodes to 'SURVIVE'.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/base64.svg`,
+      example: "Example: Images in emails are often encoded in Base64.",
+      resource: "surviv-os://docs/base64"
     },
     'override': {
       title: "Keypad Overrides",
-      content: "Security keypads use numeric codes. Entering the correct sequence disables locks while mistakes can trigger alarms."
+      content: "Security keypads use numeric codes. Entering the correct sequence disables locks while mistakes can trigger alarms.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/override.svg`,
+      example: "Example: Keypads for secure doors can be overridden by entering master codes.",
+      resource: "surviv-os://docs/override"
     },
     'firewall': {
       title: "Firewall Ports",
-      content: "Firewalls filter traffic by port number. Blocking port 80 stops standard HTTP traffic while HTTPS uses 443."
+      content: "Firewalls filter traffic by port number. Blocking port 80 stops standard HTTP traffic while HTTPS uses 443.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/firewall.svg`,
+      example: "Example: Administrators block port 80 to disable standard web access.",
+      resource: "surviv-os://docs/firewall"
     },
     'network': {
       title: "IP Address Classes",
-      content: "Class D addresses (224.0.0.0–239.255.255.255) are reserved for multicast, enabling one-to-many communication."
+      content: "Class D addresses (224.0.0.0–239.255.255.255) are reserved for multicast, enabling one-to-many communication.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/network.svg`,
+      example: "Example: IPTV streaming uses Class D multicast addresses.",
+      resource: "surviv-os://docs/multicast"
     },
     'hash': {
       title: "Cryptographic Hashes",
-      content: "SHA-256 generates a 256-bit digest used to verify data integrity. It is part of the SHA-2 family."
+      content: "SHA-256 generates a 256-bit digest used to verify data integrity. It is part of the SHA-2 family.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/hash.svg`,
+      example: "Example: Downloads often provide a SHA-256 checksum for verification.",
+      resource: "surviv-os://docs/sha256"
     }
   };
 
@@ -618,14 +654,26 @@ TIPS FOR THIS CHALLENGE:
             )}
 
             {gameState.showLearningModule && (
-              <div className="border border-blue-500/30 rounded-lg p-3 mb-4 bg-blue-900/10">
-                <h3 className="text-blue-400 font-mono text-sm font-bold mb-2">
-                  {learningModules[levels[gameState.currentLevel].id].title}
-                </h3>
-                <p className="text-blue-400 font-mono text-sm whitespace-pre-wrap">
-                  {learningModules[levels[gameState.currentLevel].id].content}
-                </p>
-              </div>
+              (() => {
+                const module = learningModules[levels[gameState.currentLevel].id];
+                return (
+                  <div className="border border-blue-500/30 rounded-lg p-3 mb-4 bg-blue-900/10">
+                    <h3 className="text-blue-400 font-mono text-sm font-bold mb-2">
+                      {module.title}
+                    </h3>
+                    <img src={module.diagram} alt={`${module.title} diagram`} className="w-full h-auto mb-2" />
+                    <p className="text-blue-400 font-mono text-sm whitespace-pre-wrap">
+                      {module.content}
+                    </p>
+                    <p className="text-blue-400 font-mono text-xs mt-2 italic">
+                      {module.example}
+                    </p>
+                    <a href={module.resource} className="text-blue-300 underline text-xs block mt-1">
+                      Additional resource
+                    </a>
+                  </div>
+                );
+              })()
             )}
             
             {!gameState.showQuestion && !gameState.answeredCorrectly && !gameState.bootUp && (
