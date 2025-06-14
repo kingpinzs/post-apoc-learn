@@ -93,6 +93,18 @@ const ApocalypseGame = () => {
       "The syntax should be: column='value'.",
       "We're looking for organic compounds.",
       'Press Enter or VERIFY to submit.'
+    ],
+    cipher: [
+      'Shift each letter back by 3.',
+      'K -> H is your first clue.',
+      'Think of the alphabet looping around.',
+      'Type the decoded word.'
+    ],
+    logic: [
+      'Three options are harmful programs.',
+      'Firewalls protect systems rather than attack.',
+      'Identify the defensive software.',
+      'Use number keys 1-4.'
     ]
   };
 
@@ -140,6 +152,14 @@ TIPS FOR THIS CHALLENGE:
 2. Match the exact column name (type).
 3. Match the exact value (organic).
 4. Don't forget the = operator.`
+    },
+    'cipher': {
+      title: "Caesar Cipher",
+      content: "A Caesar cipher shifts letters by a fixed number. To decode, shift each letter backwards. Example: KHOOR shifted back by 3 becomes HELLO."
+    },
+    'logic': {
+      title: "Malware Types",
+      content: "Trojans, worms and spyware are malicious software. Firewalls, on the other hand, defend systems against attacks."
     }
   };
 
@@ -180,6 +200,25 @@ TIPS FOR THIS CHALLENGE:
       correct: "type='organic'",
       explanation: "SQL injection successful. Chemical database accessed.",
       icon: <Database className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'cipher',
+      scenario: "[ ENCRYPTED TRANSMISSION ]\nA short message was intercepted. Decrypt it.",
+      question: "DECRYPT 'KHOOR' WITH CAESAR SHIFT 3:",
+      type: 'command',
+      correct: 'HELLO',
+      explanation: "Message decrypted. Coordinates acquired.",
+      icon: <Cpu className="w-8 h-8 text-green-500" />
+    },
+    {
+      id: 'logic',
+      scenario: "[ SECURITY AI CHALLENGE ]\nIdentify the non-malware item.",
+      question: "WHICH ITEM IS NOT MALICIOUS?\n1. Trojans\n2. Worms\n3. Firewalls\n4. Spyware",
+      type: 'multiple-choice',
+      options: ['Trojans', 'Worms', 'Firewalls', 'Spyware'],
+      correct: 2,
+      explanation: "Correct. Firewalls are defensive software.",
+      icon: <Shield className="w-8 h-8 text-green-500" />
     }
   ];
 
@@ -350,6 +389,12 @@ TIPS FOR THIS CHALLENGE:
                 <span className="text-xs">SYSTEM HEALTH</span>
               </div>
               <div className="text-green-400 font-mono mt-1">{gameState.health}%</div>
+              <div className="h-2 bg-green-900 rounded overflow-hidden mt-1">
+                <div
+                  className="h-full bg-green-500"
+                  style={{ width: `${gameState.health}%` }}
+                ></div>
+              </div>
             </div>
             <div className="border border-green-500/30 rounded-lg p-2">
               <div className="flex items-center space-x-2 text-green-500">
@@ -357,6 +402,12 @@ TIPS FOR THIS CHALLENGE:
                 <span className="text-xs">NEURAL LINK</span>
               </div>
               <div className="text-green-400 font-mono mt-1">{gameState.knowledge}%</div>
+              <div className="h-2 bg-green-900 rounded overflow-hidden mt-1">
+                <div
+                  className="h-full bg-green-500"
+                  style={{ width: `${gameState.knowledge}%` }}
+                ></div>
+              </div>
             </div>
           </div>
 
