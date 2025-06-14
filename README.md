@@ -2,6 +2,8 @@
 
 A small hacking-themed puzzle game built with React. Players progress through security challenges by answering questions, entering commands and sequences. Each correct answer boosts your neural link while mistakes drain system health.
 
+Immerse yourself in cinematic cyber missions where you outsmart rival hackers and oppressive regimes. Real command-line techniques are woven into each scenario so you learn as you infiltrate systems and defend your network.
+
 ## Running Locally
 
 1. Install dependencies

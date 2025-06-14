@@ -164,6 +164,12 @@ const ApocalypseGame = () => {
       'It outputs 64 hexadecimal characters.',
       'Part of the SHA-2 family.',
       'Use number keys 1-4.'
+    ],
+    counterhack: [
+      'This command reveals each hop to a destination.',
+      'Useful when tracking adversaries across the net.',
+      'Often installed by default on Unix systems.',
+      'Use number keys 1-4.'
     ]
   };
 
@@ -279,6 +285,13 @@ TIPS FOR THIS CHALLENGE:
       diagram: `${process.env.PUBLIC_URL}/diagrams/hash.svg`,
       example: "Example: Downloads often provide a SHA-256 checksum for verification.",
       resource: "surviv-os://docs/sha256"
+    },
+    'counterhack': {
+      title: "Traceroute Command",
+      content: "Traceroute maps the path packets take to a destination by sending packets with increasing TTL values. It helps reveal each intermediary hop and diagnose network issues.",
+      diagram: `${process.env.PUBLIC_URL}/diagrams/traceroute.svg`,
+      example: "Example: traceroute 8.8.8.8 displays hops to Google's DNS server.",
+      resource: "surviv-os://docs/traceroute"
     }
   };
 
@@ -396,7 +409,17 @@ TIPS FOR THIS CHALLENGE:
       correct: 1,
       explanation: "SHA-256 selected. Data integrity verified.",
       icon: <Beaker className="w-8 h-8 text-green-500" />
-    }
+    },
+    {
+      id: 'counterhack',
+      scenario: "[ COUNTER-HACK OPERATION ]\nRival intruders detected on a government node. Trace their network path.",
+      question: "SELECT THE COMMAND THAT TRACES HOPS TO AN IP:",
+      type: 'multiple-choice',
+      options: ['traceroute', 'wget', 'scp', 'netstat'],
+      correct: 0,
+      explanation: "Traceroute executed. Attacker route mapped.",
+      icon: <Signal className="w-8 h-8 text-green-500" />
+    },
   ];
 
   const handleAnswer = (selectedIndex) => {
