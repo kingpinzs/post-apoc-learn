@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import { Card } from '../components/ui/card';
 import { 
   AlertCircle, Brain, Cpu, Beaker, Radio, Battery, Wifi, Signal,
   Lock, Shield, Database, Workflow, Terminal, Binary
 } from 'lucide-react';
 
-const ApocalypseGame = () => {
-  const [gameState, setGameState] = useState({
+const initialState = {
     hintsAvailable: 3,
     showHint: false,
     currentHint: '',
@@ -21,53 +21,78 @@ const ApocalypseGame = () => {
     inputCommand: '',
     sequenceInput: '',
     correctSequence: '1234'
+};
+
+const ApocalypseGame = () => {
+  const [gameState, setGameState] = useState(() => {
+    const saved = localStorage.getItem('gameState');
+    return saved ? JSON.parse(saved) : initialState;
   });
 
+  const handleKeyPress = useCallback(
+    (e) => {
+      if (
+        gameState.showQuestion &&
+        levels[gameState.currentLevel].type === 'sequence'
+      ) {
+        if (/^\d$/.test(e.key)) {
+          setGameState((prev) => ({
+            ...prev,
+            sequenceInput: prev.sequenceInput + e.key,
+          }));
+        }
+      }
+    },
+    [gameState.showQuestion, gameState.currentLevel]
+  );
+
   useEffect(() => {
+    let bootTimeout;
     if (gameState.bootUp) {
-      setTimeout(() => {
-        setGameState(prev => ({
+      bootTimeout = setTimeout(() => {
+        setGameState((prev) => ({
           ...prev,
-          message: "Welcome to SURVIV-OS v2.0. Commence hacking training...",
-          bootUp: false
+          message: 'Welcome to SURVIV-OS v2.0. Commence hacking training...',
+          bootUp: false,
         }));
       }, 2000);
     }
 
-    // Add keyboard listener for number sequences
-    const handleKeyPress = (e) => {
-      if (gameState.showQuestion && levels[gameState.currentLevel].type === 'sequence') {
-        setGameState(prev => ({
-          ...prev,
-          sequenceInput: prev.sequenceInput + e.key
-        }));
-      }
-    };
-
     window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [gameState.showQuestion, gameState.currentLevel]);
+    return () => {
+      clearTimeout(bootTimeout);
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [gameState.showQuestion, gameState.currentLevel, handleKeyPress]);
 
-    const hints = {
-    'radiation': [
-      "Think about the units used to measure absorbed radiation energy",
-      "The Gray (Gy) measures energy absorbed per kilogram",
-      "1 Gray = 1 joule per kilogram of absorbed radiation"
+  useEffect(() => {
+    localStorage.setItem('gameState', JSON.stringify(gameState));
+  }, [gameState]);
+
+  const hints = {
+    radiation: [
+      'Think about the units used to measure absorbed radiation energy.',
+      'The Gray (Gy) measures energy absorbed per kilogram.',
+      '1 Gray = 1 joule per kilogram of absorbed radiation.',
+      'Use number keys 1-4 to select an option.'
     ],
-    'binary': [
-      "Break down the number into powers of 2",
-      "13 = 8 + 4 + 1",
-      "8 = 2³, 4 = 2², 1 = 2⁰"
+    binary: [
+      'Break down the number into powers of 2.',
+      '13 = 8 + 4 + 1.',
+      '8 = 2³, 4 = 2², 1 = 2⁰.',
+      'You can type directly into the input field.'
     ],
-    'sequence': [
-      "Watch for patterns in the numbers",
-      "Try entering the numbers in order",
-      "The sequence follows a simple ascending pattern"
+    sequence: [
+      'Watch for patterns in the numbers.',
+      'Try entering the numbers in order.',
+      'The sequence follows a simple ascending pattern.',
+      'Use keyboard digits or on-screen buttons.'
     ],
-    'database': [
-      "SQL queries filter data using WHERE clause",
-      "The syntax should be: column='value'",
-      "We're looking for organic compounds"
+    database: [
+      'SQL queries filter data using WHERE clause.',
+      "The syntax should be: column='value'.",
+      "We're looking for organic compounds.",
+      'Press Enter or VERIFY to submit.'
     ]
   };
 
@@ -87,9 +112,9 @@ const ApocalypseGame = () => {
     'database': {
       title: "SQL Injection & Database Hacking",
       content: `DATABASE FUNDAMENTALS:
-1. Tables store data in rows and columns
-2. SQL commands control data access
-3. WHERE clause filters data
+1. Tables store data in rows and columns.
+2. SQL commands control data access.
+3. WHERE clause filters data.
 
 BASIC SQL STRUCTURE:
 SELECT * FROM compounds
@@ -103,18 +128,18 @@ LIKE Pattern matching
 AND Multiple conditions
 
 INJECTION TECHNIQUES:
-- Simple Match: type='organic'
-- Multiple Conditions: type='organic' AND toxic='false'
-- Pattern Match: name LIKE 'acid%'
+- Simple Match: type='organic'.
+- Multiple Conditions: type='organic' AND toxic='false'.
+- Pattern Match: name LIKE 'acid%'.
 
 SAFETY REMINDER:
 Only use these techniques on authorized systems!
 
 TIPS FOR THIS CHALLENGE:
-1. Use single quotes around text values
-2. Match the exact column name (type)
-3. Match the exact value (organic)
-4. Don't forget the = operator`
+1. Use single quotes around text values.
+2. Match the exact column name (type).
+3. Match the exact value (organic).
+4. Don't forget the = operator.`
     }
   };
 
@@ -310,6 +335,9 @@ TIPS FOR THIS CHALLENGE:
             <Wifi className="w-4 h-4 text-green-500" />
           </div>
           <div className="text-green-500 text-xs">SURVIV-OS v2.0</div>
+          <div className="text-green-500 text-xs">
+            {gameState.currentLevel + 1}/{levels.length}
+          </div>
           <Battery className="w-4 h-4 text-green-500" />
         </div>
 
@@ -436,3 +464,5 @@ TIPS FOR THIS CHALLENGE:
 };
 
 export default ApocalypseGame;
+
+ApocalypseGame.propTypes = {};
