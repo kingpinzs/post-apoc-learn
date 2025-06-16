@@ -19,6 +19,26 @@ import {
   Binary,
 } from "lucide-react";
 
+const toolData = {
+  firewall: { cost: 50 },
+  antivirus: { cost: 30 },
+  patch: { cost: 40 },
+};
+
+const attacks = [
+  { id: "ddos", message: "DDoS attack detected!", tool: "firewall" },
+  {
+    id: "malware",
+    message: "Malware infiltration in progress!",
+    tool: "antivirus",
+  },
+  {
+    id: "exploit",
+    message: "Zero-day exploit targeting servers!",
+    tool: "patch",
+  },
+];
+
 const initialState = {
   hintsAvailable: 3,
   showHint: false,
@@ -39,6 +59,10 @@ const initialState = {
   glitch: false,
   showParticles: false,
   transitioning: false,
+  credits: 100,
+  inventory: { firewall: true },
+  activeAttack: null,
+  showBuyCraft: null,
 };
 
 const ApocalypseGame = () => {
@@ -104,6 +128,39 @@ const ApocalypseGame = () => {
       return () => clearTimeout(t);
     }
   }, [gameState.showParticles]);
+
+  useEffect(() => {
+    if (
+      !gameState.bootUp &&
+      !gameState.gameCompleted &&
+      gameState.activeAttack === null
+    ) {
+      const timeout = setTimeout(
+        () => {
+          const attack = attacks[Math.floor(Math.random() * attacks.length)];
+          setGameState((prev) => ({
+            ...prev,
+            activeAttack: attack,
+            message: `[ WARNING ] ${attack.message}`,
+          }));
+        },
+        Math.random() * 15000 + 10000,
+      );
+      return () => clearTimeout(timeout);
+    }
+  }, [gameState.bootUp, gameState.gameCompleted, gameState.activeAttack]);
+
+  useEffect(() => {
+    if (gameState.activeAttack) {
+      const dmg = setInterval(() => {
+        setGameState((prev) => ({
+          ...prev,
+          health: Math.max(0, prev.health - 5),
+        }));
+      }, 5000);
+      return () => clearInterval(dmg);
+    }
+  }, [gameState.activeAttack]);
 
   const hints = {
     radiation: [
@@ -826,6 +883,48 @@ TIPS FOR THIS CHALLENGE:
     localStorage.removeItem("gameState");
   };
 
+  const handleUseTool = (toolId) => {
+    if (!gameState.activeAttack) return;
+    if (gameState.activeAttack.tool === toolId) {
+      if (gameState.inventory[toolId]) {
+        setGameState((prev) => ({
+          ...prev,
+          activeAttack: null,
+          message: `[ DEFENSE DEPLOYED ] ${toolId.toUpperCase()} neutralized attack.`,
+        }));
+      } else {
+        setGameState((prev) => ({ ...prev, showBuyCraft: toolId }));
+      }
+    }
+  };
+
+  const handleBuyTool = (toolId) => {
+    const cost = toolData[toolId].cost;
+    if (gameState.credits >= cost) {
+      setGameState((prev) => ({
+        ...prev,
+        credits: prev.credits - cost,
+        inventory: { ...prev.inventory, [toolId]: true },
+        showBuyCraft: null,
+        message: `[ PURCHASED ] ${toolId.toUpperCase()} ready.`,
+      }));
+    } else {
+      setGameState((prev) => ({
+        ...prev,
+        message: "Not enough credits to purchase " + toolId + ".",
+      }));
+    }
+  };
+
+  const handleCraftTool = (toolId) => {
+    setGameState((prev) => ({
+      ...prev,
+      inventory: { ...prev.inventory, [toolId]: true },
+      showBuyCraft: null,
+      message: `[ CRAFTED ] ${toolId.toUpperCase()} assembled.`,
+    }));
+  };
+
   const renderChallenge = () => {
     const currentLevel = levels[gameState.currentLevel];
 
@@ -974,14 +1073,23 @@ TIPS FOR THIS CHALLENGE:
           <div className="text-green-500 text-xs">
             {gameState.currentLevel + 1}/{levels.length}
           </div>
+          <div className="text-green-500 text-xs">
+            CREDITS: {gameState.credits}
+          </div>
           <Battery className="w-4 h-4 text-green-500" />
         </div>
+
+        {gameState.activeAttack && (
+          <div className="bg-red-900/30 border-b border-red-500 text-red-400 text-center font-mono text-xs py-1 animate-pulse">
+            {gameState.activeAttack.message}
+          </div>
+        )}
 
         <div
           className={`p-6 bg-black rounded-b-3xl transition-opacity duration-500 ${gameState.transitioning ? "opacity-0" : "opacity-100"}`}
         >
           {/* System Stats */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="border border-green-500/30 rounded-lg p-2">
               <div className="flex items-center space-x-2 text-green-500">
                 <AlertCircle className="w-4 h-4" />
@@ -1012,7 +1120,52 @@ TIPS FOR THIS CHALLENGE:
                 ></div>
               </div>
             </div>
+            <div className="border border-green-500/30 rounded-lg p-2">
+              <div className="flex items-center space-x-2 text-green-500">
+                <Beaker className="w-4 h-4" />
+                <span className="text-xs">CREDITS</span>
+              </div>
+              <div className="text-green-400 font-mono mt-1">
+                {gameState.credits}
+              </div>
+            </div>
           </div>
+
+          {/* Tools */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {Object.keys(gameState.inventory).map((tool) => (
+              <button
+                key={tool}
+                onClick={() => handleUseTool(tool)}
+                className="bg-black border border-green-500/30 text-green-400 font-mono px-3 py-1 rounded-lg hover:bg-green-900/30 text-xs"
+              >
+                {tool.toUpperCase()}
+              </button>
+            ))}
+          </div>
+
+          {gameState.showBuyCraft && (
+            <div className="border border-blue-500/30 rounded-lg p-3 mb-4 bg-blue-900/10">
+              <p className="text-blue-400 font-mono text-sm mb-2">
+                Acquire {gameState.showBuyCraft.toUpperCase()} to stop the
+                attack.
+              </p>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handleBuyTool(gameState.showBuyCraft)}
+                  className="bg-black border border-green-500/30 text-green-400 font-mono px-3 py-1 rounded-lg hover:bg-green-900/30 text-xs"
+                >
+                  BUY (-{toolData[gameState.showBuyCraft].cost})
+                </button>
+                <button
+                  onClick={() => handleCraftTool(gameState.showBuyCraft)}
+                  className="bg-black border border-green-500/30 text-green-400 font-mono px-3 py-1 rounded-lg hover:bg-green-900/30 text-xs"
+                >
+                  CRAFT
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Help System */}
           <div className="flex justify-between mb-4">
