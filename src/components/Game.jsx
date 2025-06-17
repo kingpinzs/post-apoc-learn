@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { Card } from "../components/ui/card";
 import Particles from "./Particles";
+import GlitchEffect from "./GlitchEffect";
 import DragCommandBlock from "./drag/DragCommandBlock";
 import DropZone from "./drag/DropZone";
+import GameOver from "./GameOver";
 import {
   AlertCircle,
   Brain,
@@ -65,11 +67,15 @@ const initialState = {
   inventory: { firewall: true },
   activeAttack: null,
   showBuyCraft: null,
+  damageTaken: 0,
+  threatsStopped: 0,
+  unlockedItems: [],
 };
 
-const ApocalypseGame = () => {
+const ApocalypseGame = ({ practice = false }) => {
+  const storageKey = practice ? "practiceState" : "gameState";
   const [gameState, setGameState] = useState(() => {
-    const saved = localStorage.getItem("gameState");
+    const saved = localStorage.getItem(storageKey);
     if (saved) {
       const parsed = JSON.parse(saved);
       return {
@@ -79,6 +85,17 @@ const ApocalypseGame = () => {
           ...initialState.inventory,
           ...(parsed.inventory || {}),
         },
+      };
+    }
+    if (practice) {
+      return {
+        ...initialState,
+        credits: 9999,
+        inventory: Object.keys(toolData).reduce(
+          (acc, t) => ({ ...acc, [t]: true }),
+          {}
+        ),
+        unlockedItems: Object.keys(toolData),
       };
     }
     return initialState;
@@ -121,8 +138,8 @@ const ApocalypseGame = () => {
   }, [gameState.showQuestion, gameState.currentLevel, handleKeyPress]);
 
   useEffect(() => {
-    localStorage.setItem("gameState", JSON.stringify(gameState));
-  }, [gameState]);
+    localStorage.setItem(storageKey, JSON.stringify(gameState));
+  }, [gameState, storageKey]);
 
   useEffect(() => {
     if (gameState.glitch) {
@@ -144,36 +161,40 @@ const ApocalypseGame = () => {
 
   useEffect(() => {
     if (
-      !gameState.bootUp &&
-      !gameState.gameCompleted &&
-      gameState.activeAttack === null
+      practice ||
+      gameState.bootUp ||
+      gameState.gameCompleted ||
+      gameState.activeAttack !== null
     ) {
-      const timeout = setTimeout(
-        () => {
-          const attack = attacks[Math.floor(Math.random() * attacks.length)];
-          setGameState((prev) => ({
-            ...prev,
-            activeAttack: attack,
-            message: `[ WARNING ] ${attack.message}`,
-          }));
-        },
-        Math.random() * 15000 + 10000,
-      );
-      return () => clearTimeout(timeout);
+      return;
     }
-  }, [gameState.bootUp, gameState.gameCompleted, gameState.activeAttack]);
+    const timeout = setTimeout(() => {
+      const attack = attacks[Math.floor(Math.random() * attacks.length)];
+      setGameState((prev) => ({
+        ...prev,
+        activeAttack: attack,
+        message: `[ WARNING ] ${attack.message}`,
+      }));
+    }, Math.random() * 15000 + 10000);
+    return () => clearTimeout(timeout);
+  }, [practice, gameState.bootUp, gameState.gameCompleted, gameState.activeAttack]);
 
   useEffect(() => {
-    if (gameState.activeAttack) {
-      const dmg = setInterval(() => {
-        setGameState((prev) => ({
-          ...prev,
-          health: Math.max(0, prev.health - 5),
-        }));
-      }, 5000);
-      return () => clearInterval(dmg);
+    if (practice || !gameState.activeAttack) {
+      return;
     }
-  }, [gameState.activeAttack]);
+    const dmg = setInterval(() => {
+      setGameState((prev) => {
+        const newHealth = Math.max(0, prev.health - 5);
+        return {
+          ...prev,
+          health: newHealth,
+          damageTaken: prev.damageTaken + (prev.health - newHealth),
+        };
+      });
+    }, 5000);
+    return () => clearInterval(dmg);
+  }, [practice, gameState.activeAttack]);
 
   const hints = {
     radiation: [
@@ -850,20 +871,26 @@ TIPS FOR THIS CHALLENGE:
         correct = false;
     }
 
-    setGameState((prev) => ({
-      ...prev,
-      health: correct ? prev.health : Math.max(0, prev.health - 20),
-      knowledge: correct ? prev.knowledge + 25 : prev.knowledge,
-      message: correct
-        ? `[ HACK SUCCESSFUL ]\n${currentLevel.explanation}`
-        : "[ HACK FAILED ]\nSystem integrity compromised. Retry sequence...",
-      answeredCorrectly: correct,
-      inputCommand: "",
-      sequenceInput: "",
-      blankInput: "",
-      glitch: !correct,
-      showParticles: correct,
-    }));
+    setGameState((prev) => {
+      const newHealth = correct ? prev.health : Math.max(0, prev.health - 20);
+      return {
+        ...prev,
+        health: newHealth,
+        damageTaken: correct
+          ? prev.damageTaken
+          : prev.damageTaken + (prev.health - newHealth),
+        knowledge: correct ? prev.knowledge + 25 : prev.knowledge,
+        message: correct
+          ? `[ HACK SUCCESSFUL ]\n${currentLevel.explanation}`
+          : "[ HACK FAILED ]\nSystem integrity compromised. Retry sequence...",
+        answeredCorrectly: correct,
+        inputCommand: "",
+        sequenceInput: "",
+        blankInput: "",
+        glitch: !correct,
+        showParticles: correct,
+      };
+    });
   };
 
   const nextLevel = () => {
@@ -897,8 +924,19 @@ TIPS FOR THIS CHALLENGE:
   };
 
   const restartGame = () => {
-    setGameState(initialState);
-    localStorage.removeItem("gameState");
+    const baseState = practice
+      ? {
+          ...initialState,
+          credits: 9999,
+          inventory: Object.keys(toolData).reduce(
+            (acc, t) => ({ ...acc, [t]: true }),
+            {}
+          ),
+          unlockedItems: Object.keys(toolData),
+        }
+      : initialState;
+    setGameState(baseState);
+    localStorage.removeItem(storageKey);
   };
 
   const handleUseTool = (toolId) => {
@@ -909,6 +947,7 @@ TIPS FOR THIS CHALLENGE:
           ...prev,
           activeAttack: null,
           message: `[ DEFENSE DEPLOYED ] ${toolId.toUpperCase()} neutralized attack.`,
+          threatsStopped: prev.threatsStopped + 1,
         }));
       } else {
         setGameState((prev) => ({ ...prev, showBuyCraft: toolId }));
@@ -925,6 +964,9 @@ TIPS FOR THIS CHALLENGE:
         inventory: { ...prev.inventory, [toolId]: true },
         showBuyCraft: null,
         message: `[ PURCHASED ] ${toolId.toUpperCase()} ready.`,
+        unlockedItems: prev.unlockedItems.includes(toolId)
+          ? prev.unlockedItems
+          : [...prev.unlockedItems, toolId],
       }));
     } else {
       setGameState((prev) => ({
@@ -940,6 +982,9 @@ TIPS FOR THIS CHALLENGE:
       inventory: { ...prev.inventory, [toolId]: true },
       showBuyCraft: null,
       message: `[ CRAFTED ] ${toolId.toUpperCase()} assembled.`,
+      unlockedItems: prev.unlockedItems.includes(toolId)
+        ? prev.unlockedItems
+        : [...prev.unlockedItems, toolId],
     }));
   };
 
@@ -1225,11 +1270,15 @@ TIPS FOR THIS CHALLENGE:
               <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
             </div>
 
-            <pre
-              className={`text-green-400 font-mono text-sm mb-4 whitespace-pre-wrap ${gameState.glitch ? "glitch" : ""}`}
+            <GlitchEffect
+              intensity={6}
+              duration={500}
+              active={gameState.glitch}
             >
-              {gameState.message}
-            </pre>
+              <pre className="text-green-400 font-mono text-sm mb-4 whitespace-pre-wrap">
+                {gameState.message}
+              </pre>
+            </GlitchEffect>
 
             {gameState.showHint && (
               <div className="border border-yellow-500/30 rounded-lg p-3 mb-4 bg-yellow-900/10">
@@ -1302,17 +1351,24 @@ TIPS FOR THIS CHALLENGE:
           </div>
 
           {gameState.health <= 0 && (
-            <div className="text-center border border-red-500 rounded-lg p-4">
-              <p className="text-red-500 font-mono mb-4">
-                [ CRITICAL SYSTEM FAILURE ]
-              </p>
-              <button
-                onClick={restartGame}
-                className="bg-red-900/30 border border-red-500 text-red-400 font-mono py-2 px-4 rounded-lg hover:bg-red-900/50 transition-colors"
-              >
-                SYSTEM REBOOT
-              </button>
-            </div>
+            <GameOver
+              reason="[ CRITICAL SYSTEM FAILURE ]"
+              stats={{
+                threatsStopped: gameState.threatsStopped,
+                damageTaken: gameState.damageTaken,
+              }}
+              unlocked={gameState.unlockedItems}
+              onRetry={restartGame}
+              onPractice={() => (window.location.search = "?practice")}
+              onShare={() => {
+                const text = `Stopped ${gameState.threatsStopped} threats with ${gameState.damageTaken} damage.`;
+                if (navigator.share) {
+                  navigator.share({ text });
+                } else {
+                  window.prompt("Copy your score:", text);
+                }
+              }}
+            />
           )}
 
           {gameState.gameCompleted && (
@@ -1325,6 +1381,17 @@ TIPS FOR THIS CHALLENGE:
               </button>
             </div>
           )}
+
+          {practice && (
+            <div className="text-center mt-4">
+              <button
+                onClick={restartGame}
+                className="bg-green-900/30 border border-green-500 text-green-400 font-mono py-2 px-4 rounded-lg hover:bg-green-900/50 transition-colors"
+              >
+                RESET PRACTICE
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -1333,4 +1400,6 @@ TIPS FOR THIS CHALLENGE:
 
 export default ApocalypseGame;
 
-ApocalypseGame.propTypes = {};
+ApocalypseGame.propTypes = {
+  practice: PropTypes.bool,
+};

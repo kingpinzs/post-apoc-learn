@@ -21,18 +21,21 @@ const ExecutionVisualizer = ({ commands, onComplete }) => {
 
   return (
     <div className="space-y-1 mt-2" data-testid="execution-visualizer">
-      {commands.map((cmd, i) => (
-        <div
-          key={i}
-          className={
-            i === current
-              ? 'text-black bg-green-400 rounded px-2'
-              : 'text-green-400'
-          }
-        >
-          {cmd}
-        </div>
-      ))}
+      {commands.map((cmd, i) => {
+        const label = typeof cmd === 'string' ? cmd : cmd.type;
+        return (
+          <div
+            key={i}
+            className={
+              i === current
+                ? 'text-black bg-green-400 rounded px-2'
+                : 'text-green-400'
+            }
+          >
+            {label}
+          </div>
+        );
+      })}
     </div>
   );
 };

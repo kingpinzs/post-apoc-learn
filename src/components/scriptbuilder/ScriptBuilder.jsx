@@ -20,8 +20,8 @@ const ScriptBuilder = () => {
 
   const runScript = () => {
     const result = validateScript(commands);
-    if (!result.valid) {
-      setError(result.error);
+    if (!result.isValid) {
+      setError(result.errors.join(', '));
       return;
     }
     setError(null);
@@ -39,11 +39,14 @@ const ScriptBuilder = () => {
           data-testid="script-dropzone"
         >
           <div className="space-y-1">
-            {commands.map((c, i) => (
-              <div key={i} className="text-green-400">
-                {i + 1}. {c}
-              </div>
-            ))}
+            {commands.map((c, i) => {
+              const label = typeof c === 'string' ? c : c.type;
+              return (
+                <div key={i} className="text-green-400">
+                  {i + 1}. {label}
+                </div>
+              );
+            })}
           </div>
         </DropZone>
       </div>
