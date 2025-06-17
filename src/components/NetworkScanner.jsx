@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  allocateResources,
+  freeResources,
+} from '../lib/resourceSystem';
 
 const DEVICE_TYPES = ['Camera', 'Terminal', 'Laptop', 'Drone', 'Sensor'];
 const VULN_LEVELS = ['Low', 'Medium', 'High', 'Critical'];
@@ -28,14 +32,31 @@ const NetworkScanner = () => {
   const [devices, setDevices] = useState([]);
   const [scanning, setScanning] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [progress, setProgress] = useState(0);
+  const timerRef = useRef(null);
+  const intervalRef = useRef(null);
+
+  useEffect(() => () => {
+    clearTimeout(timerRef.current);
+    clearInterval(intervalRef.current);
+    freeResources('scanner');
+  }, []);
 
   const startScan = () => {
+    allocateResources('scanner', { cpu: 10, ram: 5, bandwidth: 15 });
     setScanning(true);
     setDevices([]);
     setSelected(null);
-    setTimeout(() => {
+    setProgress(0);
+    intervalRef.current = setInterval(() => {
+      setProgress((p) => Math.min(100, p + 5));
+    }, 150);
+    timerRef.current = setTimeout(() => {
       setDevices(generateDevices());
       setScanning(false);
+      setProgress(100);
+      clearInterval(intervalRef.current);
+      freeResources('scanner');
     }, 3000);
   };
 
@@ -59,6 +80,11 @@ const NetworkScanner = () => {
           />
         ))}
       </div>
+      {scanning && (
+        <div className="w-full bg-gray-700 h-2" data-testid="scan-progress">
+          <div className="bg-green-500 h-full" style={{ width: `${progress}%` }} />
+        </div>
+      )}
       <button
         onClick={startScan}
         className="border border-green-500 text-green-400 rounded px-3 py-1"
