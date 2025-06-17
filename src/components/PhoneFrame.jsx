@@ -24,7 +24,9 @@ const PhoneFrame = ({
   }, []);
 
   return (
-    <div className="relative w-full max-w-xs aspect-[9/16] border rounded-2xl overflow-hidden bg-black text-green-400 flex flex-col">
+    <div
+      className="relative w-full aspect-[9/16] border rounded-2xl overflow-hidden bg-black text-green-400 flex flex-col max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
+    >
       <div className={cn("flex items-center justify-between text-xs px-2 py-1", statusBarColor)}>
         <span>{time}</span>
         <div className="flex items-center space-x-2">
