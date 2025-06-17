@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { loadGame, startAutoSave } from '../lib/saveSystem';
 
 /**
  * @typedef {Object} Threat
@@ -35,6 +36,7 @@ export const initialPhoneState = {
   currentScreen: 'lock',
   unlockedApps: [],
   installedApps: [],
+  completedMissions: [],
   systemHealth: 100,
   batteryLevel: 100,
   networkStrength: 5,
@@ -48,5 +50,22 @@ export const initialPhoneState = {
  * @returns {[typeof initialPhoneState, Function]}
  */
 export default function usePhoneState() {
-  return useState(initialPhoneState);
+  const [state, setState] = useState(() => {
+    const saved = loadGame();
+    if (saved) {
+      return { ...initialPhoneState, ...saved };
+    }
+    return initialPhoneState;
+  });
+
+  useEffect(() => {
+    const stop = startAutoSave(() => ({
+      currentScreen: state.currentScreen,
+      unlockedApps: state.unlockedApps,
+      completedMissions: state.completedMissions,
+    }));
+    return stop;
+  }, [state]);
+
+  return [state, setState];
 }

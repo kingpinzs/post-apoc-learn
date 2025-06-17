@@ -1,6 +1,11 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import NetworkScanner from '../components/NetworkScanner';
+import { getUsage, resetResources } from '../lib/resourceSystem';
+
+beforeEach(() => {
+  resetResources();
+});
 
 test('scan generates devices after delay', () => {
   jest.useFakeTimers();
@@ -27,5 +32,17 @@ test('clicking device shows details panel', () => {
   fireEvent.click(device);
   expect(screen.getByText(/IP:/i)).toBeInTheDocument();
   expect(screen.getByText(/Type:/i)).toBeInTheDocument();
+  jest.useRealTimers();
+});
+
+test('resources allocated during scan are released', () => {
+  jest.useFakeTimers();
+  render(<NetworkScanner />);
+  fireEvent.click(screen.getByText('Scan'));
+  expect(getUsage().cpu).toBeGreaterThan(0);
+  act(() => {
+    jest.advanceTimersByTime(3000);
+  });
+  expect(getUsage().cpu).toBe(0);
   jest.useRealTimers();
 });
