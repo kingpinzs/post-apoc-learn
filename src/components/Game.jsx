@@ -1119,7 +1119,7 @@ TIPS FOR THIS CHALLENGE:
   return (
     <div className="min-h-screen bg-black p-4 flex items-center justify-center">
       <div className="matrix-bg" />
-      <div className="w-full max-w-md relative">
+      <div className="w-full relative max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl">
         <Particles trigger={gameState.showParticles} />
         {/* Device Frame */}
         <div className="absolute inset-0 border-2 border-green-500 rounded-3xl pointer-events-none"></div>
