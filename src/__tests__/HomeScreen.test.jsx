@@ -52,3 +52,23 @@ test('long press uninstalls app', () => {
   expect(stored[0]).toBeNull();
   jest.useRealTimers();
 });
+
+test('tapping unlocked app launches and back returns home', () => {
+  localStorage.clear();
+  const { container, getByTestId } = render(<HomeScreen />);
+  const slot0 = container.querySelector('[data-testid="grid-slot-0"]');
+  const icon = slot0.querySelector('[draggable="true"]');
+  fireEvent.click(icon);
+  expect(getByTestId('communicator-screen')).toBeInTheDocument();
+  fireEvent.click(getByTestId('back-button'));
+  expect(getByTestId('home-screen')).toBeInTheDocument();
+});
+
+test('shows message when launching locked app', () => {
+  localStorage.clear();
+  const { container, getByTestId } = render(<HomeScreen />);
+  const slot1 = container.querySelector('[data-testid="grid-slot-1"]');
+  const icon = slot1.querySelector('[draggable]');
+  fireEvent.click(icon);
+  expect(getByTestId('lock-message')).toBeInTheDocument();
+});
