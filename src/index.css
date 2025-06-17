@@ -71,3 +71,54 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* Advanced GlitchEffect animations */
+.glitch-effect {
+  --glitch-intensity: 5;
+  --glitch-duration: 500ms;
+  position: relative;
+  display: inline-block;
+}
+
+.glitch-active {
+  animation: glitch-shake var(--glitch-duration);
+  filter: drop-shadow(calc(var(--glitch-intensity) * 1px) 0 red)
+          drop-shadow(calc(var(--glitch-intensity) * -1px) 0 blue);
+}
+
+.glitch-noise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255,255,255,0.05) 0px,
+    rgba(255,255,255,0.05) 2px,
+    rgba(0,0,0,0.05) 2px,
+    rgba(0,0,0,0.05) 4px
+  );
+  opacity: 0;
+}
+
+.glitch-active .glitch-noise {
+  animation: noise-move var(--glitch-duration);
+  opacity: 0.2;
+}
+
+@keyframes glitch-shake {
+  0%,100% { transform: translate(0,0); }
+  10% { transform: translate(calc(var(--glitch-intensity) * -1px), calc(var(--glitch-intensity) * -1px)); }
+  20% { transform: translate(calc(var(--glitch-intensity) * 1px), calc(var(--glitch-intensity) * -1px)); }
+  30% { transform: translate(calc(var(--glitch-intensity) * -1px), calc(var(--glitch-intensity) * 1px)); }
+  40% { transform: translate(calc(var(--glitch-intensity) * 1px), calc(var(--glitch-intensity) * 1px)); }
+  50% { transform: translate(calc(var(--glitch-intensity) * -0.5px), calc(var(--glitch-intensity) * 0.5px)); }
+  60% { transform: translate(calc(var(--glitch-intensity) * 0.5px), calc(var(--glitch-intensity) * -0.5px)); }
+  70% { transform: translate(calc(var(--glitch-intensity) * -1px), 0); }
+  80% { transform: translate(calc(var(--glitch-intensity) * 1px), 0); }
+  90% { transform: translate(0, calc(var(--glitch-intensity) * 1px)); }
+}
+
+@keyframes noise-move {
+  0% { transform: translate(0,0); }
+  100% { transform: translate(-50%, -50%); }
+}

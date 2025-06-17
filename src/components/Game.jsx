@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { Card } from "../components/ui/card";
 import Particles from "./Particles";
+import GlitchEffect from "./GlitchEffect";
 import DragCommandBlock from "./drag/DragCommandBlock";
 import DropZone from "./drag/DropZone";
 import {
@@ -1246,11 +1247,15 @@ TIPS FOR THIS CHALLENGE:
               <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
             </div>
 
-            <pre
-              className={`text-green-400 font-mono text-sm mb-4 whitespace-pre-wrap ${gameState.glitch ? "glitch" : ""}`}
+            <GlitchEffect
+              intensity={6}
+              duration={500}
+              active={gameState.glitch}
             >
-              {gameState.message}
-            </pre>
+              <pre className="text-green-400 font-mono text-sm mb-4 whitespace-pre-wrap">
+                {gameState.message}
+              </pre>
+            </GlitchEffect>
 
             {gameState.showHint && (
               <div className="border border-yellow-500/30 rounded-lg p-3 mb-4 bg-yellow-900/10">
