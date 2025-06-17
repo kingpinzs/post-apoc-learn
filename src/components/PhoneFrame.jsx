@@ -25,7 +25,7 @@ const PhoneFrame = ({
 
   return (
     <div
-      className="relative w-full aspect-[9/16] border rounded-2xl overflow-hidden bg-black text-green-400 flex flex-col max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
+      className="relative w-full min-h-screen border overflow-hidden bg-black text-green-400 flex flex-col"
     >
       <div className={cn("flex items-center justify-between text-xs px-2 py-1", statusBarColor)}>
         <span>{time}</span>
