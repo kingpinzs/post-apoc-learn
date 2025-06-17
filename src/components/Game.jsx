@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { Card } from "../components/ui/card";
 import Particles from "./Particles";
+import DragCommandBlock from "./drag/DragCommandBlock";
+import DropZone from "./drag/DropZone";
 import {
   AlertCircle,
   Brain,
@@ -68,7 +70,18 @@ const initialState = {
 const ApocalypseGame = () => {
   const [gameState, setGameState] = useState(() => {
     const saved = localStorage.getItem("gameState");
-    return saved ? JSON.parse(saved) : initialState;
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return {
+        ...initialState,
+        ...parsed,
+        inventory: {
+          ...initialState.inventory,
+          ...(parsed.inventory || {}),
+        },
+      };
+    }
+    return initialState;
   });
 
   const handleKeyPress = useCallback(
@@ -724,6 +737,11 @@ TIPS FOR THIS CHALLENGE:
       question: "COMPLETE THE SETUP SCRIPT:",
       type: "script",
       script: `ufw ____\nufw allow 22\nufw enable`,
+      options: [
+        "default deny incoming",
+        "allow http",
+        "status",
+      ],
       correct: "default deny incoming",
       explanation: "Firewall active with SSH access only.",
       icon: <Shield className="w-8 h-8 text-green-500" />,
@@ -886,7 +904,7 @@ TIPS FOR THIS CHALLENGE:
   const handleUseTool = (toolId) => {
     if (!gameState.activeAttack) return;
     if (gameState.activeAttack.tool === toolId) {
-      if (gameState.inventory[toolId]) {
+      if (gameState.inventory?.[toolId]) {
         setGameState((prev) => ({
           ...prev,
           activeAttack: null,
@@ -975,22 +993,20 @@ TIPS FOR THIS CHALLENGE:
         return (
           <div className="space-y-4">
             <pre className="text-green-400 font-mono text-sm whitespace-pre-wrap border border-green-500/30 p-2 rounded">
-              {currentLevel.script}
+              {currentLevel.script.replace('____', gameState.blankInput || '____')}
             </pre>
-            <div className="flex items-center border border-green-500/30 rounded-lg overflow-hidden">
-              <span className="text-green-500 px-2">&gt;</span>
-              <input
-                type="text"
-                value={gameState.blankInput}
-                onChange={(e) =>
-                  setGameState((prev) => ({
-                    ...prev,
-                    blankInput: e.target.value,
-                  }))
-                }
-                className="flex-1 bg-transparent border-none text-green-400 font-mono p-2 focus:outline-none"
-                placeholder="Fill the blank..."
-              />
+            <DropZone
+              onDropCommand={(cmd) =>
+                setGameState((prev) => ({ ...prev, blankInput: cmd }))
+              }
+              className="mb-2"
+            >
+              {gameState.blankInput || 'DROP COMMAND HERE'}
+            </DropZone>
+            <div className="flex flex-wrap gap-2">
+              {currentLevel.options.map((cmd, i) => (
+                <DragCommandBlock key={i} command={cmd} />
+              ))}
             </div>
             <button
               onClick={() => handleAnswer()}
@@ -1133,7 +1149,7 @@ TIPS FOR THIS CHALLENGE:
 
           {/* Tools */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {Object.keys(gameState.inventory).map((tool) => (
+            {Object.keys(gameState.inventory || {}).map((tool) => (
               <button
                 key={tool}
                 onClick={() => handleUseTool(tool)}
