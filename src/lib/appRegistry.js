@@ -78,6 +78,16 @@ export const appRegistry = {
     description: 'Break encrypted archives and messages.',
     launchScreen: 'DecryptorScreen',
   },
+  scriptBuilder: {
+    id: 'scriptBuilder',
+    name: 'Script Builder',
+    icon: 'ClipboardList',
+    category: 'tools',
+    isLocked: false,
+    unlockRequirements: [],
+    description: 'Visually assemble and test command scripts.',
+    launchScreen: 'ScriptBuilderScreen',
+  },
 
   handbook: {
     id: 'handbook',
