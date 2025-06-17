@@ -6,6 +6,17 @@ import { cn } from '../lib/utils';
 import AppIcon from './AppIcon';
 import DockBar from './DockBar';
 import { getUsage } from '../lib/resourceSystem';
+import usePhoneState from '../hooks/usePhoneState';
+import CommunicatorScreen from './CommunicatorScreen';
+import MapScreen from './MapScreen';
+import DroneScreen from './DroneScreen';
+import ScannerScreen from './ScannerScreen';
+import TerminalScreen from './TerminalScreen';
+import DecryptorScreen from './DecryptorScreen';
+import { ScriptBuilderScreen } from './scriptbuilder';
+import HandbookScreen from './HandbookScreen';
+import StatsScreen from './StatsScreen';
+import LogScreen from './LogScreen';
 
 const GRID_KEY = 'homeGridSlots';
 
@@ -15,6 +26,10 @@ function loadDefaultGrid() {
 }
 
 const HomeScreen = ({ notifications = [] }) => {
+  const [phoneState, setPhoneState] = usePhoneState();
+  const [activeApp, setActiveApp] = useState(null);
+  const [lockMessage, setLockMessage] = useState('');
+
   const [gridSlots, setGridSlots] = useState(() => {
     const saved = localStorage.getItem(GRID_KEY);
     if (saved) {
@@ -79,6 +94,56 @@ const HomeScreen = ({ notifications = [] }) => {
     return () => clearInterval(t);
   }, []);
 
+  const screenMap = {
+    CommunicatorScreen,
+    MapScreen,
+    DroneScreen,
+    ScannerScreen,
+    TerminalScreen,
+    DecryptorScreen,
+    ScriptBuilderScreen,
+    HandbookScreen,
+    StatsScreen,
+    LogScreen,
+  };
+
+  const launchApp = (appId) => {
+    const def = appRegistry[appId];
+    if (!def) return;
+    const locked = def.isLocked && !phoneState.unlockedApps.includes(appId);
+    if (locked) {
+      const req = def.unlockRequirements?.join(', ');
+      setLockMessage(req ? `Requires: ${req}` : 'App locked');
+      return;
+    }
+    setLockMessage('');
+    setActiveApp(appId);
+    setPhoneState((s) => ({ ...s, currentScreen: 'active-app' }));
+  };
+
+  const closeApp = () => {
+    setActiveApp(null);
+    setPhoneState((s) => ({ ...s, currentScreen: 'home' }));
+  };
+
+  if (activeApp) {
+    const def = appRegistry[activeApp];
+    const Screen = screenMap[def.launchScreen];
+    return (
+      <div className="flex flex-col h-full" data-testid="active-app">
+        <button
+          type="button"
+          onClick={closeApp}
+          className="m-2 px-2 py-1 border border-green-500 text-green-400 rounded"
+          data-testid="back-button"
+        >
+          Back
+        </button>
+        {Screen && <Screen />}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full p-2 space-y-2" data-testid="home-screen">
       <input
@@ -121,6 +186,8 @@ const HomeScreen = ({ notifications = [] }) => {
                     name={def.name}
                     icon={<Icon className="w-6 h-6" />}
                     isDraggable
+                    isLocked={def.isLocked && !phoneState.unlockedApps.includes(def.id)}
+                    onClick={() => launchApp(def.id)}
                   />
                 )}
               </div>
@@ -133,6 +200,11 @@ const HomeScreen = ({ notifications = [] }) => {
           {notifications.map((n) => (
             <div key={n.id}>{n.message}</div>
           ))}
+        </div>
+      )}
+      {lockMessage && (
+        <div className="text-xs text-red-400" data-testid="lock-message">
+          {lockMessage}
         </div>
       )}
       <DockBar />

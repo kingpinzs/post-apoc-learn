@@ -11,6 +11,7 @@ const AppIcon = ({
   isDraggable = false,
   onDragStart,
   onDragEnd,
+  onClick,
 }) => {
   const [dragging, setDragging] = useState(false);
 
@@ -34,6 +35,7 @@ const AppIcon = ({
         draggable={isDraggable && !isLocked}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
+        onClick={onClick}
         className={cn(
           'relative w-16 h-16 flex items-center justify-center rounded-lg bg-gray-800 text-white',
           dragging && 'ring-2 ring-green-400 ring-offset-2 animate-pulse'
@@ -64,6 +66,7 @@ AppIcon.propTypes = {
   isDraggable: PropTypes.bool,
   onDragStart: PropTypes.func,
   onDragEnd: PropTypes.func,
+  onClick: PropTypes.func,
 };
 
 export default AppIcon;
