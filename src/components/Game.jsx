@@ -68,7 +68,18 @@ const initialState = {
 const ApocalypseGame = () => {
   const [gameState, setGameState] = useState(() => {
     const saved = localStorage.getItem("gameState");
-    return saved ? JSON.parse(saved) : initialState;
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return {
+        ...initialState,
+        ...parsed,
+        inventory: {
+          ...initialState.inventory,
+          ...(parsed.inventory || {}),
+        },
+      };
+    }
+    return initialState;
   });
 
   const handleKeyPress = useCallback(
@@ -886,7 +897,7 @@ TIPS FOR THIS CHALLENGE:
   const handleUseTool = (toolId) => {
     if (!gameState.activeAttack) return;
     if (gameState.activeAttack.tool === toolId) {
-      if (gameState.inventory[toolId]) {
+      if (gameState.inventory?.[toolId]) {
         setGameState((prev) => ({
           ...prev,
           activeAttack: null,
@@ -1133,7 +1144,7 @@ TIPS FOR THIS CHALLENGE:
 
           {/* Tools */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {Object.keys(gameState.inventory).map((tool) => (
+            {Object.keys(gameState.inventory || {}).map((tool) => (
               <button
                 key={tool}
                 onClick={() => handleUseTool(tool)}
