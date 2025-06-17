@@ -45,3 +45,29 @@
   to { transform: translateY(-150px); opacity: 0; }
 }
 
+
+/* Radar sweep animation */
+.radar-lines::before,
+.radar-lines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1px dashed rgba(16,185,129,0.4);
+}
+.radar-lines::after {
+  transform: rotate(90deg);
+}
+
+.radar-sweep {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: conic-gradient(rgba(16,185,129,0.4) 0deg, rgba(16,185,129,0) 60deg);
+  animation: radar-rotate 2s linear infinite;
+}
+
+@keyframes radar-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
