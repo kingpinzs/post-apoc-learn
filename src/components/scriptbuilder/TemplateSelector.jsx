@@ -1,9 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { scriptTemplates } from '../../lib/scriptTemplates';
 
 const TEMPLATES = {
   bash: ['init', 'end'],
   python: ['init', 'end'],
+  basicScan: scriptTemplates.basicScan,
+  attack: scriptTemplates.attack,
+  defense: scriptTemplates.defense,
+};
+
+const LABELS = {
+  bash: 'bash',
+  python: 'python',
+  basicScan: 'Basic Scan Script',
+  attack: 'Attack Script',
+  defense: 'Defense Script',
 };
 
 const TemplateSelector = ({ onSelect }) => {
@@ -16,7 +28,7 @@ const TemplateSelector = ({ onSelect }) => {
       <option value="">Select Template</option>
       {Object.keys(TEMPLATES).map(name => (
         <option key={name} value={name}>
-          {name}
+          {LABELS[name] || name}
         </option>
       ))}
     </select>
