@@ -20,8 +20,8 @@ const ScriptBuilder = () => {
 
   const runScript = () => {
     const result = validateScript(commands);
-    if (!result.valid) {
-      setError(result.error);
+    if (!result.isValid) {
+      setError(result.errors.join(', '));
       return;
     }
     setError(null);
