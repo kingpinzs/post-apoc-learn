@@ -17,6 +17,10 @@ import { ScriptBuilderScreen } from './scriptbuilder';
 import HandbookScreen from './HandbookScreen';
 import StatsScreen from './StatsScreen';
 import LogScreen from './LogScreen';
+import NetworkScanner from './NetworkScanner';
+import PortScanner from './PortScanner';
+import FirewallApp from './FirewallApp';
+import SecurityTrainingApp from './SecurityTrainingApp';
 
 const GRID_KEY = 'homeGridSlots';
 
@@ -25,7 +29,7 @@ function loadDefaultGrid() {
   return ids.concat(Array(20 - ids.length).fill(null));
 }
 
-const HomeScreen = ({ notifications = [] }) => {
+const HomeScreen = ({ notifications = [], onLaunchApp }) => {
   const [phoneState, setPhoneState] = usePhoneState();
   const [activeApp, setActiveApp] = useState(null);
   const [lockMessage, setLockMessage] = useState('');
@@ -105,6 +109,10 @@ const HomeScreen = ({ notifications = [] }) => {
     HandbookScreen,
     StatsScreen,
     LogScreen,
+    NetworkScanner,
+    PortScanner,
+    FirewallApp,
+    SecurityTrainingApp,
   };
 
   const launchApp = (appId) => {
@@ -117,8 +125,12 @@ const HomeScreen = ({ notifications = [] }) => {
       return;
     }
     setLockMessage('');
-    setActiveApp(appId);
-    setPhoneState((s) => ({ ...s, currentScreen: 'active-app' }));
+    if (onLaunchApp) {
+      onLaunchApp(appId);
+    } else {
+      setActiveApp(appId);
+      setPhoneState((s) => ({ ...s, currentScreen: 'active-app' }));
+    }
   };
 
   const closeApp = () => {
@@ -219,6 +231,7 @@ HomeScreen.propTypes = {
       message: PropTypes.string.isRequired,
     })
   ),
+  onLaunchApp: PropTypes.func,
 };
 
 export default HomeScreen;

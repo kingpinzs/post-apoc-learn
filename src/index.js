@@ -1,16 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import Game from './components/Game';
-import PracticeMode from './components/PracticeMode';
+import App from './App';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-const params = new URLSearchParams(window.location.search);
-const isPractice = params.has('practice');
 
 root.render(
   <React.StrictMode>
-    {isPractice ? <PracticeMode /> : <Game />}
+    <App />
   </React.StrictMode>
 );
 
