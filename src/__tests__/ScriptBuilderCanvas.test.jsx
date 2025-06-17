@@ -1,6 +1,7 @@
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ScriptBuilderCanvas from '../components/scriptbuilder/ScriptBuilderCanvas';
+import * as validator from '../lib/scriptValidator';
 
 function createDataTransfer(data) {
   return {
@@ -40,11 +41,13 @@ describe('ScriptBuilderCanvas', () => {
     expect(canvas.querySelector('[data-testid=canvas-block]')).toBeInTheDocument();
   });
 
-  test('calls onScriptComplete', () => {
+  test('calls onScriptComplete when validation passes', () => {
+    jest.spyOn(validator, 'validateScript').mockReturnValue({ isValid: true, errors: [] });
     const handleComplete = jest.fn();
     const { getByText } = render(
       <ScriptBuilderCanvas availableCommands={commands} onScriptComplete={handleComplete} />
     );
+
     fireEvent.click(getByText('Complete'));
     expect(handleComplete).toHaveBeenCalled();
   });

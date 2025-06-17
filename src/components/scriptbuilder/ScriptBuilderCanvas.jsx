@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import * as Icons from 'lucide-react';
+import { validateScript } from '../../lib/scriptValidator';
 function snap(value) {
   return Math.round(value / 50) * 50;
 }
@@ -61,6 +62,8 @@ const ScriptBuilderCanvas = ({ availableCommands = [], onScriptComplete }) => {
   const [blocks, setBlocks] = useState([]);
   const [dragging, setDragging] = useState(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [invalidConns, setInvalidConns] = useState([]);
+  const [errors, setErrors] = useState([]);
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -95,7 +98,22 @@ const ScriptBuilderCanvas = ({ availableCommands = [], onScriptComplete }) => {
   const handleMouseUp = () => setDragging(null);
 
   const completeScript = () => {
-    if (onScriptComplete) onScriptComplete(blocks);
+    const result = validateScript(blocks);
+    setErrors(result.errors);
+
+    const sortedBlocks = blocks.slice().sort((a, b) => a.y - b.y);
+    const invalid = [];
+    for (let i = 1; i < sortedBlocks.length; i += 1) {
+      const prev = sortedBlocks[i - 1];
+      const curr = sortedBlocks[i];
+      if (prev.x === undefined || curr.x === undefined) continue;
+      if (curr.x !== prev.x || curr.y !== prev.y + 50) {
+        invalid.push({ from: prev.id, to: curr.id });
+      }
+    }
+    setInvalidConns(invalid);
+
+    if (result.isValid && onScriptComplete) onScriptComplete(blocks);
   };
 
   const sorted = blocks.slice();
@@ -123,6 +141,9 @@ const ScriptBuilderCanvas = ({ availableCommands = [], onScriptComplete }) => {
           {sorted.map((b, i) => {
             if (i === 0) return null;
             const prev = sorted[i - 1];
+            const invalid = invalidConns.some(
+              (c) => c.from === prev.id && c.to === b.id,
+            );
             return (
               <line
                 key={b.id}
@@ -130,7 +151,7 @@ const ScriptBuilderCanvas = ({ availableCommands = [], onScriptComplete }) => {
                 y1={prev.y + 24}
                 x2={b.x + 24}
                 y2={b.y + 24}
-                stroke="#22c55e"
+                stroke={invalid ? '#dc2626' : '#22c55e'}
                 strokeWidth="2"
               />
             );
@@ -149,6 +170,13 @@ const ScriptBuilderCanvas = ({ availableCommands = [], onScriptComplete }) => {
         >
           Complete
         </button>
+        {errors.length > 0 && (
+          <ul className="mt-2 text-red-400 text-sm list-disc list-inside" data-testid="validation-errors">
+            {errors.map((e, i) => (
+              <li key={i}>{e}</li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
