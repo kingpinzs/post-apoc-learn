@@ -5,6 +5,7 @@ import Particles from "./Particles";
 import GlitchEffect from "./GlitchEffect";
 import DragCommandBlock from "./drag/DragCommandBlock";
 import DropZone from "./drag/DropZone";
+import GameOver from "./GameOver";
 import {
   AlertCircle,
   Brain,
@@ -66,6 +67,9 @@ const initialState = {
   inventory: { firewall: true },
   activeAttack: null,
   showBuyCraft: null,
+  damageTaken: 0,
+  threatsStopped: 0,
+  unlockedItems: [],
 };
 
 const ApocalypseGame = ({ practice = false }) => {
@@ -91,6 +95,7 @@ const ApocalypseGame = ({ practice = false }) => {
           (acc, t) => ({ ...acc, [t]: true }),
           {}
         ),
+        unlockedItems: Object.keys(toolData),
       };
     }
     return initialState;
@@ -179,10 +184,14 @@ const ApocalypseGame = ({ practice = false }) => {
       return;
     }
     const dmg = setInterval(() => {
-      setGameState((prev) => ({
-        ...prev,
-        health: Math.max(0, prev.health - 5),
-      }));
+      setGameState((prev) => {
+        const newHealth = Math.max(0, prev.health - 5);
+        return {
+          ...prev,
+          health: newHealth,
+          damageTaken: prev.damageTaken + (prev.health - newHealth),
+        };
+      });
     }, 5000);
     return () => clearInterval(dmg);
   }, [practice, gameState.activeAttack]);
@@ -862,20 +871,26 @@ TIPS FOR THIS CHALLENGE:
         correct = false;
     }
 
-    setGameState((prev) => ({
-      ...prev,
-      health: correct ? prev.health : Math.max(0, prev.health - 20),
-      knowledge: correct ? prev.knowledge + 25 : prev.knowledge,
-      message: correct
-        ? `[ HACK SUCCESSFUL ]\n${currentLevel.explanation}`
-        : "[ HACK FAILED ]\nSystem integrity compromised. Retry sequence...",
-      answeredCorrectly: correct,
-      inputCommand: "",
-      sequenceInput: "",
-      blankInput: "",
-      glitch: !correct,
-      showParticles: correct,
-    }));
+    setGameState((prev) => {
+      const newHealth = correct ? prev.health : Math.max(0, prev.health - 20);
+      return {
+        ...prev,
+        health: newHealth,
+        damageTaken: correct
+          ? prev.damageTaken
+          : prev.damageTaken + (prev.health - newHealth),
+        knowledge: correct ? prev.knowledge + 25 : prev.knowledge,
+        message: correct
+          ? `[ HACK SUCCESSFUL ]\n${currentLevel.explanation}`
+          : "[ HACK FAILED ]\nSystem integrity compromised. Retry sequence...",
+        answeredCorrectly: correct,
+        inputCommand: "",
+        sequenceInput: "",
+        blankInput: "",
+        glitch: !correct,
+        showParticles: correct,
+      };
+    });
   };
 
   const nextLevel = () => {
@@ -917,6 +932,7 @@ TIPS FOR THIS CHALLENGE:
             (acc, t) => ({ ...acc, [t]: true }),
             {}
           ),
+          unlockedItems: Object.keys(toolData),
         }
       : initialState;
     setGameState(baseState);
@@ -931,6 +947,7 @@ TIPS FOR THIS CHALLENGE:
           ...prev,
           activeAttack: null,
           message: `[ DEFENSE DEPLOYED ] ${toolId.toUpperCase()} neutralized attack.`,
+          threatsStopped: prev.threatsStopped + 1,
         }));
       } else {
         setGameState((prev) => ({ ...prev, showBuyCraft: toolId }));
@@ -947,6 +964,9 @@ TIPS FOR THIS CHALLENGE:
         inventory: { ...prev.inventory, [toolId]: true },
         showBuyCraft: null,
         message: `[ PURCHASED ] ${toolId.toUpperCase()} ready.`,
+        unlockedItems: prev.unlockedItems.includes(toolId)
+          ? prev.unlockedItems
+          : [...prev.unlockedItems, toolId],
       }));
     } else {
       setGameState((prev) => ({
@@ -962,6 +982,9 @@ TIPS FOR THIS CHALLENGE:
       inventory: { ...prev.inventory, [toolId]: true },
       showBuyCraft: null,
       message: `[ CRAFTED ] ${toolId.toUpperCase()} assembled.`,
+      unlockedItems: prev.unlockedItems.includes(toolId)
+        ? prev.unlockedItems
+        : [...prev.unlockedItems, toolId],
     }));
   };
 
@@ -1328,17 +1351,24 @@ TIPS FOR THIS CHALLENGE:
           </div>
 
           {gameState.health <= 0 && (
-            <div className="text-center border border-red-500 rounded-lg p-4">
-              <p className="text-red-500 font-mono mb-4">
-                [ CRITICAL SYSTEM FAILURE ]
-              </p>
-              <button
-                onClick={restartGame}
-                className="bg-red-900/30 border border-red-500 text-red-400 font-mono py-2 px-4 rounded-lg hover:bg-red-900/50 transition-colors"
-              >
-                SYSTEM REBOOT
-              </button>
-            </div>
+            <GameOver
+              reason="[ CRITICAL SYSTEM FAILURE ]"
+              stats={{
+                threatsStopped: gameState.threatsStopped,
+                damageTaken: gameState.damageTaken,
+              }}
+              unlocked={gameState.unlockedItems}
+              onRetry={restartGame}
+              onPractice={() => (window.location.search = "?practice")}
+              onShare={() => {
+                const text = `Stopped ${gameState.threatsStopped} threats with ${gameState.damageTaken} damage.`;
+                if (navigator.share) {
+                  navigator.share({ text });
+                } else {
+                  window.prompt("Copy your score:", text);
+                }
+              }}
+            />
           )}
 
           {gameState.gameCompleted && (
