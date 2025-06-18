@@ -25,3 +25,16 @@ test('loadGame returns null for invalid JSON', () => {
   localStorage.setItem('survivos-save', '{bad json');
   expect(loadGame()).toBeNull();
 });
+
+test('loadGame returns null for mismatched version', () => {
+  localStorage.setItem(
+    'survivos-save',
+    JSON.stringify({ version: 2, currentScreen: 'home', unlockedApps: [], completedMissions: [] })
+  );
+  expect(loadGame()).toBeNull();
+});
+
+test('loadGame returns null when fields are missing', () => {
+  localStorage.setItem('survivos-save', JSON.stringify({ version: 1 }));
+  expect(loadGame()).toBeNull();
+});

@@ -29,6 +29,16 @@ export function loadGame() {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw);
+    if (
+      !parsed ||
+      typeof parsed !== 'object' ||
+      parsed.version !== VERSION ||
+      typeof parsed.currentScreen !== 'string' ||
+      !Array.isArray(parsed.unlockedApps) ||
+      !Array.isArray(parsed.completedMissions)
+    ) {
+      return null;
+    }
     return parsed;
   } catch {
     return null;
