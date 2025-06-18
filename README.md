@@ -256,6 +256,13 @@ The build outputs to the `build/` directory with:
 - Service worker for offline play
 - Source maps for debugging
 
+## Offline Mode
+
+SURVIV-OS now monitors network connectivity and caches assets for offline play.
+Actions performed while offline are queued and synced once a connection is
+restored. When a new version of the game is available, you'll be notified to
+reload.
+
 ## 🤝 Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
