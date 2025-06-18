@@ -38,3 +38,15 @@ test('loadGame returns null when fields are missing', () => {
   localStorage.setItem('survivos-save', JSON.stringify({ version: 1 }));
   expect(loadGame()).toBeNull();
 });
+
+test('saveGame persists installedApps', () => {
+  saveGame({
+    currentScreen: 'home',
+    unlockedApps: [],
+    completedMissions: [],
+    installedApps: ['scanner'],
+  });
+  const data = loadGame();
+  expect(data.installedApps).toEqual(['scanner']);
+});
+

@@ -5,6 +5,7 @@ import GlitchEffect from "./GlitchEffect";
 import DragCommandBlock from "./drag/DragCommandBlock";
 import DropZone from "./drag/DropZone";
 import GameOver from "./GameOver";
+import useAchievements from "../hooks/useAchievements";
 import {
   AlertCircle,
   Brain,
@@ -73,6 +74,7 @@ const initialState = {
 
 const ApocalypseGame = ({ practice = false }) => {
   const storageKey = practice ? "practiceState" : "gameState";
+  const { addProgress } = useAchievements() || {};
   const [gameState, setGameState] = useState(() => {
     const saved = localStorage.getItem(storageKey);
     if (saved) {
@@ -127,6 +129,7 @@ const ApocalypseGame = ({ practice = false }) => {
           message: "Welcome to SURVIV-OS v2.0. Commence hacking training...",
           bootUp: false,
         }));
+        if (addProgress) addProgress('boot-sequence', 100);
       }, 2000);
     }
 
@@ -158,6 +161,19 @@ const ApocalypseGame = ({ practice = false }) => {
       return () => clearTimeout(t);
     }
   }, [gameState.showParticles]);
+
+  useEffect(() => {
+    if (gameState.gameCompleted && addProgress) {
+      if (gameState.damageTaken === 0) addProgress('untouchable', 100);
+    }
+  }, [gameState.gameCompleted, gameState.damageTaken]);
+
+  useEffect(() => {
+    if (addProgress) {
+      if (gameState.credits >= 500) addProgress('credit-hoarder', 100);
+      if (gameState.credits >= 1000) addProgress('resource-tycoon', 100);
+    }
+  }, [gameState.credits]);
 
   useEffect(() => {
     if (
@@ -552,6 +568,15 @@ TIPS FOR THIS CHALLENGE:
     },
   };
 
+  const levelAchievements = {
+    radiation: 'radiation-shield',
+    binary: 'binary-whisperer',
+    database: 'database-raider',
+    cipher: 'cipher-cracker',
+    protocol: 'protocol-keeper',
+    patch: 'ai-vanquisher',
+  };
+
   const levels = [
     {
       id: "radiation",
@@ -848,6 +873,7 @@ TIPS FOR THIS CHALLENGE:
 
   const handleAnswer = (selectedIndex) => {
     const currentLevel = levels[gameState.currentLevel];
+    const hintsLeft = gameState.hintsAvailable;
     let correct = false;
 
     switch (currentLevel.type) {
@@ -891,6 +917,15 @@ TIPS FOR THIS CHALLENGE:
         showParticles: correct,
       };
     });
+    if (correct && addProgress) {
+      const achId = levelAchievements[currentLevel.id];
+      if (achId) addProgress(achId, 100);
+      if (hintsLeft === 3) {
+        addProgress('hintless-hero', 100);
+        addProgress('zero-mistakes', 100);
+        addProgress('perfectionist', 20);
+      }
+    }
   };
 
   const nextLevel = () => {
@@ -949,6 +984,14 @@ TIPS FOR THIS CHALLENGE:
           message: `[ DEFENSE DEPLOYED ] ${toolId.toUpperCase()} neutralized attack.`,
           threatsStopped: prev.threatsStopped + 1,
         }));
+        if (addProgress) {
+          addProgress('first-blood', 100);
+          addProgress('guardian', 10);
+          addProgress('shield-master', 4);
+          if (gameState.damageTaken === 0) {
+            addProgress('flawless-defense', 20);
+          }
+        }
       } else {
         setGameState((prev) => ({ ...prev, showBuyCraft: toolId }));
       }
@@ -968,6 +1011,11 @@ TIPS FOR THIS CHALLENGE:
           ? prev.unlockedItems
           : [...prev.unlockedItems, toolId],
       }));
+      if (addProgress) {
+        addProgress('tinkerer', 100);
+        addProgress('gearhead', 34);
+        addProgress('arsenal-master', 20);
+      }
     } else {
       setGameState((prev) => ({
         ...prev,
@@ -986,6 +1034,11 @@ TIPS FOR THIS CHALLENGE:
         ? prev.unlockedItems
         : [...prev.unlockedItems, toolId],
     }));
+    if (addProgress) {
+      addProgress('tinkerer', 100);
+      addProgress('gearhead', 34);
+      addProgress('arsenal-master', 20);
+    }
   };
 
   const renderChallenge = () => {

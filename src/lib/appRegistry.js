@@ -119,6 +119,16 @@ export const appRegistry = {
     description: 'Archive of intercepted radio chatter.',
     launchScreen: 'LogScreen',
   },
+  trophyRoom: {
+    id: 'trophyRoom',
+    name: 'Trophy Room',
+    icon: 'Award',
+    category: 'info',
+    isLocked: false,
+    unlockRequirements: [],
+    description: 'View earned achievements.',
+    launchScreen: 'TrophyRoomScreen',
+  },
   securityTraining: {
     id: 'securityTraining',
     name: 'Security Training',
@@ -158,5 +168,15 @@ export const appRegistry = {
     unlockRequirements: [],
     description: 'Configure firewall rules.',
     launchScreen: 'FirewallApp',
+  },
+  settings: {
+    id: 'settings',
+    name: 'Settings',
+    icon: 'Settings',
+    category: 'info',
+    isLocked: false,
+    unlockRequirements: [],
+    description: 'Configure audio, display, and gameplay options.',
+    launchScreen: 'SettingsScreen',
   },
 };
