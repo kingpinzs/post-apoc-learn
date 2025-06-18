@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
-import { Card } from "../components/ui/card";
 import Particles from "./Particles";
 import GlitchEffect from "./GlitchEffect";
 import DragCommandBlock from "./drag/DragCommandBlock";
@@ -115,6 +114,7 @@ const ApocalypseGame = ({ practice = false }) => {
         }
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [gameState.showQuestion, gameState.currentLevel],
   );
 
@@ -135,7 +135,7 @@ const ApocalypseGame = ({ practice = false }) => {
       clearTimeout(bootTimeout);
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [gameState.showQuestion, gameState.currentLevel, handleKeyPress]);
+  }, [gameState.showQuestion, gameState.currentLevel, gameState.bootUp, handleKeyPress]);
 
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(gameState));
@@ -175,7 +175,7 @@ const ApocalypseGame = ({ practice = false }) => {
         activeAttack: attack,
         message: `[ WARNING ] ${attack.message}`,
       }));
-    }, Math.random() * 15000 + 10000);
+    }, Math.random() * 5000 + 5000);
     return () => clearTimeout(timeout);
   }, [practice, gameState.bootUp, gameState.gameCompleted, gameState.activeAttack]);
 

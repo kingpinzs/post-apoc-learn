@@ -46,3 +46,38 @@ test('resources allocated during scan are released', () => {
   expect(getUsage().cpu).toBe(0);
   jest.useRealTimers();
 });
+
+test('attack launches port scanner with ip', () => {
+  jest.useFakeTimers();
+  const handleLaunch = jest.fn();
+  render(<NetworkScanner onLaunchApp={handleLaunch} />);
+  fireEvent.click(screen.getByText('Scan'));
+  act(() => {
+    jest.advanceTimersByTime(3000);
+  });
+  fireEvent.click(screen.getByTestId('bad-device'));
+  const ip = screen.getByText(/IP:/i).textContent.replace('IP: ', '');
+  fireEvent.click(screen.getByText('Attack'));
+  expect(handleLaunch).toHaveBeenCalledWith('portScanner', {
+    initialTarget: ip,
+  });
+  jest.useRealTimers();
+});
+
+test('connect launches terminal with ip', () => {
+  jest.useFakeTimers();
+  const handleLaunch = jest.fn();
+  render(<NetworkScanner onLaunchApp={handleLaunch} />);
+  fireEvent.click(screen.getByText('Scan'));
+  act(() => {
+    jest.advanceTimersByTime(3000);
+  });
+  const device = screen.getAllByTestId('device')[0];
+  fireEvent.click(device);
+  const ip = screen.getByText(/IP:/i).textContent.replace('IP: ', '');
+  fireEvent.click(screen.getByText('Connect'));
+  expect(handleLaunch).toHaveBeenCalledWith('terminal', {
+    initialCommand: `connect ${ip}`,
+  });
+  jest.useRealTimers();
+});
