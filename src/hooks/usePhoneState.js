@@ -67,5 +67,31 @@ export default function usePhoneState() {
     return stop;
   }, [state]);
 
+  useEffect(() => {
+    const setOnline = () => {
+      const downlink = navigator.connection && typeof navigator.connection.downlink === 'number'
+        ? navigator.connection.downlink
+        : 5;
+      setState(prev => ({
+        ...prev,
+        networkStrength: Math.min(5, Math.max(1, Math.round(downlink))),
+      }));
+    };
+
+    const setOffline = () => {
+      setState(prev => ({ ...prev, networkStrength: 0 }));
+    };
+
+    setOnline();
+    window.addEventListener('online', setOnline);
+    window.addEventListener('offline', setOffline);
+    navigator.connection && navigator.connection.addEventListener('change', setOnline);
+    return () => {
+      window.removeEventListener('online', setOnline);
+      window.removeEventListener('offline', setOffline);
+      navigator.connection && navigator.connection.removeEventListener('change', setOnline);
+    };
+  }, []);
+
   return [state, setState];
 }
