@@ -232,15 +232,16 @@ Run the test suite:
 npm test
 ```
 
-Run tests in watch mode:
+Generate a coverage report:
 ```bash
-npm test -- --watch
+npm run coverage
 ```
 
-Generate coverage report:
+Run Cypress end-to-end tests:
 ```bash
-npm test -- --coverage
+npm run e2e
 ```
+
 
 ## 📦 Building for Production
 
