@@ -6,6 +6,7 @@ import DragCommandBlock from "./drag/DragCommandBlock";
 import DropZone from "./drag/DropZone";
 import GameOver from "./GameOver";
 import VictoryScreen from "./VictoryScreen";
+import GameMenu from "./GameMenu";
 import useAchievements from "../hooks/useAchievements";
 import { addHighScore } from "../lib/highscores";
 import {
@@ -1462,7 +1463,7 @@ TIPS FOR THIS CHALLENGE:
                     <p className="text-blue-400 font-mono text-sm whitespace-pre-wrap">
                       {module.content}
                     </p>
-                    <p className="text-blue-400 font-mono text-xs mt-2 italic">
+                    <p className="text-blue-400 font-mono text-xs mt-2 italic">Task 2: Create Integrated Game Menu System
                       {module.example}
                     </p>
                     <a
@@ -1558,62 +1559,7 @@ TIPS FOR THIS CHALLENGE:
           )}
         </div>
       </div>
-
-      {showTools && !activeUtility && (
-        <div className="absolute inset-0 bg-black/90 p-4 space-y-2" data-testid="tool-menu">
-          <button
-            type="button"
-            onClick={() => setShowTools(false)}
-            className="mb-2 px-2 py-1 border border-green-500 text-green-400 rounded"
-          >
-            Close
-          </button>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => launchUtility('networkScanner')}
-              className="border border-green-500 text-green-400 rounded px-2 py-1 text-xs"
-            >
-              Network Scanner
-            </button>
-            <button
-              onClick={() => launchUtility('portScanner')}
-              className="border border-green-500 text-green-400 rounded px-2 py-1 text-xs"
-            >
-              Port Scanner
-            </button>
-            <button
-              onClick={() => launchUtility('firewall')}
-              className="border border-green-500 text-green-400 rounded px-2 py-1 text-xs"
-            >
-              Firewall
-            </button>
-            <button
-              onClick={() => launchUtility('terminal')}
-              className="border border-green-500 text-green-400 rounded px-2 py-1 text-xs"
-            >
-              Terminal
-            </button>
-          </div>
-        </div>
-      )}
-
-      {activeUtility && (
-        <div className="absolute inset-0 bg-black/90 overflow-auto" data-testid="utility-screen">
-          <button
-            type="button"
-            onClick={closeUtility}
-            className="m-2 px-2 py-1 border border-green-500 text-green-400 rounded"
-          >
-            Back
-          </button>
-          {(() => {
-            const Component = utilityComponents[activeUtility];
-            return Component ? (
-              <Component onLaunchApp={launchUtility} {...utilityProps} />
-            ) : null;
-          })()}
-        </div>
-      )}
+      <GameMenu />
     </div>
   );
 };
