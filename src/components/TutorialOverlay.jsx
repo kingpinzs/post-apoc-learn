@@ -1,12 +1,19 @@
 import React, { useEffect, useState, useLayoutEffect } from "react";
 import PropTypes from "prop-types";
 
+// --- FIX START ---
+// This custom hook makes the component compatible with both the browser and the JSDOM test environment.
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+// --- FIX END ---
+
 const TutorialOverlay = ({ steps = [], onComplete }) => {
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState(null);
 
   // update highlight rect on step change
-  useLayoutEffect(() => {
+  // We now use the "safe" hook instead of useLayoutEffect directly.
+  useIsomorphicLayoutEffect(() => {
     if (index >= steps.length) return;
     const el = document.getElementById(steps[index].targetId);
     if (el) setRect(el.getBoundingClientRect());
@@ -37,7 +44,7 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
 
   if (index >= steps.length) return null;
 
-  const { targetId, message } = steps[index];
+  const { message } = steps[index];
   let highlight = {};
   let tip = {};
   if (rect) {

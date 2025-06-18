@@ -28,7 +28,7 @@ jobs:
         run: npm install
 
       - name: Run unit tests
-        run: npm test -- --watchAll=false --coverage
+        run: npm test -- --watchAll=false --coverage --detectOpenHandles
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4

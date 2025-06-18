@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import TutorialOverlay from '../components/TutorialOverlay';
 import { tutorialMissions, loadProgress, saveProgress } from '../lib/tutorialSystem';
 
@@ -16,9 +16,9 @@ export const TutorialProvider = ({ children }) => {
     setState({ ...state, activeMission: id });
   };
 
-  const skipTutorial = () => {
+  const skipTutorial = useCallback(() => {
     setState({ completed: tutorialMissions.map((m) => m.id), activeMission: null });
-  };
+  }, []);
 
   const resume = () => {
     if (state.activeMission) return;
@@ -26,9 +26,9 @@ export const TutorialProvider = ({ children }) => {
     if (next) setState({ ...state, activeMission: next.id });
   };
 
-  const showHelp = (targetId, message) => {
+  const showHelp = useCallback((targetId, message) => {
     setHelpSteps([{ targetId, message, action: 'click' }]);
-  };
+  }, []);
 
   const activeMission = tutorialMissions.find((m) => m.id === state.activeMission);
 
