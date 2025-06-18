@@ -49,3 +49,4 @@ test('saveGame persists installedApps', () => {
   const data = loadGame();
   expect(data.installedApps).toEqual(['scanner']);
 });
+
