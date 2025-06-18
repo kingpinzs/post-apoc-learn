@@ -20,3 +20,8 @@ test('resetGame clears saved data', () => {
   resetGame();
   expect(loadGame()).toBeNull();
 });
+
+test('loadGame returns null for invalid JSON', () => {
+  localStorage.setItem('survivos-save', '{bad json');
+  expect(loadGame()).toBeNull();
+});
