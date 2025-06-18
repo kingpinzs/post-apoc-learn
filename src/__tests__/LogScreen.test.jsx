@@ -4,6 +4,15 @@ import LogScreen from '../components/LogScreen';
 
 test('displays intercepted logs', () => {
   render(<LogScreen />);
-  expect(screen.getByText(/Log entry 1$/)).toBeInTheDocument();
-  expect(screen.getByText(/Log entry 2$/)).toBeInTheDocument();
+
+  // ensure container renders
+  expect(screen.getByTestId('log-screen')).toBeInTheDocument();
+
+  // first couple of logs should be visible
+  expect(screen.getByText('Log entry 1')).toBeInTheDocument();
+  expect(screen.getByText('Log entry 2')).toBeInTheDocument();
+
+  // there should be multiple log entries rendered
+  const entries = screen.getAllByTestId('log-entry');
+  expect(entries.length).toBeGreaterThan(0);
 });
