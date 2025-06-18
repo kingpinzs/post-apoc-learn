@@ -24,6 +24,11 @@ import FirewallApp from './FirewallApp';
 import SecurityTrainingApp from './SecurityTrainingApp';
 import SettingsScreen from './SettingsScreen';
 import LeaderboardScreen from './LeaderboardScreen';
+import DDoSSimulator from './DDoSSimulator';
+import PacketAnalyzer from './PacketAnalyzer';
+import ChemicalDatabase from './ChemicalDatabase';
+import RadiationMonitor from './RadiationMonitor';
+import EmergencyKeypad from './EmergencyKeypad';
 
 const GRID_KEY = 'homeGridSlots';
 
@@ -120,6 +125,11 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
     FirewallApp,
     SecurityTrainingApp,
     SettingsScreen,
+    DDoSSimulator,
+    PacketAnalyzer,
+    ChemicalDatabase,
+    RadiationMonitor,
+    EmergencyKeypad,
   };
 
   const launchApp = (appId, props = {}) => {
