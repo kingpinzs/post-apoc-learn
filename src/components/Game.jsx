@@ -30,6 +30,7 @@ import NetworkScanner from "./NetworkScanner";
 import PortScanner from "./PortScanner";
 import FirewallApp from "./FirewallApp";
 import TerminalScreen from "./TerminalScreen";
+import { useAppIntegration } from "./AppIntegration";
 
 const toolData = {
   firewall: { cost: 50 },
@@ -99,6 +100,7 @@ const initialState = {
 };
 
 const ApocalypseGame = ({ practice = false }) => {
+  const { requestApp } = useAppIntegration() || {};
   const storageKey = practice ? "practiceState" : "gameState";
   const { addProgress } = useAchievements() || {};
   const [gameState, setGameState] = useState(() => {
@@ -140,9 +142,13 @@ const ApocalypseGame = ({ practice = false }) => {
   };
 
   const launchUtility = (id, props = {}) => {
-    setActiveUtility(id);
-    setUtilityProps(props);
-    setShowTools(false);
+    if (requestApp) {
+      requestApp(id, props);
+    } else {
+      setActiveUtility(id);
+      setUtilityProps(props);
+      setShowTools(false);
+    }
   };
 
   const closeUtility = () => {
