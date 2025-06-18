@@ -25,6 +25,11 @@ import {
   Binary,
 } from "lucide-react";
 
+import NetworkScanner from "./NetworkScanner";
+import PortScanner from "./PortScanner";
+import FirewallApp from "./FirewallApp";
+import TerminalScreen from "./TerminalScreen";
+
 const toolData = {
   firewall: { cost: 50 },
   antivirus: { cost: 30 },
@@ -121,6 +126,28 @@ const ApocalypseGame = ({ practice = false }) => {
     }
     return initialState;
   });
+
+  const [showTools, setShowTools] = useState(false);
+  const [activeUtility, setActiveUtility] = useState(null);
+  const [utilityProps, setUtilityProps] = useState({});
+
+  const utilityComponents = {
+    networkScanner: NetworkScanner,
+    portScanner: PortScanner,
+    firewall: FirewallApp,
+    terminal: TerminalScreen,
+  };
+
+  const launchUtility = (id, props = {}) => {
+    setActiveUtility(id);
+    setUtilityProps(props);
+    setShowTools(false);
+  };
+
+  const closeUtility = () => {
+    setActiveUtility(null);
+    setUtilityProps({});
+  };
 
   const handleKeyPress = useCallback(
     (e) => {
@@ -1247,6 +1274,14 @@ TIPS FOR THIS CHALLENGE:
             CREDITS: {gameState.credits}
           </div>
           <Battery className="w-4 h-4 text-green-500" />
+          <button
+            type="button"
+            onClick={() => setShowTools((s) => !s)}
+            className="ml-2 px-2 py-1 border border-green-500 text-green-400 rounded text-xs"
+            data-testid="toggle-tools"
+          >
+            {showTools ? 'CLOSE' : 'TOOLS'}
+          </button>
         </div>
 
         {gameState.activeAttack && (
@@ -1510,6 +1545,62 @@ TIPS FOR THIS CHALLENGE:
           )}
         </div>
       </div>
+
+      {showTools && !activeUtility && (
+        <div className="absolute inset-0 bg-black/90 p-4 space-y-2" data-testid="tool-menu">
+          <button
+            type="button"
+            onClick={() => setShowTools(false)}
+            className="mb-2 px-2 py-1 border border-green-500 text-green-400 rounded"
+          >
+            Close
+          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => launchUtility('networkScanner')}
+              className="border border-green-500 text-green-400 rounded px-2 py-1 text-xs"
+            >
+              Network Scanner
+            </button>
+            <button
+              onClick={() => launchUtility('portScanner')}
+              className="border border-green-500 text-green-400 rounded px-2 py-1 text-xs"
+            >
+              Port Scanner
+            </button>
+            <button
+              onClick={() => launchUtility('firewall')}
+              className="border border-green-500 text-green-400 rounded px-2 py-1 text-xs"
+            >
+              Firewall
+            </button>
+            <button
+              onClick={() => launchUtility('terminal')}
+              className="border border-green-500 text-green-400 rounded px-2 py-1 text-xs"
+            >
+              Terminal
+            </button>
+          </div>
+        </div>
+      )}
+
+      {activeUtility && (
+        <div className="absolute inset-0 bg-black/90 overflow-auto" data-testid="utility-screen">
+          <button
+            type="button"
+            onClick={closeUtility}
+            className="m-2 px-2 py-1 border border-green-500 text-green-400 rounded"
+          >
+            Back
+          </button>
+          {(() => {
+            const Component = utilityComponents[activeUtility];
+            return Component ? (
+              <Component onLaunchApp={launchUtility} {...utilityProps} />
+            ) : null;
+          })()}
+        </div>
+      )}
     </div>
   );
 };
