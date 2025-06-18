@@ -41,7 +41,12 @@ const ExecutionVisualizer = ({ commands, onComplete }) => {
 };
 
 ExecutionVisualizer.propTypes = {
-  commands: PropTypes.arrayOf(PropTypes.string).isRequired,
+  commands: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.shape({ type: PropTypes.string.isRequired }),
+    ]),
+  ).isRequired,
   onComplete: PropTypes.func,
 };
 
