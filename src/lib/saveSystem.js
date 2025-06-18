@@ -12,6 +12,7 @@ export function saveGame(state) {
     currentScreen: state.currentScreen,
     unlockedApps: state.unlockedApps || [],
     completedMissions: state.completedMissions || [],
+    installedApps: state.installedApps || [],
   };
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -29,7 +30,21 @@ export function loadGame() {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw);
-    return parsed;
+    if (
+      !parsed ||
+      typeof parsed !== 'object' ||
+      parsed.version !== VERSION ||
+      typeof parsed.currentScreen !== 'string' ||
+      !Array.isArray(parsed.unlockedApps) ||
+      !Array.isArray(parsed.completedMissions) ||
+      (parsed.installedApps && !Array.isArray(parsed.installedApps))
+    ) {
+      return null;
+    }
+    return {
+      ...parsed,
+      installedApps: parsed.installedApps || [],
+    };
   } catch {
     return null;
   }
