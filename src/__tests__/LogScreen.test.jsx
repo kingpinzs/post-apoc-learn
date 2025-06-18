@@ -4,6 +4,6 @@ import LogScreen from '../components/LogScreen';
 
 test('displays intercepted logs', () => {
   render(<LogScreen />);
-  expect(screen.getByText(/Encrypted ping/)).toBeInTheDocument();
-  expect(screen.getByText(/Distress call/)).toBeInTheDocument();
+  expect(screen.getByText(/Log entry 1$/)).toBeInTheDocument();
+  expect(screen.getByText(/Log entry 2$/)).toBeInTheDocument();
 });
