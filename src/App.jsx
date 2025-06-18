@@ -15,6 +15,7 @@ import HandbookScreen from './components/HandbookScreen';
 import StatsScreen from './components/StatsScreen';
 import LogScreen from './components/LogScreen';
 import SecurityTrainingApp from './components/SecurityTrainingApp';
+import { TutorialProvider } from "./hooks/useTutorial";
 import usePhoneState from './hooks/usePhoneState';
 
 const appComponents = {
@@ -59,7 +60,8 @@ const App = () => {
 
   const Active = currentApp ? appComponents[currentApp] : null;
 
-  return (
+  return (<TutorialProvider>
+  
     <PhoneFrame
       batteryLevel={phoneState.batteryLevel}
       networkStrength={phoneState.networkStrength}
@@ -99,7 +101,8 @@ const App = () => {
         )}
       </div>
     </PhoneFrame>
-  );
+  </TutorialProvider>
+);
 };
 
 export default App;
