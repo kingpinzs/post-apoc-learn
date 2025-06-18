@@ -55,6 +55,7 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
   }, [gridSlots]);
 
   const [overIndex, setOverIndex] = useState(null);
+  const [showGrid, setShowGrid] = useState(true);
 
   const handleDrop = (index) => (e) => {
     e.preventDefault();
@@ -177,42 +178,52 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
         <div>RAM {usage.ram}%</div>
         <div>BW {usage.bandwidth}%</div>
       </div>
-      <div className="flex-1 overflow-auto">
-        <div className="grid grid-cols-4 gap-2" id="app-grid" data-testid="app-grid">
-          {gridSlots.map((appId, i) => {
-            const def = appRegistry[appId];
-            const Icon = def ? Icons[def.icon] : null;
-            const hidden = search && def && !def.name.toLowerCase().includes(search.toLowerCase());
-            return (
-              <div
-                key={i}
-                onDrop={handleDrop(i)}
-                onDragOver={handleDragOver(i)}
-                onDragLeave={handleDragLeave}
-                onPointerDown={handlePointerDown(i)}
-                onPointerUp={cancelLongPress}
-                onPointerMove={cancelLongPress}
-                className={cn(
-                  'w-full h-20 flex items-center justify-center rounded border',
-                  overIndex === i ? 'border-green-400 bg-gray-700/50' : 'border-gray-700 bg-gray-800'
-                )}
-                data-testid={`grid-slot-${i}`}
-              >
-                {!hidden && def && Icon && (
-                  <AppIcon
-                    appId={def.id}
-                    name={def.name}
-                    icon={<Icon className="w-6 h-6" />}
-                    isDraggable
-                    isLocked={def.isLocked && !phoneState.unlockedApps.includes(def.id)}
-                    onClick={() => launchApp(def.id)}
-                  />
-                )}
-              </div>
-            );
-          })}
+      <button
+        type="button"
+        onClick={() => setShowGrid((s) => !s)}
+        className="self-end border border-green-500 text-green-400 rounded px-2 py-1 text-xs"
+        data-testid="toggle-apps"
+      >
+        {showGrid ? 'Hide Apps' : 'Show Apps'}
+      </button>
+      {showGrid && (
+        <div className="flex-1 overflow-auto">
+          <div className="grid grid-cols-4 gap-2" data-testid="app-grid">
+            {gridSlots.map((appId, i) => {
+              const def = appRegistry[appId];
+              const Icon = def ? Icons[def.icon] : null;
+              const hidden = search && def && !def.name.toLowerCase().includes(search.toLowerCase());
+              return (
+                <div
+                  key={i}
+                  onDrop={handleDrop(i)}
+                  onDragOver={handleDragOver(i)}
+                  onDragLeave={handleDragLeave}
+                  onPointerDown={handlePointerDown(i)}
+                  onPointerUp={cancelLongPress}
+                  onPointerMove={cancelLongPress}
+                  className={cn(
+                    'w-full h-20 flex items-center justify-center rounded border',
+                    overIndex === i ? 'border-green-400 bg-gray-700/50' : 'border-gray-700 bg-gray-800'
+                  )}
+                  data-testid={`grid-slot-${i}`}
+                >
+                  {!hidden && def && Icon && (
+                    <AppIcon
+                      appId={def.id}
+                      name={def.name}
+                      icon={<Icon className="w-6 h-6" />}
+                      isDraggable
+                      isLocked={def.isLocked && !phoneState.unlockedApps.includes(def.id)}
+                      onClick={() => launchApp(def.id)}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
       {notifications.length > 0 && (
         <div className="text-xs text-green-400 space-y-1" data-testid="notifications">
           {notifications.map((n) => (
