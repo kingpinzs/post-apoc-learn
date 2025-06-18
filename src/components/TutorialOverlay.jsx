@@ -57,21 +57,19 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
 
   return (
     <div className="fixed inset-0 z-50 pointer-events-none">
-      <div className="absolute inset-0 bg-black/70"></div>
+      <div className="absolute inset-0 bg-black/70" />
       {hasRect && (
         <div
           className="absolute border-2 border-blue-400 rounded-md pointer-events-none"
           style={highlight}
         />
       )}
-      {hasRect && (
-        <div
-          className="absolute bg-white text-black p-2 rounded-md shadow pointer-events-auto"
-          style={tip}
-        >
-          {message}
-        </div>
-      )}
+      <div
+        className="absolute bg-white text-black p-2 rounded-md shadow pointer-events-auto"
+        style={tip}
+      >
+        {message}
+      </div>
     </div>
   );
 };
