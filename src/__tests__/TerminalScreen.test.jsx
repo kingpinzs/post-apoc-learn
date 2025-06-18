@@ -19,3 +19,8 @@ test('runs basic file commands', () => {
   fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
   expect(getByText(/Stay hidden/)).toBeInTheDocument();
 });
+
+test('initial command prefills input', () => {
+  const { getByDisplayValue } = render(<TerminalScreen initialCommand="ping 1.2.3.4" />);
+  expect(getByDisplayValue('ping 1.2.3.4')).toBeInTheDocument();
+});

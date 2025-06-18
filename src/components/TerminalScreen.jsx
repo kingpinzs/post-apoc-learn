@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * Minimal command-line interface supporting a few demo commands.
@@ -12,10 +13,14 @@ const readFile = {
   'survivor.txt': 'Stay hidden. Avoid radiation. Keep moving.',
 };
 
-const TerminalScreen = () => {
+const TerminalScreen = ({ initialCommand = '' }) => {
   const [cwd, setCwd] = useState('/');
   const [history, setHistory] = useState([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(initialCommand);
+
+  useEffect(() => {
+    setInput(initialCommand);
+  }, [initialCommand]);
 
   const run = () => {
     const parts = input.trim().split(' ');
@@ -54,6 +59,10 @@ const TerminalScreen = () => {
       </div>
     </div>
   );
+};
+
+TerminalScreen.propTypes = {
+  initialCommand: PropTypes.string,
 };
 
 export default TerminalScreen;

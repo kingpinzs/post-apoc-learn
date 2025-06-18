@@ -175,7 +175,7 @@ const ApocalypseGame = ({ practice = false }) => {
         activeAttack: attack,
         message: `[ WARNING ] ${attack.message}`,
       }));
-    }, Math.random() * 15000 + 10000);
+    }, Math.random() * 5000 + 5000);
     return () => clearTimeout(timeout);
   }, [practice, gameState.bootUp, gameState.gameCompleted, gameState.activeAttack]);
 
