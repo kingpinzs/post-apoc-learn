@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { loadSettings } from './lib/settings';
+import { detectQuality } from './hooks/usePerformance';
+import PerformanceOverlay from './components/PerformanceOverlay';
 import PhoneFrame from './components/PhoneFrame';
 import HomeScreen from './components/HomeScreen';
 import NetworkScanner from './components/NetworkScanner';
@@ -14,7 +17,10 @@ import { ScriptBuilderScreen } from './components/scriptbuilder';
 import HandbookScreen from './components/HandbookScreen';
 import StatsScreen from './components/StatsScreen';
 import LogScreen from './components/LogScreen';
+import TrophyRoomScreen from './components/TrophyRoomScreen';
 import SecurityTrainingApp from './components/SecurityTrainingApp';
+import SettingsScreen from './components/SettingsScreen';
+import { TutorialProvider } from "./hooks/useTutorial";
 import usePhoneState from './hooks/usePhoneState';
 
 const appComponents = {
@@ -28,10 +34,12 @@ const appComponents = {
   handbook: HandbookScreen,
   worldStats: StatsScreen,
   signalLog: LogScreen,
+  trophyRoom: TrophyRoomScreen,
   securityTraining: SecurityTrainingApp,
   networkScanner: NetworkScanner,
   portScanner: PortScanner,
   firewall: FirewallApp,
+  settings: SettingsScreen,
 };
 
 const App = () => {
@@ -39,6 +47,7 @@ const App = () => {
   const practiceMode = params.has('practice');
 
   const [phoneState] = usePhoneState();
+  const [settings] = useState(() => loadSettings(detectQuality));
   const [currentApp, setCurrentApp] = useState(null);
   const [appProps, setAppProps] = useState({});
   const [animating, setAnimating] = useState(false);
@@ -59,7 +68,8 @@ const App = () => {
 
   const Active = currentApp ? appComponents[currentApp] : null;
 
-  return (
+  return (<TutorialProvider>
+  
     <PhoneFrame
       batteryLevel={phoneState.batteryLevel}
       networkStrength={phoneState.networkStrength}
@@ -98,8 +108,10 @@ const App = () => {
           </div>
         )}
       </div>
+      <PerformanceOverlay show={settings.performance.debugOverlay} />
     </PhoneFrame>
-  );
+  </TutorialProvider>
+);
 };
 
 export default App;

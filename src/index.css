@@ -1,6 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  transform: scale(var(--render-scale, 1));
+  transform-origin: top left;
+}
 /* Matrix-style background */
 .matrix-bg {
   position: fixed;
@@ -122,3 +127,13 @@
   0% { transform: translate(0,0); }
   100% { transform: translate(-50%, -50%); }
 }
+
+body.high-contrast {
+  filter: contrast(2);
+}
+
+body.reduce-motion * {
+  animation-duration: 0s !important;
+  transition-duration: 0s !important;
+}
+

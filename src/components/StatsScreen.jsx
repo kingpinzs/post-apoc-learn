@@ -1,9 +1,11 @@
 import React from 'react';
+import { useRenderCount } from '../hooks/usePerformance';
 
 /**
  * Displays world statistics such as radiation and threat levels.
  */
-const StatsScreen = () => {
+const StatsScreen = React.memo(() => {
+  useRenderCount();
   const stats = {
     radiation: 'Moderate',
     threats: 'Low',
@@ -17,6 +19,6 @@ const StatsScreen = () => {
       <div>Progress: {stats.progress}</div>
     </div>
   );
-};
+});
 
 export default StatsScreen;

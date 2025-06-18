@@ -209,6 +209,13 @@ Success grants immediate gameplay benefits, while failure triggers defensive min
 - **Animation Throttling**: RequestAnimationFrame for smooth effects
 - **Mobile First**: Touch-optimized interactions
 
+### Performance Monitoring & Optimization
+- **FPS & Memory Overlay**: Toggle in settings to display real-time performance.
+- **Quality Presets**: Auto-detected Low/Medium/High profiles.
+- **Virtualized Lists**: Efficient scrolling of long log screens.
+- **Lazy Components**: Heavy apps load on demand.
+- **Automatic Scaling**: Render scale adjusts for low-end devices.
+
 ## 📚 Educational Value
 
 SURVIV-OS teaches fundamental cybersecurity concepts including:
@@ -232,15 +239,16 @@ Run the test suite:
 npm test
 ```
 
-Run tests in watch mode:
+Generate a coverage report:
 ```bash
-npm test -- --watch
+npm run coverage
 ```
 
-Generate coverage report:
+Run Cypress end-to-end tests:
 ```bash
-npm test -- --coverage
+npm run e2e
 ```
+
 
 ## 📦 Building for Production
 
@@ -254,6 +262,38 @@ The build outputs to the `build/` directory with:
 - Optimized assets
 - Service worker for offline play
 - Source maps for debugging
+
+## 🏆 Endgame & Replayability
+
+### Victory Sequence
+- Cinematic ending resolving the story
+- Summary of time, accuracy and threats stopped
+- List of items unlocked during the run
+- Stylish credits roll
+- Option to start **New Game+** with higher difficulty
+
+### Game Over Recap
+- Shows what killed you and a tip for improvement
+- Quick retry using the last checkpoint
+- Share defeat statistics with friends
+- Failing three times grants a sympathy item
+
+### Leaderboards & Replays
+- Local high score table tracking speed and accuracy
+- Multiple score categories for bragging rights
+- View saved replays of best runs
+
+### Post-Game Modes
+- Endless survival arenas
+- Special challenge missions
+- Dedicated speed run timer
+
+## Offline Mode
+
+SURVIV-OS now monitors network connectivity and caches assets for offline play.
+Actions performed while offline are queued and synced once a connection is
+restored. When a new version of the game is available, you'll be notified to
+reload.
 
 ## 🤝 Contributing
 

@@ -17,10 +17,13 @@ import { ScriptBuilderScreen } from './scriptbuilder';
 import HandbookScreen from './HandbookScreen';
 import StatsScreen from './StatsScreen';
 import LogScreen from './LogScreen';
+import TrophyRoomScreen from './TrophyRoomScreen';
 import NetworkScanner from './NetworkScanner';
 import PortScanner from './PortScanner';
 import FirewallApp from './FirewallApp';
 import SecurityTrainingApp from './SecurityTrainingApp';
+import SettingsScreen from './SettingsScreen';
+import LeaderboardScreen from './LeaderboardScreen';
 
 const GRID_KEY = 'homeGridSlots';
 
@@ -110,10 +113,13 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
     HandbookScreen,
     StatsScreen,
     LogScreen,
+    TrophyRoomScreen,
+    LeaderboardScreen,
     NetworkScanner,
     PortScanner,
     FirewallApp,
     SecurityTrainingApp,
+    SettingsScreen,
   };
 
   const launchApp = (appId, props = {}) => {
@@ -165,9 +171,9 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search"
         className="w-full px-2 py-1 rounded bg-gray-800 text-green-400"
-        data-testid="search-bar"
+        id="search-input" data-testid="search-bar"
       />
-      <div className="text-xs text-green-400 flex justify-around border border-gray-700 rounded p-1" data-testid="status-widgets">
+      <div className="text-xs text-green-400 flex justify-around border border-gray-700 rounded p-1" id="status-widgets" data-testid="status-widgets">
         <div>CPU {usage.cpu}%</div>
         <div>RAM {usage.ram}%</div>
         <div>BW {usage.bandwidth}%</div>
