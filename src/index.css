@@ -1,6 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  transform: scale(var(--render-scale, 1));
+  transform-origin: top left;
+}
 /* Matrix-style background */
 .matrix-bg {
   position: fixed;

@@ -209,6 +209,13 @@ Success grants immediate gameplay benefits, while failure triggers defensive min
 - **Animation Throttling**: RequestAnimationFrame for smooth effects
 - **Mobile First**: Touch-optimized interactions
 
+### Performance Monitoring & Optimization
+- **FPS & Memory Overlay**: Toggle in settings to display real-time performance.
+- **Quality Presets**: Auto-detected Low/Medium/High profiles.
+- **Virtualized Lists**: Efficient scrolling of long log screens.
+- **Lazy Components**: Heavy apps load on demand.
+- **Automatic Scaling**: Render scale adjusts for low-end devices.
+
 ## 📚 Educational Value
 
 SURVIV-OS teaches fundamental cybersecurity concepts including:
