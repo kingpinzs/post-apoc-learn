@@ -25,7 +25,7 @@ Unlike traditional security training, SURVIV-OS uses intuitive drag-and-drop mec
 
 ### Security Tools & Apps
 - **Network Scanner**: Discover devices and identify threats with visual radar
-- **Port Scanner**: Analyze vulnerabilities in target systems
+- **Port Scanner**: Analyze vulnerabilities, add custom ports and cancel scans
 - **Firewall Manager**: Configure rules by dragging and dropping policies
 - **DDoS Simulator**: Launch controlled attacks against hostile targets
 - **Packet Analyzer**: Visualize network traffic in real-time

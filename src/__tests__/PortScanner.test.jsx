@@ -18,3 +18,24 @@ test('scan generates results after delay', () => {
   expect(rows.length).toBeGreaterThan(0);
   jest.useRealTimers();
 });
+
+test('can add a custom port', () => {
+  render(<PortScanner />);
+  fireEvent.change(screen.getByPlaceholderText('Add port'), {
+    target: { value: '8080' },
+  });
+  fireEvent.click(screen.getByText('Add'));
+  expect(screen.getByText(/8080/)).toBeInTheDocument();
+});
+
+test('cancel stops scan', () => {
+  jest.useFakeTimers();
+  render(<PortScanner />);
+  fireEvent.click(screen.getByText('Scan'));
+  fireEvent.click(screen.getByText('Cancel'));
+  act(() => {
+    jest.advanceTimersByTime(1000);
+  });
+  expect(screen.queryByText('Cancel')).not.toBeInTheDocument();
+  jest.useRealTimers();
+});
