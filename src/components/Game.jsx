@@ -26,6 +26,11 @@ import {
   Binary,
 } from "lucide-react";
 
+import NetworkScanner from "./NetworkScanner";
+import PortScanner from "./PortScanner";
+import FirewallApp from "./FirewallApp";
+import TerminalScreen from "./TerminalScreen";
+
 const toolData = {
   firewall: { cost: 50 },
   antivirus: { cost: 30 },
@@ -122,6 +127,28 @@ const ApocalypseGame = ({ practice = false }) => {
     }
     return initialState;
   });
+
+  const [showTools, setShowTools] = useState(false);
+  const [activeUtility, setActiveUtility] = useState(null);
+  const [utilityProps, setUtilityProps] = useState({});
+
+  const utilityComponents = {
+    networkScanner: NetworkScanner,
+    portScanner: PortScanner,
+    firewall: FirewallApp,
+    terminal: TerminalScreen,
+  };
+
+  const launchUtility = (id, props = {}) => {
+    setActiveUtility(id);
+    setUtilityProps(props);
+    setShowTools(false);
+  };
+
+  const closeUtility = () => {
+    setActiveUtility(null);
+    setUtilityProps({});
+  };
 
   const handleKeyPress = useCallback(
     (e) => {
@@ -1261,6 +1288,14 @@ TIPS FOR THIS CHALLENGE:
             CREDITS: {gameState.credits}
           </div>
           <Battery className="w-4 h-4 text-green-500" />
+          <button
+            type="button"
+            onClick={() => setShowTools((s) => !s)}
+            className="ml-2 px-2 py-1 border border-green-500 text-green-400 rounded text-xs"
+            data-testid="toggle-tools"
+          >
+            {showTools ? 'CLOSE' : 'TOOLS'}
+          </button>
         </div>
 
         {gameState.activeAttack && (
@@ -1428,7 +1463,7 @@ TIPS FOR THIS CHALLENGE:
                     <p className="text-blue-400 font-mono text-sm whitespace-pre-wrap">
                       {module.content}
                     </p>
-                    <p className="text-blue-400 font-mono text-xs mt-2 italic">
+                    <p className="text-blue-400 font-mono text-xs mt-2 italic">Task 2: Create Integrated Game Menu System
                       {module.example}
                     </p>
                     <a
