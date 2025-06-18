@@ -5,7 +5,9 @@ import GlitchEffect from "./GlitchEffect";
 import DragCommandBlock from "./drag/DragCommandBlock";
 import DropZone from "./drag/DropZone";
 import GameOver from "./GameOver";
+import VictoryScreen from "./VictoryScreen";
 import useAchievements from "../hooks/useAchievements";
+import { addHighScore } from "../lib/highscores";
 import {
   AlertCircle,
   Brain,
@@ -43,6 +45,21 @@ const attacks = [
   },
 ];
 
+function recordFailure() {
+  try {
+    const raw = localStorage.getItem('survivos-failures');
+    const count = raw ? parseInt(raw, 10) : 0;
+    const next = count + 1;
+    localStorage.setItem('survivos-failures', next);
+    if (next % 3 === 0) {
+      return ['sympathy kit'];
+    }
+  } catch {
+    /* ignore */
+  }
+  return [];
+}
+
 const initialState = {
   hintsAvailable: 3,
   showHint: false,
@@ -69,6 +86,9 @@ const initialState = {
   showBuyCraft: null,
   damageTaken: 0,
   threatsStopped: 0,
+  startTime: Date.now(),
+  actions: 0,
+  successfulActions: 0,
   unlockedItems: [],
 };
 
@@ -169,6 +189,22 @@ const ApocalypseGame = ({ practice = false }) => {
   }, [gameState.gameCompleted, gameState.damageTaken]);
 
   useEffect(() => {
+    if (gameState.gameCompleted) {
+      const time = Math.floor((Date.now() - gameState.startTime) / 1000);
+      const accuracy = gameState.actions
+        ? (gameState.successfulActions / gameState.actions) * 100
+        : 100;
+      const score = gameState.threatsStopped * 100 - gameState.damageTaken;
+      addHighScore({
+        score,
+        threatsStopped: gameState.threatsStopped,
+        time,
+        accuracy,
+      });
+    }
+  }, [gameState.gameCompleted]);
+
+  useEffect(() => {
     if (addProgress) {
       if (gameState.credits >= 500) addProgress('credit-hoarder', 100);
       if (gameState.credits >= 1000) addProgress('resource-tycoon', 100);
@@ -211,6 +247,18 @@ const ApocalypseGame = ({ practice = false }) => {
     }, 5000);
     return () => clearInterval(dmg);
   }, [practice, gameState.activeAttack]);
+
+  useEffect(() => {
+    if (gameState.health <= 0) {
+      const extras = recordFailure();
+      if (extras.length) {
+        setGameState((prev) => ({
+          ...prev,
+          unlockedItems: [...prev.unlockedItems, ...extras],
+        }));
+      }
+    }
+  }, [gameState.health]);
 
   const hints = {
     radiation: [
@@ -983,6 +1031,8 @@ TIPS FOR THIS CHALLENGE:
           activeAttack: null,
           message: `[ DEFENSE DEPLOYED ] ${toolId.toUpperCase()} neutralized attack.`,
           threatsStopped: prev.threatsStopped + 1,
+          actions: prev.actions + 1,
+          successfulActions: prev.successfulActions + 1,
         }));
         if (addProgress) {
           addProgress('first-blood', 100);
@@ -993,8 +1043,14 @@ TIPS FOR THIS CHALLENGE:
           }
         }
       } else {
-        setGameState((prev) => ({ ...prev, showBuyCraft: toolId }));
+        setGameState((prev) => ({
+          ...prev,
+          actions: prev.actions + 1,
+          showBuyCraft: toolId,
+        }));
       }
+    } else {
+      setGameState((prev) => ({ ...prev, actions: prev.actions + 1 }));
     }
   };
 
@@ -1409,6 +1465,8 @@ TIPS FOR THIS CHALLENGE:
               stats={{
                 threatsStopped: gameState.threatsStopped,
                 damageTaken: gameState.damageTaken,
+                killer: gameState.activeAttack?.id || 'radiation',
+                tip: 'Deploy the correct tool sooner to avoid damage.',
               }}
               unlocked={gameState.unlockedItems}
               onRetry={restartGame}
@@ -1425,14 +1483,19 @@ TIPS FOR THIS CHALLENGE:
           )}
 
           {gameState.gameCompleted && (
-            <div className="text-center border border-green-500 rounded-lg p-4 mt-4">
-              <button
-                onClick={restartGame}
-                className="bg-green-900/30 border border-green-500 text-green-400 font-mono py-2 px-4 rounded-lg hover:bg-green-900/50 transition-colors"
-              >
-                RESTART TRAINING
-              </button>
-            </div>
+            <VictoryScreen
+              stats={{
+                time: Math.floor((Date.now() - gameState.startTime) / 1000),
+                accuracy: gameState.actions
+                  ? (gameState.successfulActions / gameState.actions) * 100
+                  : 100,
+                threatsStopped: gameState.threatsStopped,
+                score: gameState.threatsStopped * 100 - gameState.damageTaken,
+              }}
+              unlocked={gameState.unlockedItems}
+              onRestart={restartGame}
+              onNewGamePlus={() => restartGame()}
+            />
           )}
 
           {practice && (

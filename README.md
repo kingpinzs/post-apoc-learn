@@ -263,6 +263,31 @@ The build outputs to the `build/` directory with:
 - Service worker for offline play
 - Source maps for debugging
 
+## 🏆 Endgame & Replayability
+
+### Victory Sequence
+- Cinematic ending resolving the story
+- Summary of time, accuracy and threats stopped
+- List of items unlocked during the run
+- Stylish credits roll
+- Option to start **New Game+** with higher difficulty
+
+### Game Over Recap
+- Shows what killed you and a tip for improvement
+- Quick retry using the last checkpoint
+- Share defeat statistics with friends
+- Failing three times grants a sympathy item
+
+### Leaderboards & Replays
+- Local high score table tracking speed and accuracy
+- Multiple score categories for bragging rights
+- View saved replays of best runs
+
+### Post-Game Modes
+- Endless survival arenas
+- Special challenge missions
+- Dedicated speed run timer
+
 ## Offline Mode
 
 SURVIV-OS now monitors network connectivity and caches assets for offline play.

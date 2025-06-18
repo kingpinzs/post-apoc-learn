@@ -23,6 +23,7 @@ import PortScanner from './PortScanner';
 import FirewallApp from './FirewallApp';
 import SecurityTrainingApp from './SecurityTrainingApp';
 import SettingsScreen from './SettingsScreen';
+import LeaderboardScreen from './LeaderboardScreen';
 
 const GRID_KEY = 'homeGridSlots';
 
@@ -112,6 +113,7 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
     StatsScreen,
     LogScreen,
     TrophyRoomScreen,
+    LeaderboardScreen,
     NetworkScanner,
     PortScanner,
     FirewallApp,
