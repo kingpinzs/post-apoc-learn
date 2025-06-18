@@ -115,7 +115,7 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
     SecurityTrainingApp,
   };
 
-  const launchApp = (appId) => {
+  const launchApp = (appId, props = {}) => {
     const def = appRegistry[appId];
     if (!def) return;
     const locked = def.isLocked && !phoneState.unlockedApps.includes(appId);
@@ -126,7 +126,7 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
     }
     setLockMessage('');
     if (onLaunchApp) {
-      onLaunchApp(appId);
+      onLaunchApp(appId, props);
     } else {
       setActiveApp(appId);
       setPhoneState((s) => ({ ...s, currentScreen: 'active-app' }));

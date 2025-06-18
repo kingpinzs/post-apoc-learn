@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 import {
   allocateResources,
   freeResources,
@@ -28,10 +29,11 @@ function generateDevices() {
   return devices;
 }
 
-const NetworkScanner = () => {
+const NetworkScanner = ({ onLaunchApp }) => {
   const [devices, setDevices] = useState([]);
   const [scanning, setScanning] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [actionMsg, setActionMsg] = useState('');
   const [progress, setProgress] = useState(0);
   const timerRef = useRef(null);
   const intervalRef = useRef(null);
@@ -58,6 +60,21 @@ const NetworkScanner = () => {
       clearInterval(intervalRef.current);
       freeResources('scanner');
     }, 3000);
+  };
+
+  const handleAction = () => {
+    if (!selected) return;
+    if (selected.isBad) {
+      setActionMsg(`Attacking ${selected.ip}...`);
+      if (onLaunchApp) {
+        onLaunchApp('portScanner', { initialTarget: selected.ip });
+      }
+    } else {
+      setActionMsg(`Connecting to ${selected.ip}...`);
+      if (onLaunchApp) {
+        onLaunchApp('terminal', { initialCommand: `connect ${selected.ip}` });
+      }
+    }
   };
 
   return (
@@ -93,15 +110,26 @@ const NetworkScanner = () => {
         {scanning ? 'Scanning...' : 'Scan'}
       </button>
       {selected && (
-        <div className="text-green-400 border border-green-500 rounded p-2">
+        <div className="text-green-400 border border-green-500 rounded p-2 space-y-2">
           <div>IP: {selected.ip}</div>
           <div>Type: {selected.type}</div>
           <div>Vulnerability: {selected.vulnerability}</div>
           {selected.isBad && <div className="text-red-400">TARGET DEVICE</div>}
+          <button
+            onClick={handleAction}
+            className="mt-2 border border-green-500 rounded px-2 py-1"
+          >
+            {selected.isBad ? 'Attack' : 'Connect'}
+          </button>
+          {actionMsg && <div className="text-xs">{actionMsg}</div>}
         </div>
       )}
     </div>
   );
+};
+
+NetworkScanner.propTypes = {
+  onLaunchApp: PropTypes.func,
 };
 
 export default NetworkScanner;

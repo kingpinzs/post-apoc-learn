@@ -40,13 +40,21 @@ const App = () => {
 
   const [phoneState] = usePhoneState();
   const [currentApp, setCurrentApp] = useState(null);
+  const [appProps, setAppProps] = useState({});
+  const [animating, setAnimating] = useState(false);
 
-  const handleLaunchApp = (appId) => {
+  const handleLaunchApp = (appId, props = {}) => {
+    setAnimating(true);
     setCurrentApp(appId);
+    setAppProps(props);
+    setTimeout(() => setAnimating(false), 300);
   };
 
   const handleBack = () => {
+    setAnimating(true);
     setCurrentApp(null);
+    setAppProps({});
+    setTimeout(() => setAnimating(false), 300);
   };
 
   const Active = currentApp ? appComponents[currentApp] : null;
@@ -57,20 +65,39 @@ const App = () => {
       networkStrength={phoneState.networkStrength}
       threatLevel={phoneState.activeThreats.length}
     >
-      {!Active && <HomeScreen onLaunchApp={handleLaunchApp} />}
-      {Active && (
-        <div className="flex flex-col h-full" data-testid="active-app">
-          <button
-            type="button"
-            onClick={handleBack}
-            className="m-2 px-2 py-1 border border-green-500 text-green-400 rounded"
-            data-testid="back-button"
-          >
-            Back
-          </button>
-          <Active practice={practiceMode} />
+      <div className="relative h-full overflow-hidden">
+        <div
+          className={`absolute inset-0 transition-transform duration-300 ${
+            currentApp ? '-translate-x-full' : 'translate-x-0'
+          } ${animating ? '' : ''}`}
+        >
+          <HomeScreen onLaunchApp={handleLaunchApp} />
         </div>
-      )}
+        {Active && (
+          <div
+            className={`absolute inset-0 transition-transform duration-300 ${
+              currentApp ? 'translate-x-0' : 'translate-x-full'
+            } ${animating ? '' : ''}`}
+            data-testid="active-app"
+          >
+            <div className="flex flex-col h-full">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="m-2 px-2 py-1 border border-green-500 text-green-400 rounded"
+                data-testid="back-button"
+              >
+                Back
+              </button>
+              <Active
+                practice={practiceMode}
+                onLaunchApp={handleLaunchApp}
+                {...appProps}
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </PhoneFrame>
   );
 };
