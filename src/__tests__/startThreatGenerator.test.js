@@ -31,3 +31,21 @@ test('generator invokes callback repeatedly and can stop', () => {
   jest.runOnlyPendingTimers();
   expect(threats).toHaveLength(2);
 });
+
+test('stopping within callback prevents further scheduling', () => {
+  jest.useFakeTimers();
+  const threats = [];
+  let stop;
+  // deterministic values for type, severity, timeToImpact, target
+  mockRandomSequence([0.1, 0.9, 0.5, 0.3]);
+  stop = startThreatGenerator(t => {
+    threats.push(t);
+    stop();
+  }, ['net']);
+  // run first scheduled threat which calls stop()
+  jest.runOnlyPendingTimers();
+  expect(threats).toHaveLength(1);
+  // any additional timers should have been cleared
+  jest.runOnlyPendingTimers();
+  expect(threats).toHaveLength(1);
+});
