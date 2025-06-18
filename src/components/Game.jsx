@@ -6,6 +6,7 @@ import DragCommandBlock from "./drag/DragCommandBlock";
 import DropZone from "./drag/DropZone";
 import GameOver from "./GameOver";
 import VictoryScreen from "./VictoryScreen";
+import GameMenu from "./GameMenu";
 import useAchievements from "../hooks/useAchievements";
 import { addHighScore } from "../lib/highscores";
 import {
@@ -1523,6 +1524,7 @@ TIPS FOR THIS CHALLENGE:
           )}
         </div>
       </div>
+      <GameMenu />
     </div>
   );
 };
