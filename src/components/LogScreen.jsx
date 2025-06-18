@@ -17,7 +17,11 @@ const LogScreen = () => {
       <VirtualList
         items={logs}
         height={200}
-        rowRenderer={(l) => <div key={l.id}>- {l.text}</div>}
+        rowRenderer={(l) => (
+          <div key={l.id} data-testid="log-entry">
+            {l.text}
+          </div>
+        )}
       />
     </div>
   );
