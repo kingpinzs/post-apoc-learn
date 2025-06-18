@@ -14,6 +14,13 @@ test('flushQueue processes queued actions and clears storage', async () => {
   expect(localStorage.getItem('offline-actions')).toBeNull();
 });
 
+test('flushQueue handles invalid JSON gracefully', async () => {
+  localStorage.setItem('offline-actions', 'bad');
+  const processor = jest.fn();
+  await flushQueue(processor);
+  expect(processor).not.toHaveBeenCalled();
+});
+
 test('useOfflineQueue registers online listener and flushes queue', async () => {
   enqueueAction({ a: 1 });
   const processor = jest.fn(() => Promise.resolve());

@@ -24,6 +24,12 @@ describe('useAchievements', () => {
     expect(JSON.parse(localStorage.getItem('survivos-achievements'))['boot-sequence']).toBe(40);
   });
 
+  test('handles malformed JSON in storage', () => {
+    localStorage.setItem('survivos-achievements', '{bad json');
+    const { result } = renderHook(() => useAchievements(), { wrapper });
+    expect(result.current.progress).toEqual({});
+  });
+
   test('achievement notification appears once when completed multiple times', async () => {
     jest.useFakeTimers();
     function Test() {

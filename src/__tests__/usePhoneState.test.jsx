@@ -21,3 +21,16 @@ test('network strength updates on offline event', async () => {
   await waitFor(() => expect(result.current[0].networkStrength).toBe(0));
 });
 
+test('loads saved state from localStorage', () => {
+  const saved = {
+    version: 1,
+    currentScreen: 'home',
+    unlockedApps: ['map'],
+    completedMissions: [],
+    installedApps: [],
+  };
+  localStorage.setItem('survivos-save', JSON.stringify(saved));
+  const { result } = renderHook(() => usePhoneState());
+  expect(result.current[0].currentScreen).toBe('home');
+});
+
