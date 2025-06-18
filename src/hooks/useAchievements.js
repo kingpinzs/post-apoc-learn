@@ -31,10 +31,10 @@ export const AchievementsProvider = ({ children }) => {
       if (current < 100 && next >= 100) {
         const def = ACHIEVEMENTS.find((a) => a.id === id);
         if (def) {
-          // --- FIX STARTS HERE ---
-          // Check if the achievement is already in the recent list before adding.
-          setRecent((r) => (r.find(item => item.id === def.id) ? r : [...r, def]));
-          // --- FIX ENDS HERE ---
+          // Only push the achievement if it is not already queued for display
+          setRecent((list) =>
+            list.some((item) => item.id === def.id) ? list : [...list, def]
+          );
           setTimeout(() =>
             setRecent((r) => r.filter((d) => d.id !== id)),
           5000);
