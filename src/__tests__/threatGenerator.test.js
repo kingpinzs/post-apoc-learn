@@ -1,4 +1,9 @@
-import { generateThreat } from '../lib/threatGenerator';
+import {
+  generateThreat,
+  computeNextDifficulty,
+  recordPerformance,
+  resetPerformance,
+} from '../lib/threatGenerator';
 
 const components = ['net', 'db'];
 
@@ -41,4 +46,26 @@ test('bounds severity and timeToImpact', () => {
   const threat = generateThreat(-3, ['x']);
   expect(threat.severity).toBe(1);
   expect(threat.timeToImpact).toBeGreaterThanOrEqual(5);
+});
+
+describe('dynamic difficulty', () => {
+  beforeEach(() => {
+    resetPerformance();
+  });
+
+  test('computeNextDifficulty increases on high success', () => {
+    for (let i = 0; i < 5; i += 1) {
+      recordPerformance({ success: true, time: 5, damage: 0 });
+    }
+    const next = computeNextDifficulty(1);
+    expect(next).toBeGreaterThan(1);
+  });
+
+  test('computeNextDifficulty decreases when failing', () => {
+    for (let i = 0; i < 5; i += 1) {
+      recordPerformance({ success: false, time: 25, damage: 30 });
+    }
+    const next = computeNextDifficulty(3);
+    expect(next).toBeLessThan(3);
+  });
 });
