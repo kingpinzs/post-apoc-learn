@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, renderHook, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import usePhoneState, { initialPhoneState } from '../hooks/usePhoneState';
 
@@ -12,3 +12,12 @@ test('usePhoneState falls back to defaults with invalid save data', () => {
   const { getByTestId } = render(<TestComponent />);
   expect(getByTestId('screen').textContent).toBe(initialPhoneState.currentScreen);
 });
+
+test('network strength updates on offline event', async () => {
+  const { result } = renderHook(() => usePhoneState());
+  act(() => {
+    window.dispatchEvent(new Event('offline'));
+  });
+  await waitFor(() => expect(result.current[0].networkStrength).toBe(0));
+});
+
