@@ -9,6 +9,8 @@ const GameOver = ({ reason, stats, unlocked = [], onRetry, onPractice, onShare }
     <div className="text-green-400 font-mono mb-4 space-y-1" data-testid="statistics">
       <div>Threats Stopped: {stats.threatsStopped}</div>
       <div>Damage Taken: {stats.damageTaken}</div>
+      {stats.killer && <div>Killed By: {stats.killer}</div>}
+      {stats.tip && <div className="italic text-xs">Tip: {stats.tip}</div>}
     </div>
     <div className="text-green-400 font-mono mb-4" data-testid="unlocked-items">
       {unlocked.length > 0 ? (
@@ -52,6 +54,8 @@ GameOver.propTypes = {
   stats: PropTypes.shape({
     threatsStopped: PropTypes.number,
     damageTaken: PropTypes.number,
+    killer: PropTypes.string,
+    tip: PropTypes.string,
   }).isRequired,
   unlocked: PropTypes.arrayOf(PropTypes.string),
   onRetry: PropTypes.func,

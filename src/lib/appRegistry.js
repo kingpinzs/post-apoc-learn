@@ -169,6 +169,16 @@ export const appRegistry = {
     description: 'Configure firewall rules.',
     launchScreen: 'FirewallApp',
   },
+  leaderboard: {
+    id: 'leaderboard',
+    name: 'Leaderboard',
+    icon: 'List',
+    category: 'info',
+    isLocked: false,
+    unlockRequirements: [],
+    description: 'View local high scores.',
+    launchScreen: 'LeaderboardScreen',
+  },
   settings: {
     id: 'settings',
     name: 'Settings',
