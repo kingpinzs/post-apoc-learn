@@ -209,6 +209,13 @@ Success grants immediate gameplay benefits, while failure triggers defensive min
 - **Animation Throttling**: RequestAnimationFrame for smooth effects
 - **Mobile First**: Touch-optimized interactions
 
+### Performance Monitoring & Optimization
+- **FPS & Memory Overlay**: Toggle in settings to display real-time performance.
+- **Quality Presets**: Auto-detected Low/Medium/High profiles.
+- **Virtualized Lists**: Efficient scrolling of long log screens.
+- **Lazy Components**: Heavy apps load on demand.
+- **Automatic Scaling**: Render scale adjusts for low-end devices.
+
 ## 📚 Educational Value
 
 SURVIV-OS teaches fundamental cybersecurity concepts including:
@@ -255,6 +262,13 @@ The build outputs to the `build/` directory with:
 - Optimized assets
 - Service worker for offline play
 - Source maps for debugging
+
+## Offline Mode
+
+SURVIV-OS now monitors network connectivity and caches assets for offline play.
+Actions performed while offline are queued and synced once a connection is
+restored. When a new version of the game is available, you'll be notified to
+reload.
 
 ## 🤝 Contributing
 

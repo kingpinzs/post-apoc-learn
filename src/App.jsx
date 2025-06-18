@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { loadSettings } from './lib/settings';
+import { detectQuality } from './hooks/usePerformance';
+import PerformanceOverlay from './components/PerformanceOverlay';
 import PhoneFrame from './components/PhoneFrame';
 import HomeScreen from './components/HomeScreen';
 import NetworkScanner from './components/NetworkScanner';
@@ -44,6 +47,7 @@ const App = () => {
   const practiceMode = params.has('practice');
 
   const [phoneState] = usePhoneState();
+  const [settings] = useState(() => loadSettings(detectQuality));
   const [currentApp, setCurrentApp] = useState(null);
   const [appProps, setAppProps] = useState({});
   const [animating, setAnimating] = useState(false);
@@ -104,6 +108,7 @@ const App = () => {
           </div>
         )}
       </div>
+      <PerformanceOverlay show={settings.performance.debugOverlay} />
     </PhoneFrame>
   </TutorialProvider>
 );

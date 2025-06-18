@@ -25,6 +25,7 @@ const PhoneFrame = ({
 
   return (
     <div
+      data-testid="phone-frame"
       className="relative w-full h-screen border overflow-hidden bg-black text-green-400 flex flex-col"
     >
       <div className={cn("flex items-center justify-between text-xs px-2 py-1", statusBarColor)}>
@@ -36,7 +37,9 @@ const PhoneFrame = ({
           </div>
           <div className="flex items-center space-x-1">
             <Wifi className="w-4 h-4" />
-            <span>{networkStrength}</span>
+            <span className={networkStrength === 0 ? 'text-red-500' : ''}>
+              {networkStrength}
+            </span>
           </div>
           <div id="threat-indicator" className="flex items-center space-x-1">
             <Shield className="w-4 h-4" />
