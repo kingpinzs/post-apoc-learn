@@ -48,7 +48,9 @@ const App = () => {
 
   const [phoneState] = usePhoneState();
   const [settings] = useState(() => loadSettings(detectQuality));
-  const [currentApp, setCurrentApp] = useState(null);
+  // Launch straight into the training module on initial load so the
+  // game interface is visible without selecting an app first.
+  const [currentApp, setCurrentApp] = useState('securityTraining');
   const [appProps, setAppProps] = useState({});
   const [animating, setAnimating] = useState(false);
 
