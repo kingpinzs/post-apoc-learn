@@ -158,7 +158,13 @@ const ApocalypseGame = ({ practice = false }) => {
       clearTimeout(bootTimeout);
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [gameState.showQuestion, gameState.currentLevel, gameState.bootUp, handleKeyPress]);
+  }, [
+    gameState.showQuestion,
+    gameState.currentLevel,
+    gameState.bootUp,
+    handleKeyPress,
+    addProgress,
+  ]);
 
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(gameState));
@@ -186,7 +192,7 @@ const ApocalypseGame = ({ practice = false }) => {
     if (gameState.gameCompleted && addProgress) {
       if (gameState.damageTaken === 0) addProgress('untouchable', 100);
     }
-  }, [gameState.gameCompleted, gameState.damageTaken]);
+  }, [gameState.gameCompleted, gameState.damageTaken, addProgress]);
 
   useEffect(() => {
     if (gameState.gameCompleted) {
@@ -202,14 +208,21 @@ const ApocalypseGame = ({ practice = false }) => {
         accuracy,
       });
     }
-  }, [gameState.gameCompleted]);
+  }, [
+    gameState.gameCompleted,
+    gameState.startTime,
+    gameState.actions,
+    gameState.successfulActions,
+    gameState.threatsStopped,
+    gameState.damageTaken,
+  ]);
 
   useEffect(() => {
     if (addProgress) {
       if (gameState.credits >= 500) addProgress('credit-hoarder', 100);
       if (gameState.credits >= 1000) addProgress('resource-tycoon', 100);
     }
-  }, [gameState.credits]);
+  }, [gameState.credits, addProgress]);
 
   useEffect(() => {
     if (
