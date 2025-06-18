@@ -4,6 +4,7 @@ import { detectQuality } from './hooks/usePerformance';
 import PhoneFrame from './components/PhoneFrame';
 import PerformanceOverlay from './components/PerformanceOverlay';
 import ApocalypseGame from './components/Game';
+import AppIntegration from './components/AppIntegration';
 import { TutorialProvider } from './hooks/useTutorial';
 import usePhoneState from './hooks/usePhoneState';
 
@@ -21,8 +22,10 @@ const App = () => {
         networkStrength={phoneState.networkStrength}
         threatLevel={phoneState.activeThreats.length}
       >
-        <ApocalypseGame practice={practiceMode} />
-        <PerformanceOverlay show={settings.performance.debugOverlay} />
+        <AppIntegration>
+          <ApocalypseGame practice={practiceMode} />
+          <PerformanceOverlay show={settings.performance.debugOverlay} />
+        </AppIntegration>
       </PhoneFrame>
     </TutorialProvider>
   );
