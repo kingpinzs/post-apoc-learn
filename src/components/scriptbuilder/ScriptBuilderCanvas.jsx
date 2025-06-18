@@ -33,11 +33,17 @@ PaletteItem.propTypes = {
 
 const CanvasBlock = ({ block, onMouseDown }) => {
   const Icon = Icons[block.icon] || Icons.Terminal;
+  const style = {
+    position: 'absolute',
+    left: typeof block.x === 'number' && !Number.isNaN(block.x) ? block.x : 0,
+    top: typeof block.y === 'number' && !Number.isNaN(block.y) ? block.y : 0,
+  };
+
   return (
     <div
       onMouseDown={onMouseDown}
       className="absolute w-12 h-12 flex items-center justify-center border border-green-500/30 bg-black text-green-400 rounded select-none cursor-grab active:cursor-grabbing"
-      style={{ left: block.x, top: block.y }}
+      style={style}
       data-testid="canvas-block"
     >
       <Icon className="w-5 h-5" />
@@ -71,10 +77,18 @@ const ScriptBuilderCanvas = ({ availableCommands = [], onScriptComplete }) => {
     if (!data) return;
     const cmd = JSON.parse(data);
     const rect = canvasRef.current.getBoundingClientRect();
-    const x = snap(e.clientX - rect.left);
-    const y = snap(e.clientY - rect.top);
-    const id = Date.now() + Math.random();
-    setBlocks((prev) => [...prev, { ...cmd, id, x, y }]);
+    const clientX = e.clientX || 0;
+    const clientY = e.clientY || 0;
+    const position = {
+      x: Math.max(0, clientX - rect.left),
+      y: Math.max(0, clientY - rect.top),
+    };
+    const x = snap(position.x);
+    const y = snap(position.y);
+    if (!Number.isNaN(x) && !Number.isNaN(y)) {
+      const id = Date.now() + Math.random();
+      setBlocks((prev) => [...prev, { ...cmd, id, x, y }]);
+    }
   };
 
   const handleDragOver = (e) => e.preventDefault();
