@@ -1,46 +1,6 @@
 import React, { useState, useEffect } from 'react';
-
-const STORAGE_KEY = 'survivos-settings';
-
-const defaultSettings = {
-  audio: {
-    masterVolume: 1,
-    musicVolume: 0.7,
-    sfxVolume: 0.7,
-    muted: false,
-  },
-  display: {
-    brightness: 100,
-    highContrast: false,
-    reduceMotion: false,
-    fontSize: 16,
-  },
-  gameplay: {
-    difficulty: 'Normal',
-    hints: true,
-    autosaveInterval: 30000,
-    practiceMode: false,
-  },
-};
-
-function loadSettings() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultSettings;
-    const parsed = JSON.parse(raw);
-    return { ...defaultSettings, ...parsed };
-  } catch {
-    return defaultSettings;
-  }
-}
-
-function saveSettings(s) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-  } catch {
-    /* ignore */
-  }
-}
+import { loadSettings, saveSettings, defaultSettings } from '../lib/settings';
+import { detectQuality } from '../hooks/usePerformance';
 
 const Slider = ({ label, value, onChange, min = 0, max = 1, step = 0.01 }) => (
   <label className="flex items-center space-x-2">
@@ -59,7 +19,7 @@ const Slider = ({ label, value, onChange, min = 0, max = 1, step = 0.01 }) => (
 );
 
 const SettingsScreen = () => {
-  const [settings, setSettings] = useState(loadSettings);
+  const [settings, setSettings] = useState(() => loadSettings(detectQuality));
 
   useEffect(() => {
     saveSettings(settings);
@@ -67,6 +27,7 @@ const SettingsScreen = () => {
     document.documentElement.style.fontSize = `${settings.display.fontSize}px`;
     document.body.classList.toggle('high-contrast', settings.display.highContrast);
     document.body.classList.toggle('reduce-motion', settings.display.reduceMotion);
+    document.body.style.setProperty('--render-scale', settings.performance.renderScale);
   }, [settings]);
 
   const update = (path, value) => {
@@ -168,6 +129,55 @@ const SettingsScreen = () => {
         <label className="flex items-center space-x-2">
           <input type="checkbox" checked={settings.gameplay.practiceMode} onChange={(e) => update(['gameplay','practiceMode'], e.target.checked)} />
           <span>Practice Mode</span>
+        </label>
+      </section>
+
+      <section className="space-y-2">
+        <h3 className="text-lg">Performance</h3>
+        <label className="flex items-center space-x-2">
+          <span className="w-32">Quality</span>
+          <select
+            className="bg-black border border-green-500"
+            value={settings.performance.quality}
+            onChange={(e) => update(['performance','quality'], e.target.value)}
+          >
+            <option>Low</option>
+            <option>Medium</option>
+            <option>High</option>
+          </select>
+        </label>
+        <Slider
+          label="Particles"
+          value={settings.performance.particleDensity}
+          onChange={(v) => update(['performance','particleDensity'], v)}
+        />
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={settings.performance.animations}
+            onChange={(e) => update(['performance','animations'], e.target.checked)}
+          />
+          <span>Animations</span>
+        </label>
+        <label className="flex items-center space-x-2">
+          <span className="w-32">Render Scale</span>
+          <input
+            type="number"
+            min="0.5"
+            max="1"
+            step="0.1"
+            className="w-20 bg-black border border-green-500"
+            value={settings.performance.renderScale}
+            onChange={(e) => update(['performance','renderScale'], parseFloat(e.target.value))}
+          />
+        </label>
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={settings.performance.debugOverlay}
+            onChange={(e) => update(['performance','debugOverlay'], e.target.checked)}
+          />
+          <span>Debug Overlay</span>
         </label>
       </section>
 

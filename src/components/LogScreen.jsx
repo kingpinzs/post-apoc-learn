@@ -1,20 +1,24 @@
 import React, { useState } from 'react';
+import VirtualList from './VirtualList';
 
 /**
  * Viewer for intercepted signal logs.
  */
 const LogScreen = () => {
-  const [logs] = useState([
-    { id: 1, text: 'Encrypted ping from sector 7' },
-    { id: 2, text: 'Old broadcast decoded: keep moving' },
-    { id: 3, text: 'Distress call triangulated near canyon' },
-  ]);
+  const [logs] = useState(() =>
+    Array.from({ length: 100 }).map((_, i) => ({
+      id: i + 1,
+      text: `Log entry ${i + 1}`,
+    }))
+  );
 
   return (
-    <div className="p-4 space-y-1 text-green-400" data-testid="log-screen">
-      {logs.map((l) => (
-        <div key={l.id}>- {l.text}</div>
-      ))}
+    <div className="p-4 text-green-400" data-testid="log-screen">
+      <VirtualList
+        items={logs}
+        height={200}
+        rowRenderer={(l) => <div key={l.id}>- {l.text}</div>}
+      />
     </div>
   );
 };
