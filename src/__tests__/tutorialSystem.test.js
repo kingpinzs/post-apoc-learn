@@ -16,6 +16,12 @@ test('resetProgress clears data', () => {
   expect(loadProgress()).toEqual({ completed: [], activeMission: null });
 });
 
+test('loadProgress handles malformed JSON', () => {
+  localStorage.setItem('survivos-tutorial', '{bad json');
+  const data = loadProgress();
+  expect(data).toEqual({ completed: [], activeMission: null });
+});
+
 // ensure missions list includes expected ids
 test('tutorial missions defined', () => {
   const ids = tutorialMissions.map((m) => m.id);

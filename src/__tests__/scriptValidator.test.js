@@ -21,6 +21,23 @@ test('rejects invalid connections', () => {
   expect(result.isValid).toBe(false);
 });
 
+test('rejects missing END block', () => {
+  const result = validateScript([start, action]);
+  expect(result.isValid).toBe(false);
+  expect(result.errors).toContain('Missing END block');
+});
+
+test('handles blocks without coordinates', () => {
+  const loose = { type: 'ACTION' };
+  const res = validateScript([start, loose, end]);
+  expect(res.isValid).toBe(true);
+});
+
+test('supports string blocks', () => {
+  const result = validateScript(['START', 'END']);
+  expect(result.isValid).toBe(true);
+});
+
 test('detects infinite loop', () => {
   const loop = { id: 4, type: 'LOOP', x: 0, y: 50, parameters: {} };
   const res = validateScript([start, loop, end]);

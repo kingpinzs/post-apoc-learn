@@ -35,3 +35,10 @@ test('higher difficulty increases severity', () => {
   const high = generateThreat(5, components);
   expect(high.severity).toBeGreaterThan(low.severity);
 });
+
+test('bounds severity and timeToImpact', () => {
+  mockRandomSequence([0.5, 0.1, 0, 0]);
+  const threat = generateThreat(-3, ['x']);
+  expect(threat.severity).toBe(1);
+  expect(threat.timeToImpact).toBeGreaterThanOrEqual(5);
+});

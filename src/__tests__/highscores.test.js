@@ -23,3 +23,8 @@ test('addHighScore sorts scores and keeps top 10', () => {
   expect(scores[0].score).toBe(11);
   expect(scores[9].score).toBe(2);
 });
+
+test('loadHighScores handles malformed JSON', () => {
+  localStorage.setItem('survivos-highscores', '{bad');
+  expect(loadHighScores()).toEqual([]);
+});

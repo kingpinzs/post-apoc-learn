@@ -50,3 +50,11 @@ test('saveGame persists installedApps', () => {
   expect(data.installedApps).toEqual(['scanner']);
 });
 
+test('defaults array fields when missing', () => {
+  saveGame({ currentScreen: 'home' });
+  const data = loadGame();
+  expect(data.unlockedApps).toEqual([]);
+  expect(data.completedMissions).toEqual([]);
+  expect(data.installedApps).toEqual([]);
+});
+
