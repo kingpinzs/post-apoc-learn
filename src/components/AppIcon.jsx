@@ -30,7 +30,7 @@ const AppIcon = ({
   };
 
   return (
-    <div className="flex flex-col items-center w-16">
+    <div id={`app-icon-${appId}`} className="flex flex-col items-center w-16">
       <div
         draggable={isDraggable && !isLocked}
         onDragStart={handleDragStart}
