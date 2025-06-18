@@ -15,6 +15,7 @@ import HandbookScreen from './components/HandbookScreen';
 import StatsScreen from './components/StatsScreen';
 import LogScreen from './components/LogScreen';
 import SecurityTrainingApp from './components/SecurityTrainingApp';
+import SettingsScreen from './components/SettingsScreen';
 import { TutorialProvider } from "./hooks/useTutorial";
 import usePhoneState from './hooks/usePhoneState';
 
@@ -33,6 +34,7 @@ const appComponents = {
   networkScanner: NetworkScanner,
   portScanner: PortScanner,
   firewall: FirewallApp,
+  settings: SettingsScreen,
 };
 
 const App = () => {

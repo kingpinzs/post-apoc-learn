@@ -159,4 +159,14 @@ export const appRegistry = {
     description: 'Configure firewall rules.',
     launchScreen: 'FirewallApp',
   },
+  settings: {
+    id: 'settings',
+    name: 'Settings',
+    icon: 'Settings',
+    category: 'info',
+    isLocked: false,
+    unlockRequirements: [],
+    description: 'Configure audio, display, and gameplay options.',
+    launchScreen: 'SettingsScreen',
+  },
 };
