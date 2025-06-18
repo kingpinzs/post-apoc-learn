@@ -21,6 +21,7 @@ import NetworkScanner from './NetworkScanner';
 import PortScanner from './PortScanner';
 import FirewallApp from './FirewallApp';
 import SecurityTrainingApp from './SecurityTrainingApp';
+import SettingsScreen from './SettingsScreen';
 
 const GRID_KEY = 'homeGridSlots';
 
@@ -113,6 +114,7 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
     PortScanner,
     FirewallApp,
     SecurityTrainingApp,
+    SettingsScreen,
   };
 
   const launchApp = (appId, props = {}) => {

@@ -122,3 +122,13 @@
   0% { transform: translate(0,0); }
   100% { transform: translate(-50%, -50%); }
 }
+
+body.high-contrast {
+  filter: contrast(2);
+}
+
+body.reduce-motion * {
+  animation-duration: 0s !important;
+  transition-duration: 0s !important;
+}
+
