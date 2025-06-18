@@ -14,6 +14,7 @@ import { ScriptBuilderScreen } from './components/scriptbuilder';
 import HandbookScreen from './components/HandbookScreen';
 import StatsScreen from './components/StatsScreen';
 import LogScreen from './components/LogScreen';
+import TrophyRoomScreen from './components/TrophyRoomScreen';
 import SecurityTrainingApp from './components/SecurityTrainingApp';
 import SettingsScreen from './components/SettingsScreen';
 import { TutorialProvider } from "./hooks/useTutorial";
@@ -30,6 +31,7 @@ const appComponents = {
   handbook: HandbookScreen,
   worldStats: StatsScreen,
   signalLog: LogScreen,
+  trophyRoom: TrophyRoomScreen,
   securityTraining: SecurityTrainingApp,
   networkScanner: NetworkScanner,
   portScanner: PortScanner,

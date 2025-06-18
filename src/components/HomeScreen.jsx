@@ -17,6 +17,7 @@ import { ScriptBuilderScreen } from './scriptbuilder';
 import HandbookScreen from './HandbookScreen';
 import StatsScreen from './StatsScreen';
 import LogScreen from './LogScreen';
+import TrophyRoomScreen from './TrophyRoomScreen';
 import NetworkScanner from './NetworkScanner';
 import PortScanner from './PortScanner';
 import FirewallApp from './FirewallApp';
@@ -110,6 +111,7 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
     HandbookScreen,
     StatsScreen,
     LogScreen,
+    TrophyRoomScreen,
     NetworkScanner,
     PortScanner,
     FirewallApp,

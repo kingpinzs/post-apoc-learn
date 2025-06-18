@@ -119,6 +119,16 @@ export const appRegistry = {
     description: 'Archive of intercepted radio chatter.',
     launchScreen: 'LogScreen',
   },
+  trophyRoom: {
+    id: 'trophyRoom',
+    name: 'Trophy Room',
+    icon: 'Award',
+    category: 'info',
+    isLocked: false,
+    unlockRequirements: [],
+    description: 'View earned achievements.',
+    launchScreen: 'TrophyRoomScreen',
+  },
   securityTraining: {
     id: 'securityTraining',
     name: 'Security Training',
