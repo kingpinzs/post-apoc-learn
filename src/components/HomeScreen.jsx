@@ -164,15 +164,15 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search"
         className="w-full px-2 py-1 rounded bg-gray-800 text-green-400"
-        data-testid="search-bar"
+        id="search-input" data-testid="search-bar"
       />
-      <div className="text-xs text-green-400 flex justify-around border border-gray-700 rounded p-1" data-testid="status-widgets">
+      <div className="text-xs text-green-400 flex justify-around border border-gray-700 rounded p-1" id="status-widgets" data-testid="status-widgets">
         <div>CPU {usage.cpu}%</div>
         <div>RAM {usage.ram}%</div>
         <div>BW {usage.bandwidth}%</div>
       </div>
       <div className="flex-1 overflow-auto">
-        <div className="grid grid-cols-4 gap-2" data-testid="app-grid">
+        <div className="grid grid-cols-4 gap-2" id="app-grid" data-testid="app-grid">
           {gridSlots.map((appId, i) => {
             const def = appRegistry[appId];
             const Icon = def ? Icons[def.icon] : null;

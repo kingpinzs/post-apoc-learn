@@ -38,7 +38,7 @@ const PhoneFrame = ({
             <Wifi className="w-4 h-4" />
             <span>{networkStrength}</span>
           </div>
-          <div className="flex items-center space-x-1">
+          <div id="threat-indicator" className="flex items-center space-x-1">
             <Shield className="w-4 h-4" />
             <span>{threatLevel}</span>
           </div>
