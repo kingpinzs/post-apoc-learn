@@ -22,6 +22,7 @@ const ScriptBuilder = () => {
     const result = validateScript(commands);
     if (!result.isValid) {
       setError(result.errors.join(', '));
+      setExec(null);
       return;
     }
     setError(null);
