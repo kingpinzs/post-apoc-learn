@@ -8,6 +8,8 @@ import GameOver from "./GameOver";
 import VictoryScreen from "./VictoryScreen";
 import GameMenu from "./GameMenu";
 import QuickAccessBar from "./QuickAccessBar";
+import DefenseMinigame from "./defense/DefenseMinigame";
+import ThreatPanel from "./ThreatPanel";
 import StorylineManager from "./StorylineManager";
 import useAchievements from "../hooks/useAchievements";
 import { addHighScore } from "../lib/highscores";
@@ -51,6 +53,8 @@ const attacks = [
     tool: "patch",
   },
 ];
+
+const SYSTEM_COMPONENTS = ["network", "database", "services", "kernel"];
 
 // Restrict which attacks appear based on the player's level
 const attackStages = [
@@ -104,8 +108,13 @@ const initialState = {
   inventory: { firewall: true },
   cooldowns: { firewall: 0, antivirus: 0, patch: 0 },
   activeAttack: null,
+  attackTimeLeft: 0,
   showBuyCraft: null,
   damageTaken: 0,
+  combo: 0,
+  damageFlash: false,
+  successFlash: false,
+  showMinigame: false,
   threatsStopped: 0,
   startTime: Date.now(),
   actions: 0,
@@ -222,6 +231,24 @@ const ApocalypseGame = ({ practice = false }) => {
   }, [gameState.showParticles]);
 
   useEffect(() => {
+    if (gameState.damageFlash) {
+      const t = setTimeout(() => {
+        setGameState((prev) => ({ ...prev, damageFlash: false }));
+      }, 500);
+      return () => clearTimeout(t);
+    }
+  }, [gameState.damageFlash]);
+
+  useEffect(() => {
+    if (gameState.successFlash) {
+      const t = setTimeout(() => {
+        setGameState((prev) => ({ ...prev, successFlash: false }));
+      }, 300);
+      return () => clearTimeout(t);
+    }
+  }, [gameState.successFlash]);
+
+  useEffect(() => {
     const t = setInterval(() => {
       setGameState((prev) => {
         const next = { ...prev.cooldowns };
@@ -304,11 +331,16 @@ const ApocalypseGame = ({ practice = false }) => {
       );
       const allowedIds = attackStages[stage];
       const possible = attacks.filter((a) => allowedIds.includes(a.id));
-      const attack =
-        possible[Math.floor(Math.random() * possible.length)];
+      const attack = possible[Math.floor(Math.random() * possible.length)];
+      const pattern = Array.from({ length: 4 }, () =>
+        String.fromCharCode(65 + Math.floor(Math.random() * 4))
+      );
+      const target =
+        SYSTEM_COMPONENTS[Math.floor(Math.random() * SYSTEM_COMPONENTS.length)];
       setGameState((prev) => ({
         ...prev,
-        activeAttack: attack,
+        activeAttack: { ...attack, pattern, target },
+        attackTimeLeft: 10,
         message: `[ WARNING ] ${attack.message}`,
       }));
     }, Math.random() * 5000 + 5000);
@@ -335,21 +367,21 @@ const ApocalypseGame = ({ practice = false }) => {
   }, [gameState.activeAttack, gameState.inventory]);
 
   useEffect(() => {
-    if (practice || !gameState.activeAttack) {
-      return;
+    if (!gameState.activeAttack) return;
+    const timer = setInterval(() => {
+      setGameState((prev) => ({
+        ...prev,
+        attackTimeLeft: Math.max(0, prev.attackTimeLeft - 1),
+      }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [gameState.activeAttack]);
+
+  useEffect(() => {
+    if (gameState.attackTimeLeft <= 0 && gameState.activeAttack) {
+      resolveFailure();
     }
-    const dmg = setInterval(() => {
-      setGameState((prev) => {
-        const newHealth = Math.max(0, prev.health - 5);
-        return {
-          ...prev,
-          health: newHealth,
-          damageTaken: prev.damageTaken + (prev.health - newHealth),
-        };
-      });
-    }, 5000);
-    return () => clearInterval(dmg);
-  }, [practice, gameState.activeAttack]);
+  }, [gameState.attackTimeLeft]);
 
   useEffect(() => {
     if (gameState.health <= 0) {
@@ -1135,6 +1167,44 @@ TIPS FOR THIS CHALLENGE:
     localStorage.removeItem(storageKey);
   };
 
+  const resolveSuccess = (toolId) => {
+    setGameState((prev) => ({
+      ...prev,
+      activeAttack: null,
+      attackTimeLeft: 0,
+      successFlash: true,
+      combo: prev.combo + 1,
+      message: `[ DEFENSE DEPLOYED ] ${toolId.toUpperCase()} neutralized attack.`,
+      threatsStopped: prev.threatsStopped + 1,
+      actions: prev.actions + 1,
+      successfulActions: prev.successfulActions + 1,
+      cooldowns: { ...prev.cooldowns, [toolId]: 5 },
+    }));
+    if (addProgress) {
+      addProgress('first-blood', 100);
+      addProgress('guardian', 10);
+      addProgress('shield-master', 4);
+      if (gameState.damageTaken === 0) {
+        addProgress('flawless-defense', 20);
+      }
+    }
+  };
+
+  const resolveFailure = () => {
+    setGameState((prev) => {
+      const newHealth = Math.max(0, prev.health - 10);
+      return {
+        ...prev,
+        health: newHealth,
+        damageTaken: prev.damageTaken + (prev.health - newHealth),
+        activeAttack: null,
+        attackTimeLeft: 0,
+        damageFlash: true,
+        combo: 0,
+      };
+    });
+  };
+
   const handleUseTool = (toolId) => {
     if (gameState.cooldowns[toolId] > 0) {
       setGameState((prev) => ({ ...prev, message: `${toolId.toUpperCase()} recharging...` }));
@@ -1143,23 +1213,7 @@ TIPS FOR THIS CHALLENGE:
     if (!gameState.activeAttack) return;
     if (gameState.activeAttack.tool === toolId) {
       if (gameState.inventory?.[toolId]) {
-        setGameState((prev) => ({
-          ...prev,
-          activeAttack: null,
-          message: `[ DEFENSE DEPLOYED ] ${toolId.toUpperCase()} neutralized attack.`,
-          threatsStopped: prev.threatsStopped + 1,
-          actions: prev.actions + 1,
-          successfulActions: prev.successfulActions + 1,
-          cooldowns: { ...prev.cooldowns, [toolId]: 5 },
-        }));
-        if (addProgress) {
-          addProgress('first-blood', 100);
-          addProgress('guardian', 10);
-          addProgress('shield-master', 4);
-          if (gameState.damageTaken === 0) {
-            addProgress('flawless-defense', 20);
-          }
-        }
+        resolveSuccess(toolId);
       } else {
         setGameState((prev) => ({
           ...prev,
@@ -1344,7 +1398,9 @@ TIPS FOR THIS CHALLENGE:
   };
 
   return (
-    <div className="min-h-screen bg-black p-4 flex items-center justify-center">
+    <div
+      className={`min-h-screen bg-black p-4 flex items-center justify-center ${gameState.damageFlash ? 'screen-shake flash-red' : ''} ${gameState.successFlash ? 'flash-green' : ''}`}
+    >
       <div className="matrix-bg" />
       <div className="w-full relative max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl">
         <Particles trigger={gameState.showParticles} />
@@ -1382,11 +1438,11 @@ TIPS FOR THIS CHALLENGE:
           </button>
         </div>
 
-        {gameState.activeAttack && (
-          <div className="bg-red-900/30 border-b border-red-500 text-red-400 text-center font-mono text-xs py-1 animate-pulse">
-            {gameState.activeAttack.message}
-          </div>
-        )}
+        <ThreatPanel
+          threat={gameState.activeAttack}
+          timeLeft={gameState.attackTimeLeft}
+          combo={gameState.combo}
+        />
 
         <div
           className={`p-6 bg-black rounded-b-3xl transition-opacity duration-500 ${gameState.transitioning ? "opacity-0" : "opacity-100"}`}
@@ -1436,16 +1492,29 @@ TIPS FOR THIS CHALLENGE:
 
           {/* Tools */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {Object.keys(gameState.inventory || {}).map((tool) => (
-              <button
-                key={tool}
-                onClick={() => handleUseTool(tool)}
-                className="bg-black border border-green-500/30 text-green-400 font-mono px-3 py-1 rounded-lg hover:bg-green-900/30 text-xs"
-              >
-                {tool.toUpperCase()}
-              </button>
-            ))}
-          </div>
+        {Object.keys(gameState.inventory || {}).map((tool) => (
+          <button
+            key={tool}
+            onClick={() => handleUseTool(tool)}
+            className="bg-black border border-green-500/30 text-green-400 font-mono px-3 py-1 rounded-lg hover:bg-green-900/30 text-xs"
+          >
+            {tool.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
+      {gameState.activeAttack && (
+        <div className="mb-4">
+          <button
+            onClick={() =>
+              setGameState((prev) => ({ ...prev, showMinigame: true }))
+            }
+            className="bg-black border border-green-500/30 text-green-400 font-mono px-3 py-1 rounded-lg hover:bg-green-900/30 text-xs"
+          >
+            DEFEND MANUALLY
+          </button>
+        </div>
+      )}
 
           {gameState.showBuyCraft && (
             <div className="border border-blue-500/30 rounded-lg p-3 mb-4 bg-blue-900/10">
@@ -1668,6 +1737,23 @@ TIPS FOR THIS CHALLENGE:
         paused={paused}
         unlockedApps={gameState.unlockedApps}
       />
+
+      {gameState.showMinigame && gameState.activeAttack && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+          <DefenseMinigame
+            threatPattern={gameState.activeAttack.pattern}
+            timeLimit={gameState.attackTimeLeft}
+            onSuccess={() => {
+              resolveSuccess(gameState.activeAttack.tool);
+              setGameState((prev) => ({ ...prev, showMinigame: false }));
+            }}
+            onFailure={() => {
+              resolveFailure();
+              setGameState((prev) => ({ ...prev, showMinigame: false }));
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };
