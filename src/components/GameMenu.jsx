@@ -91,6 +91,36 @@ const GameMenu = ({ onTogglePause, paused = false }) => {
     return () => window.removeEventListener('keydown', handler);
   }, [active, onTogglePause]);
 
+  useEffect(() => {
+    let startX = null;
+    let startY = null;
+    const handleStart = (e) => {
+      if (active || open) return;
+      const t = e.touches?.[0];
+      if (!t) return;
+      startX = t.clientX;
+      startY = t.clientY;
+    };
+    const handleEnd = (e) => {
+      if (startX === null || startY === null) return;
+      const t = e.changedTouches?.[0];
+      if (!t) return;
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+        toggle();
+      }
+      startX = null;
+      startY = null;
+    };
+    window.addEventListener('touchstart', handleStart);
+    window.addEventListener('touchend', handleEnd);
+    return () => {
+      window.removeEventListener('touchstart', handleStart);
+      window.removeEventListener('touchend', handleEnd);
+    };
+  }, [active, open]);
+
   const ActiveComp = active ? APPS[active]?.Component : null;
 
   return (
