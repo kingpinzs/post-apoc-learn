@@ -384,7 +384,7 @@ const ApocalypseGame = ({ practice = false }) => {
     if (gameState.attackTimeLeft <= 0 && gameState.activeAttack) {
       resolveFailure();
     }
-  }, [gameState.attackTimeLeft]);
+  }, [gameState.attackTimeLeft, gameState.activeAttack]);
 
   useEffect(() => {
     if (gameState.health <= 0) {
