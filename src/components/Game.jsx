@@ -7,6 +7,7 @@ import DropZone from "./drag/DropZone";
 import GameOver from "./GameOver";
 import VictoryScreen from "./VictoryScreen";
 import GameMenu from "./GameMenu";
+import QuickAccessBar from "./QuickAccessBar";
 import useAchievements from "../hooks/useAchievements";
 import { addHighScore } from "../lib/highscores";
 import {
@@ -100,6 +101,7 @@ const initialState = {
   transitioning: false,
   credits: 100,
   inventory: { firewall: true },
+  cooldowns: { firewall: 0, antivirus: 0, patch: 0 },
   activeAttack: null,
   showBuyCraft: null,
   damageTaken: 0,
@@ -148,6 +150,7 @@ const ApocalypseGame = ({ practice = false }) => {
 
   const [showTools, setShowTools] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [selectedTool, setSelectedTool] = useState(null);
 
   const handleKeyPress = useCallback(
     (e) => {
@@ -216,6 +219,23 @@ const ApocalypseGame = ({ practice = false }) => {
       return () => clearTimeout(t);
     }
   }, [gameState.showParticles]);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setGameState((prev) => {
+        const next = { ...prev.cooldowns };
+        let changed = false;
+        for (const k in next) {
+          if (next[k] > 0) {
+            next[k] = Math.max(0, next[k] - 1);
+            changed = true;
+          }
+        }
+        return changed ? { ...prev, cooldowns: next } : prev;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, []);
 
   const { showHelp, completed = [], activeMission } = useTutorial() || {};
   const tutorialDone = completed.length >= tutorialMissions.length && !activeMission;
@@ -1115,6 +1135,10 @@ TIPS FOR THIS CHALLENGE:
   };
 
   const handleUseTool = (toolId) => {
+    if (gameState.cooldowns[toolId] > 0) {
+      setGameState((prev) => ({ ...prev, message: `${toolId.toUpperCase()} recharging...` }));
+      return;
+    }
     if (!gameState.activeAttack) return;
     if (gameState.activeAttack.tool === toolId) {
       if (gameState.inventory?.[toolId]) {
@@ -1125,6 +1149,7 @@ TIPS FOR THIS CHALLENGE:
           threatsStopped: prev.threatsStopped + 1,
           actions: prev.actions + 1,
           successfulActions: prev.successfulActions + 1,
+          cooldowns: { ...prev.cooldowns, [toolId]: 5 },
         }));
         if (addProgress) {
           addProgress('first-blood', 100);
@@ -1622,6 +1647,20 @@ TIPS FOR THIS CHALLENGE:
           <div className="text-xl">PAUSED - Press P to resume</div>
         </div>
       )}
+      <QuickAccessBar
+        health={gameState.health}
+        credits={gameState.credits}
+        activeAttack={gameState.activeAttack}
+        inventory={gameState.inventory}
+        cooldowns={gameState.cooldowns}
+        selectedTool={selectedTool}
+        onSelectTool={(t) => setSelectedTool(t)}
+        onDefend={(tool) => {
+          handleUseTool(tool);
+          setSelectedTool(null);
+        }}
+        onOpenMenu={() => window.dispatchEvent(new Event('open-menu'))}
+      />
       <GameMenu
         onTogglePause={() => setPaused((p) => !p)}
         paused={paused}
