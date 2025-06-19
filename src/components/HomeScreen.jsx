@@ -196,7 +196,7 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
       </button>
       {showGrid && (
         <div className="flex-1 overflow-auto">
-          <div className="grid grid-cols-4 gap-2" data-testid="app-grid">
+          <div className="grid grid-cols-4 gap-2" id="app-grid" data-testid="app-grid">
             {gridSlots.map((appId, i) => {
               const def = appRegistry[appId];
               const Icon = def ? Icons[def.icon] : null;
