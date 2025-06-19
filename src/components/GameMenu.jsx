@@ -164,6 +164,7 @@ const GameMenu = ({ onTogglePause, paused = false, unlockedApps = [] }) => {
         type="button"
         onClick={toggle}
         id="menu-toggle"
+        data-tutorial="menu-toggle"
         className="fixed top-2 right-2 z-40 p-1 bg-gray-800 text-green-400 rounded"
         data-testid="menu-toggle"
       >
@@ -187,6 +188,7 @@ const GameMenu = ({ onTogglePause, paused = false, unlockedApps = [] }) => {
                   locked ? 'opacity-40 cursor-not-allowed' : ''
                 }`}
                 id={`app-icon-${id}`}
+                data-tutorial={`app-icon-${id}`}
                 data-testid={`menu-item-${id}`}
               >
                 <Icon className="w-6 h-6" />

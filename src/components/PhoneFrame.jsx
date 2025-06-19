@@ -75,6 +75,7 @@ const PhoneFrame = ({
           className="flex items-center justify-between text-xs px-2 py-1 bg-gray-900 border-b border-green-500/40"
           data-testid="game-status-bar"
           id="status-bar"
+          data-tutorial="status-bar"
         >
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
