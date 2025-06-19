@@ -15,32 +15,52 @@ const useIsomorphicLayoutEffect =
 const TutorialOverlay = ({ steps = [], onComplete }) => {
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState(null);
+  const [element, setElement] = useState(null);
+  const [missing, setMissing] = useState(false);
   const tipRef = useRef(null);
   const [tipSize, setTipSize] = useState({ width: 0, height: 0 });
 
-  // update highlight rect on step change
-  // We now use the "safe" hook instead of useLayoutEffect directly.
-  useIsomorphicLayoutEffect(() => {
+  const debug =
+    typeof window !== 'undefined' &&
+    window.localStorage.getItem('tutorial-debug') === '1';
+
+  // find target element with retries
+  useEffect(() => {
     if (index >= steps.length) return;
-    const el = document.getElementById(steps[index].targetId);
-    if (el) setRect(el.getBoundingClientRect());
+    setMissing(false);
+    setElement(null);
+    const delays = [0, 100, 500, 1000];
+    let attempt = 0;
+    let timer;
+    function search() {
+      const el = document.querySelector(
+        `[data-tutorial="${steps[index].target}"]`
+      );
+      if (el) {
+        setElement(el);
+      } else if (attempt < delays.length - 1) {
+        timer = setTimeout(search, delays[++attempt]);
+      } else {
+        setMissing(true);
+      }
+    }
+    search();
+    return () => clearTimeout(timer);
   }, [index, steps]);
+
+  // update highlight rect when element changes
+  useIsomorphicLayoutEffect(() => {
+    if (element) setRect(element.getBoundingClientRect());
+  }, [element]);
 
   // handle progression
   useEffect(() => {
-    if (index >= steps.length) {
-      return;
-    }
-    const { targetId, action } = steps[index];
-    const el = document.getElementById(targetId);
-    if (!el) return;
-
+    if (!element || index >= steps.length) return;
+    const { action } = steps[index];
     const handler = () => setIndex((i) => i + 1);
-    el.addEventListener(action, handler);
-    return () => {
-      el.removeEventListener(action, handler);
-    };
-  }, [index, steps]);
+    element.addEventListener(action, handler);
+    return () => element.removeEventListener(action, handler);
+  }, [element, index, steps]);
 
   // fire completion callback
   useEffect(() => {
@@ -103,7 +123,21 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
         ref={tipRef}
       >
         {message}
+        {missing && (
+          <button
+            type="button"
+            onClick={() => setIndex((i) => i + 1)}
+            className="ml-2 text-xs underline text-blue-600 pointer-events-auto"
+          >
+            Skip Step
+          </button>
+        )}
       </div>
+      {debug && (
+        <div className="absolute bottom-2 left-2 text-xs bg-black/70 text-white p-1 rounded pointer-events-auto">
+          Step {index + 1}/{steps.length}: {steps[index].target}
+        </div>
+      )}
     </div>
   );
 };
@@ -111,7 +145,7 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
 TutorialOverlay.propTypes = {
   steps: PropTypes.arrayOf(
     PropTypes.shape({
-      targetId: PropTypes.string.isRequired,
+      target: PropTypes.string.isRequired,
       message: PropTypes.string.isRequired,
       action: PropTypes.string.isRequired,
     })

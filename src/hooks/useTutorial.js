@@ -26,8 +26,8 @@ export const TutorialProvider = ({ children, autoStart = true }) => {
     if (next) setState({ ...state, activeMission: next.id });
   }, [state]);
 
-  const showHelp = useCallback((targetId, message) => {
-    setHelpSteps([{ targetId, message, action: 'click' }]);
+  const showHelp = useCallback((target, message) => {
+    setHelpSteps([{ target, message, action: 'click' }]);
   }, []);
 
   useEffect(() => {
