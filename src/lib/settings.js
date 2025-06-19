@@ -1,3 +1,5 @@
+import { DEFAULT_DIFFICULTY } from './difficulties';
+
 const STORAGE_KEY = 'survivos-settings';
 
 export const defaultSettings = {
@@ -14,7 +16,7 @@ export const defaultSettings = {
     fontSize: 16,
   },
   gameplay: {
-    difficulty: 'Normal',
+    difficulty: DEFAULT_DIFFICULTY,
     hints: true,
     autosaveInterval: 30000,
     practiceMode: false,

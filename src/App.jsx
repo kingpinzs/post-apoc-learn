@@ -15,6 +15,8 @@ const App = () => {
       <MainGameContainer
         practiceMode={practiceMode}
         showPerformance={settings.performance.debugOverlay}
+        difficulty={settings.gameplay.difficulty}
+        hints={settings.gameplay.hints}
       />
     </TutorialProvider>
   );

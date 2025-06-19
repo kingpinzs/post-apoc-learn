@@ -26,5 +26,11 @@ describe('ApocalypseGame', () => {
     ).toBeInTheDocument();
     jest.useRealTimers();
   });
+
+  test('quick save stores state', () => {
+    render(<ApocalypseGame />);
+    fireEvent.keyDown(window, { key: 'F5' });
+    expect(localStorage.getItem('survivos-quick')).not.toBeNull();
+  });
 });
 

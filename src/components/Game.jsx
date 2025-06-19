@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 
 import { appRegistry } from '../lib/appRegistry';
+import { DIFFICULTY_PRESETS } from '../lib/difficulties';
 import { useTutorial } from '../hooks/useTutorial';
 import { tutorialMissions } from '../lib/tutorialSystem';
 import { playSound } from '../lib/sound';
@@ -127,7 +128,8 @@ const initialState = {
   newUnlock: null,
 };
 
-const ApocalypseGame = ({ practice = false }) => {
+const ApocalypseGame = ({ practice = false, difficulty = 'Operative', hints: enableHints = true }) => {
+  const preset = DIFFICULTY_PRESETS[difficulty] || DIFFICULTY_PRESETS.Operative;
   const storageKey = practice ? "practiceState" : "gameState";
   const { addProgress } = useAchievements() || {};
   const [gameState, setGameState] = useState(() => {
@@ -136,6 +138,7 @@ const ApocalypseGame = ({ practice = false }) => {
       const parsed = JSON.parse(saved);
       return {
         ...initialState,
+        hintsAvailable: enableHints && preset.hints ? initialState.hintsAvailable : 0,
         ...parsed,
         inventory: {
           ...initialState.inventory,
@@ -147,6 +150,7 @@ const ApocalypseGame = ({ practice = false }) => {
     if (practice) {
       return {
         ...initialState,
+        hintsAvailable: enableHints && preset.hints ? initialState.hintsAvailable : 0,
         credits: 9999,
         inventory: Object.keys(toolData).reduce(
           (acc, t) => ({ ...acc, [t]: true }),
@@ -158,7 +162,7 @@ const ApocalypseGame = ({ practice = false }) => {
         ),
       };
     }
-    return initialState;
+    return { ...initialState, hintsAvailable: enableHints && preset.hints ? initialState.hintsAvailable : 0 };
   });
 
   const [showTools, setShowTools] = useState(false);
@@ -167,6 +171,15 @@ const ApocalypseGame = ({ practice = false }) => {
 
   const handleKeyPress = useCallback(
     (e) => {
+      if (e.key === 'F5') {
+        localStorage.setItem('survivos-quick', JSON.stringify(gameState));
+        return;
+      }
+      if (e.key === 'F9') {
+        const saved = localStorage.getItem('survivos-quick');
+        if (saved) setGameState(JSON.parse(saved));
+        return;
+      }
       if (paused) return;
       if (
         gameState.showQuestion &&
@@ -181,7 +194,7 @@ const ApocalypseGame = ({ practice = false }) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [gameState.showQuestion, gameState.currentLevel, paused],
+    [gameState.showQuestion, gameState.currentLevel, paused, gameState],
   );
 
   useEffect(() => {
@@ -343,10 +356,10 @@ const ApocalypseGame = ({ practice = false }) => {
       setGameState((prev) => ({
         ...prev,
         activeAttack: { ...attack, pattern, target },
-        attackTimeLeft: 10,
+        attackTimeLeft: Math.round(10 * preset.timeScale),
         message: `[ WARNING ] ${attack.message}`,
       }));
-    }, Math.random() * 5000 + 5000);
+    }, (Math.random() * 5000 + 5000) / preset.threatRate);
     return () => clearTimeout(timeout);
   }, [
     practice,
@@ -1176,20 +1189,25 @@ TIPS FOR THIS CHALLENGE:
 
   const resolveSuccess = (toolId) => {
     playSound('success');
-    setGameState((prev) => ({
-      ...prev,
-      activeAttack: null,
-      attackTimeLeft: 0,
-      successFlash: true,
-      showParticles: true,
-      particleColor: '#00aaff',
-      combo: prev.combo + 1,
-      message: `[ DEFENSE DEPLOYED ] ${toolId.toUpperCase()} neutralized attack.`,
-      threatsStopped: prev.threatsStopped + 1,
-      actions: prev.actions + 1,
-      successfulActions: prev.successfulActions + 1,
-      cooldowns: { ...prev.cooldowns, [toolId]: 5 },
-    }));
+    setGameState((prev) => {
+      const stopped = prev.threatsStopped + 1;
+      return {
+        ...prev,
+        activeAttack: null,
+        attackTimeLeft: 0,
+        successFlash: true,
+        showParticles: true,
+        particleColor: '#00aaff',
+        combo: prev.combo + 1,
+        message: `[ DEFENSE DEPLOYED ] ${toolId.toUpperCase()} neutralized attack.`,
+        threatsStopped: stopped,
+        actions: prev.actions + 1,
+        successfulActions: prev.successfulActions + 1,
+        cooldowns: { ...prev.cooldowns, [toolId]: 5 },
+        hintsAvailable:
+          stopped >= 5 ? 0 : prev.hintsAvailable,
+      };
+    });
     if (addProgress) {
       addProgress('first-blood', 100);
       addProgress('guardian', 10);
@@ -1789,4 +1807,6 @@ export default ApocalypseGame;
 
 ApocalypseGame.propTypes = {
   practice: PropTypes.bool,
+  difficulty: PropTypes.string,
+  hints: PropTypes.bool,
 };
