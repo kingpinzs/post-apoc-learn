@@ -8,6 +8,7 @@ import GameOver from "./GameOver";
 import VictoryScreen from "./VictoryScreen";
 import GameMenu from "./GameMenu";
 import QuickAccessBar from "./QuickAccessBar";
+import StorylineManager from "./StorylineManager";
 import useAchievements from "../hooks/useAchievements";
 import { addHighScore } from "../lib/highscores";
 import {
@@ -1661,6 +1662,7 @@ TIPS FOR THIS CHALLENGE:
         }}
         onOpenMenu={() => window.dispatchEvent(new Event('open-menu'))}
       />
+      <StorylineManager currentLevel={gameState.currentLevel} />
       <GameMenu
         onTogglePause={() => setPaused((p) => !p)}
         paused={paused}
