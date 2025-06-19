@@ -3,18 +3,14 @@ import '@testing-library/jest-dom';
 import GameMenu from '../components/GameMenu';
 
 test('toggle button shows menu', () => {
-  render(<GameMenu />);
+  render(<GameMenu unlockedApps={['terminal']} />);
   const toggle = screen.getByTestId('menu-toggle');
   fireEvent.click(toggle);
   expect(screen.getByTestId('game-menu')).toBeInTheDocument();
 });
 
 test('keyboard shortcut opens terminal', () => {
-  localStorage.setItem(
-    'survivos-save',
-    JSON.stringify({ version: 1, unlockedApps: ['terminal'], completedMissions: [] })
-  );
-  render(<GameMenu />);
+  render(<GameMenu unlockedApps={['terminal']} />);
   fireEvent.keyDown(window, { key: 't' });
   expect(screen.getByTestId('terminal-screen')).toBeInTheDocument();
   fireEvent.click(screen.getByTestId('minimize-button'));
@@ -30,11 +26,7 @@ test('escape key toggles menu', () => {
 });
 
 test('breadcrumb shows active tool name', () => {
-  localStorage.setItem(
-    'survivos-save',
-    JSON.stringify({ version: 1, unlockedApps: ['terminal'], completedMissions: [] })
-  );
-  render(<GameMenu />);
+  render(<GameMenu unlockedApps={['terminal']} />);
   fireEvent.keyDown(window, { key: 't' });
   expect(screen.getByText('Game')).toBeInTheDocument();
   expect(screen.getByText(/Terminal/i)).toBeInTheDocument();

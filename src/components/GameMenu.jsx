@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import * as Icons from 'lucide-react';
-import usePhoneState from '../hooks/usePhoneState';
 import { appRegistry } from '../lib/appRegistry';
 import NetworkScanner from './NetworkScanner';
 import PortScanner from './PortScanner';
@@ -20,15 +19,13 @@ const COMPONENTS = {
   SettingsScreen,
 };
 
-const GameMenu = ({ onTogglePause, paused = false }) => {
+const GameMenu = ({ onTogglePause, paused = false, unlockedApps = [] }) => {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(null);
   const [appProps, setAppProps] = useState({});
-  const [phoneState] = usePhoneState();
 
   const availableApps = Object.values(appRegistry).filter(
-    (a) =>
-      a.category === 'tools' && (!a.isLocked || phoneState.unlockedApps.includes(a.id))
+    (a) => a.category === 'tools'
   );
   const APPS = Object.fromEntries(
     availableApps.map((a) => [
@@ -37,6 +34,7 @@ const GameMenu = ({ onTogglePause, paused = false }) => {
         icon: Icons[a.icon] || Icons.Box,
         label: a.name,
         Component: COMPONENTS[a.launchScreen],
+        locked: a.isLocked && !unlockedApps.includes(a.id),
       },
     ])
   );
@@ -138,16 +136,22 @@ const GameMenu = ({ onTogglePause, paused = false }) => {
           className="fixed top-10 right-2 z-40 bg-black/80 p-2 rounded grid grid-cols-2 gap-2"
           data-testid="game-menu"
         >
-          {Object.entries(APPS).map(([id, { icon: Icon, label }]) => (
+          {Object.entries(APPS).map(([id, { icon: Icon, label, locked }]) => (
             <button
               key={id}
               type="button"
-              onClick={() => launchApp(id)}
-              className="flex flex-col items-center p-2 rounded hover:bg-gray-700"
+              onClick={() => !locked && launchApp(id)}
+              className={`flex flex-col items-center p-2 rounded hover:bg-gray-700 ${
+                locked ? 'opacity-40 cursor-not-allowed' : ''
+              }`}
+              id={`app-icon-${id}`}
               data-testid={`menu-item-${id}`}
             >
               <Icon className="w-6 h-6" />
               <span className="text-xs mt-1">{label}</span>
+              {locked && (
+                <span className="text-[10px] text-yellow-400 mt-1">LOCKED</span>
+              )}
             </button>
           ))}
         </div>
