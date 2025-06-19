@@ -4,7 +4,7 @@ import { tutorialMissions, loadProgress, saveProgress } from '../lib/tutorialSys
 
 const TutorialContext = createContext(null);
 
-export const TutorialProvider = ({ children }) => {
+export const TutorialProvider = ({ children, autoStart = true }) => {
   const [state, setState] = useState(() => loadProgress());
   const [helpSteps, setHelpSteps] = useState(null);
 
@@ -29,6 +29,12 @@ export const TutorialProvider = ({ children }) => {
   const showHelp = useCallback((targetId, message) => {
     setHelpSteps([{ targetId, message, action: 'click' }]);
   }, []);
+
+  useEffect(() => {
+    if (autoStart) {
+      resume();
+    }
+  }, [autoStart]);
 
   const activeMission = tutorialMissions.find((m) => m.id === state.activeMission);
 
