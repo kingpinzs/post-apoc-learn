@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Menu, Heart, AlertCircle } from 'lucide-react';
+import { Menu, Heart } from 'lucide-react';
 import { getUsage } from '../lib/resourceSystem';
 
 const toolList = ['firewall', 'antivirus', 'patch'];
