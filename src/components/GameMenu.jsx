@@ -171,7 +171,7 @@ const GameMenu = ({ onTogglePause, paused = false, unlockedApps = [] }) => {
       </button>
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-black/80 flex items-center justify-center"
+          className="fixed inset-0 z-40 bg-black/80 flex items-center justify-center animate-slide-in-right"
           data-testid="menu-overlay"
         >
           <div

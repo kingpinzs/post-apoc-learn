@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
-const Particles = ({ trigger }) => {
+const Particles = ({ trigger, color = '#00ff00' }) => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -22,7 +22,11 @@ const Particles = ({ trigger }) => {
         <span
           key={i}
           className="particle"
-          style={{ left: `${item.left}%`, animationDelay: `${item.delay}s` }}
+          style={{
+            left: `${item.left}%`,
+            animationDelay: `${item.delay}s`,
+            '--particle-color': color,
+          }}
         />
       ))}
     </div>
@@ -31,6 +35,7 @@ const Particles = ({ trigger }) => {
 
 Particles.propTypes = {
   trigger: PropTypes.bool,
+  color: PropTypes.string,
 };
 
 export default Particles;

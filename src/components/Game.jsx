@@ -8,6 +8,7 @@ import GameOver from "./GameOver";
 import VictoryScreen from "./VictoryScreen";
 import GameMenu from "./GameMenu";
 import QuickAccessBar from "./QuickAccessBar";
+import HUD from "./HUD";
 import DefenseMinigame from "./defense/DefenseMinigame";
 import ThreatPanel from "./ThreatPanel";
 import StorylineManager from "./StorylineManager";
@@ -33,6 +34,7 @@ import {
 import { appRegistry } from '../lib/appRegistry';
 import { useTutorial } from '../hooks/useTutorial';
 import { tutorialMissions } from '../lib/tutorialSystem';
+import { playSound } from '../lib/sound';
 
 const toolData = {
   firewall: { cost: 50 },
@@ -103,6 +105,7 @@ const initialState = {
   gameCompleted: false,
   glitch: false,
   showParticles: false,
+  particleColor: '#00ff00',
   transitioning: false,
   credits: 100,
   inventory: { firewall: true },
@@ -1057,6 +1060,7 @@ TIPS FOR THIS CHALLENGE:
   const handleAnswer = (selectedIndex) => {
     const currentLevel = levels[gameState.currentLevel];
     const hintsLeft = gameState.hintsAvailable;
+    playSound('type');
     let correct = false;
 
     switch (currentLevel.type) {
@@ -1097,9 +1101,12 @@ TIPS FOR THIS CHALLENGE:
         sequenceInput: "",
         blankInput: "",
         glitch: !correct,
-        showParticles: correct,
+        showParticles: true,
+        particleColor: correct ? '#00ff00' : '#ff0000',
       };
     });
+    if (correct) playSound('success');
+    else playSound('fail');
     if (correct && addProgress) {
       const achId = levelAchievements[currentLevel.id];
       if (achId) addProgress(achId, 100);
@@ -1168,11 +1175,14 @@ TIPS FOR THIS CHALLENGE:
   };
 
   const resolveSuccess = (toolId) => {
+    playSound('success');
     setGameState((prev) => ({
       ...prev,
       activeAttack: null,
       attackTimeLeft: 0,
       successFlash: true,
+      showParticles: true,
+      particleColor: '#00aaff',
       combo: prev.combo + 1,
       message: `[ DEFENSE DEPLOYED ] ${toolId.toUpperCase()} neutralized attack.`,
       threatsStopped: prev.threatsStopped + 1,
@@ -1191,6 +1201,7 @@ TIPS FOR THIS CHALLENGE:
   };
 
   const resolveFailure = () => {
+    playSound('fail');
     setGameState((prev) => {
       const newHealth = Math.max(0, prev.health - 10);
       return {
@@ -1200,6 +1211,8 @@ TIPS FOR THIS CHALLENGE:
         activeAttack: null,
         attackTimeLeft: 0,
         damageFlash: true,
+        showParticles: true,
+        particleColor: '#ff0000',
         combo: 0,
       };
     });
@@ -1211,6 +1224,7 @@ TIPS FOR THIS CHALLENGE:
       return;
     }
     if (!gameState.activeAttack) return;
+    playSound('alert');
     if (gameState.activeAttack.tool === toolId) {
       if (gameState.inventory?.[toolId]) {
         resolveSuccess(toolId);
@@ -1229,12 +1243,15 @@ TIPS FOR THIS CHALLENGE:
   const handleBuyTool = (toolId) => {
     const cost = toolData[toolId].cost;
     if (gameState.credits >= cost) {
+      playSound('success');
       setGameState((prev) => ({
         ...prev,
         credits: prev.credits - cost,
         inventory: { ...prev.inventory, [toolId]: true },
         showBuyCraft: null,
         message: `[ PURCHASED ] ${toolId.toUpperCase()} ready.`,
+        showParticles: true,
+        particleColor: '#00aaff',
         unlockedItems: prev.unlockedItems.includes(toolId)
           ? prev.unlockedItems
           : [...prev.unlockedItems, toolId],
@@ -1245,6 +1262,7 @@ TIPS FOR THIS CHALLENGE:
         addProgress('arsenal-master', 20);
       }
     } else {
+      playSound('fail');
       setGameState((prev) => ({
         ...prev,
         message: "Not enough credits to purchase " + toolId + ".",
@@ -1253,11 +1271,14 @@ TIPS FOR THIS CHALLENGE:
   };
 
   const handleCraftTool = (toolId) => {
+    playSound('success');
     setGameState((prev) => ({
       ...prev,
       inventory: { ...prev.inventory, [toolId]: true },
       showBuyCraft: null,
       message: `[ CRAFTED ] ${toolId.toUpperCase()} assembled.`,
+      showParticles: true,
+      particleColor: '#00aaff',
       unlockedItems: prev.unlockedItems.includes(toolId)
         ? prev.unlockedItems
         : [...prev.unlockedItems, toolId],
@@ -1403,7 +1424,7 @@ TIPS FOR THIS CHALLENGE:
     >
       <div className="matrix-bg" />
       <div className="w-full relative max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl">
-        <Particles trigger={gameState.showParticles} />
+        <Particles trigger={gameState.showParticles} color={gameState.particleColor} />
         {gameState.newUnlock && (
           <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
             <div className="bg-black/80 text-green-400 p-4 rounded" data-testid="unlock-overlay">
@@ -1445,7 +1466,7 @@ TIPS FOR THIS CHALLENGE:
         />
 
         <div
-          className={`p-6 bg-black rounded-b-3xl transition-opacity duration-500 ${gameState.transitioning ? "opacity-0" : "opacity-100"}`}
+          className={`p-6 bg-black rounded-b-3xl fade-transition ${gameState.transitioning ? "opacity-0" : "opacity-100"}`}
         >
           {/* System Stats */}
           <div className="grid grid-cols-3 gap-4 mb-6">
@@ -1717,6 +1738,12 @@ TIPS FOR THIS CHALLENGE:
           <div className="text-xl">PAUSED - Press P to resume</div>
         </div>
       )}
+      <HUD
+        objective={levels[gameState.currentLevel].objective || levels[gameState.currentLevel].question}
+        time={gameState.attackTimeLeft || null}
+        health={gameState.health}
+        buffs={[]}
+      />
       <QuickAccessBar
         health={gameState.health}
         credits={gameState.credits}
