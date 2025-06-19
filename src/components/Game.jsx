@@ -26,10 +26,6 @@ import {
   Binary,
 } from "lucide-react";
 
-import NetworkScanner from "./NetworkScanner";
-import PortScanner from "./PortScanner";
-import FirewallApp from "./FirewallApp";
-import TerminalScreen from "./TerminalScreen";
 import { useAppIntegration } from "./AppIntegration";
 import { appRegistry } from '../lib/appRegistry';
 import { useTutorial } from '../hooks/useTutorial';
@@ -145,31 +141,7 @@ const ApocalypseGame = ({ practice = false }) => {
   });
 
   const [showTools, setShowTools] = useState(false);
-  const [activeUtility, setActiveUtility] = useState(null);
-  const [utilityProps, setUtilityProps] = useState({});
   const [paused, setPaused] = useState(false);
-
-  const utilityComponents = {
-    networkScanner: NetworkScanner,
-    portScanner: PortScanner,
-    firewall: FirewallApp,
-    terminal: TerminalScreen,
-  };
-
-  const launchUtility = (id, props = {}) => {
-    if (requestApp) {
-      requestApp(id, props);
-    } else {
-      setActiveUtility(id);
-      setUtilityProps(props);
-      setShowTools(false);
-    }
-  };
-
-  const closeUtility = () => {
-    setActiveUtility(null);
-    setUtilityProps({});
-  };
 
   const handleKeyPress = useCallback(
     (e) => {
