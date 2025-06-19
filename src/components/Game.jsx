@@ -368,6 +368,8 @@ const ApocalypseGame = ({ practice = false, difficulty = 'Operative', hints: ena
     gameState.activeAttack,
     gameState.currentLevel,
     tutorialDone,
+    preset.threatRate,
+    preset.timeScale,
   ]);
 
   // When an attack starts, prompt the player to acquire the correct tool
