@@ -104,6 +104,7 @@ const PhoneFrame = ({
             <button
               type="button"
               onClick={onMenu}
+              title="Open menu"
               className="p-1 hover:bg-green-900/40 rounded"
               data-testid="menu-button"
             >

@@ -35,6 +35,6 @@ test('breadcrumb shows active tool name', () => {
 test('swipe gesture opens menu', () => {
   render(<GameMenu />);
   fireEvent.touchStart(window, { touches: [{ clientX: 0, clientY: 0 }] });
-  fireEvent.touchEnd(window, { changedTouches: [{ clientX: 100, clientY: 0 }] });
+  fireEvent.touchMove(window, { touches: [{ clientX: 80, clientY: 0 }] });
   expect(screen.getByTestId('game-menu')).toBeInTheDocument();
 });
