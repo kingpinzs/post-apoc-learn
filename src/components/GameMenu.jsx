@@ -92,29 +92,43 @@ const GameMenu = ({ onTogglePause, paused = false, unlockedApps = [] }) => {
   useEffect(() => {
     let startX = null;
     let startY = null;
+    let triggered = false;
+
     const handleStart = (e) => {
       if (active || open) return;
       const t = e.touches?.[0];
       if (!t) return;
       startX = t.clientX;
       startY = t.clientY;
+      triggered = false;
     };
-    const handleEnd = (e) => {
-      if (startX === null || startY === null) return;
-      const t = e.changedTouches?.[0];
+
+    const handleMove = (e) => {
+      if (startX === null || startY === null || triggered) return;
+      const t = e.touches?.[0];
       if (!t) return;
       const dx = t.clientX - startX;
       const dy = t.clientY - startY;
-      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+      if (Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy)) {
         toggle();
+        triggered = true;
+        startX = null;
+        startY = null;
       }
+    };
+
+    const handleEnd = () => {
       startX = null;
       startY = null;
+      triggered = false;
     };
+
     window.addEventListener('touchstart', handleStart);
+    window.addEventListener('touchmove', handleMove);
     window.addEventListener('touchend', handleEnd);
     return () => {
       window.removeEventListener('touchstart', handleStart);
+      window.removeEventListener('touchmove', handleMove);
       window.removeEventListener('touchend', handleEnd);
     };
   }, [active, open]);
