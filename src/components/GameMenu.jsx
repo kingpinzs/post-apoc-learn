@@ -94,21 +94,23 @@ const GameMenu = ({ onTogglePause, paused = false, unlockedApps = [] }) => {
     let startY = null;
     let triggered = false;
 
+    const getPoint = (e) => e.touches?.[0] || e;
+
     const handleStart = (e) => {
       if (active || open) return;
-      const t = e.touches?.[0];
-      if (!t) return;
-      startX = t.clientX;
-      startY = t.clientY;
+      const p = getPoint(e);
+      if (!p || (e.pointerType && e.pointerType === 'mouse')) return;
+      startX = p.clientX;
+      startY = p.clientY;
       triggered = false;
     };
 
     const handleMove = (e) => {
       if (startX === null || startY === null || triggered) return;
-      const t = e.touches?.[0];
-      if (!t) return;
-      const dx = t.clientX - startX;
-      const dy = t.clientY - startY;
+      const p = getPoint(e);
+      if (!p || (e.pointerType && e.pointerType === 'mouse')) return;
+      const dx = p.clientX - startX;
+      const dy = p.clientY - startY;
       if (Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy)) {
         toggle();
         triggered = true;
@@ -123,13 +125,28 @@ const GameMenu = ({ onTogglePause, paused = false, unlockedApps = [] }) => {
       triggered = false;
     };
 
-    window.addEventListener('touchstart', handleStart);
-    window.addEventListener('touchmove', handleMove);
-    window.addEventListener('touchend', handleEnd);
+    const add = (type, fn, opts) => window.addEventListener(type, fn, opts);
+    const remove = (type, fn) => window.removeEventListener(type, fn);
+
+    add('touchstart', handleStart);
+    add('touchmove', handleMove);
+    add('touchend', handleEnd);
+
+    if (window.PointerEvent) {
+      add('pointerdown', handleStart);
+      add('pointermove', handleMove);
+      add('pointerup', handleEnd);
+    }
+
     return () => {
-      window.removeEventListener('touchstart', handleStart);
-      window.removeEventListener('touchmove', handleMove);
-      window.removeEventListener('touchend', handleEnd);
+      remove('touchstart', handleStart);
+      remove('touchmove', handleMove);
+      remove('touchend', handleEnd);
+      if (window.PointerEvent) {
+        remove('pointerdown', handleStart);
+        remove('pointermove', handleMove);
+        remove('pointerup', handleEnd);
+      }
     };
   }, [active, open]);
 
