@@ -28,6 +28,7 @@ import {
 
 import { appRegistry } from '../lib/appRegistry';
 import { useTutorial } from '../hooks/useTutorial';
+import { tutorialMissions } from '../lib/tutorialSystem';
 
 const toolData = {
   firewall: { cost: 50 },
@@ -216,7 +217,8 @@ const ApocalypseGame = ({ practice = false }) => {
     }
   }, [gameState.showParticles]);
 
-  const { showHelp } = useTutorial() || {};
+  const { showHelp, completed = [], activeMission } = useTutorial() || {};
+  const tutorialDone = completed.length >= tutorialMissions.length && !activeMission;
 
   useEffect(() => {
     if (gameState.newUnlock) {
@@ -269,7 +271,8 @@ const ApocalypseGame = ({ practice = false }) => {
       practice ||
       gameState.bootUp ||
       gameState.gameCompleted ||
-      gameState.activeAttack !== null
+      gameState.activeAttack !== null ||
+      !tutorialDone
     ) {
       return;
     }
@@ -295,6 +298,7 @@ const ApocalypseGame = ({ practice = false }) => {
     gameState.gameCompleted,
     gameState.activeAttack,
     gameState.currentLevel,
+    tutorialDone,
   ]);
 
   // When an attack starts, prompt the player to acquire the correct tool
