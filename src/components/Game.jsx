@@ -42,6 +42,7 @@ import {
   startGame as startGameState,
   completeTutorial as finishTutorial,
   bootComplete,
+  canStartGame,
   getState as getGameState,
   pauseGame,
   resumeGame,
@@ -1699,11 +1700,16 @@ TIPS FOR THIS CHALLENGE:
 
             {!gameState.showQuestion &&
               !gameState.answeredCorrectly &&
+              canStartGame() &&
               gameState.phase === GameStates.READY && (
                 <button
                   onClick={() => {
-                    if (startGameState()) {
-                      setGameState((prev) => ({ ...prev, showQuestion: true, phase: GameStates.PLAYING }));
+                    if (canStartGame() && startGameState()) {
+                      setGameState((prev) => ({
+                        ...prev,
+                        showQuestion: true,
+                        phase: GameStates.PLAYING,
+                      }));
                     }
                   }}
                   className="w-full bg-green-900/30 border border-green-500 text-green-400 font-mono py-2 px-4 rounded-lg hover:bg-green-900/50 transition-colors"
