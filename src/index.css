@@ -137,3 +137,33 @@ body.reduce-motion * {
   transition-duration: 0s !important;
 }
 
+@keyframes shake {
+  0%,100% { transform: translate(0,0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(2px, -2px); }
+  60% { transform: translate(-2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+}
+
+.screen-shake {
+  animation: shake 0.5s;
+}
+
+@keyframes flash-red {
+  from { background: rgba(255,0,0,0.3); }
+  to { background: transparent; }
+}
+
+.flash-red {
+  animation: flash-red 0.3s;
+}
+
+@keyframes flash-green {
+  from { background: rgba(0,255,0,0.3); }
+  to { background: transparent; }
+}
+
+.flash-green {
+  animation: flash-green 0.3s;
+}
+
