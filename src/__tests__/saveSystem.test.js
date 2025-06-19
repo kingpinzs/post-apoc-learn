@@ -5,18 +5,17 @@ beforeEach(() => {
 });
 
 test('saves and loads game data', () => {
-  saveGame({ currentScreen: 'home', unlockedApps: ['map'], completedMissions: ['m1'] });
+  saveGame({ unlockedApps: ['map'], completedMissions: ['m1'] });
   const data = loadGame();
   expect(data).toMatchObject({
     version: 1,
-    currentScreen: 'home',
     unlockedApps: ['map'],
     completedMissions: ['m1'],
   });
 });
 
 test('resetGame clears saved data', () => {
-  saveGame({ currentScreen: 'home', unlockedApps: [], completedMissions: [] });
+  saveGame({ unlockedApps: [], completedMissions: [] });
   resetGame();
   expect(loadGame()).toBeNull();
 });
@@ -29,7 +28,7 @@ test('loadGame returns null for invalid JSON', () => {
 test('loadGame returns null for mismatched version', () => {
   localStorage.setItem(
     'survivos-save',
-    JSON.stringify({ version: 2, currentScreen: 'home', unlockedApps: [], completedMissions: [] })
+    JSON.stringify({ version: 2, unlockedApps: [], completedMissions: [] })
   );
   expect(loadGame()).toBeNull();
 });
@@ -41,7 +40,6 @@ test('loadGame returns null when fields are missing', () => {
 
 test('saveGame persists installedApps', () => {
   saveGame({
-    currentScreen: 'home',
     unlockedApps: [],
     completedMissions: [],
     installedApps: ['scanner'],
@@ -51,7 +49,7 @@ test('saveGame persists installedApps', () => {
 });
 
 test('defaults array fields when missing', () => {
-  saveGame({ currentScreen: 'home' });
+  saveGame({});
   const data = loadGame();
   expect(data.unlockedApps).toEqual([]);
   expect(data.completedMissions).toEqual([]);

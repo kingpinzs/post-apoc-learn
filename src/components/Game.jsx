@@ -133,6 +133,7 @@ const ApocalypseGame = ({ practice = false }) => {
   const [showTools, setShowTools] = useState(false);
   const [activeUtility, setActiveUtility] = useState(null);
   const [utilityProps, setUtilityProps] = useState({});
+  const [paused, setPaused] = useState(false);
 
   const utilityComponents = {
     networkScanner: NetworkScanner,
@@ -158,6 +159,7 @@ const ApocalypseGame = ({ practice = false }) => {
 
   const handleKeyPress = useCallback(
     (e) => {
+      if (paused) return;
       if (
         gameState.showQuestion &&
         levels[gameState.currentLevel].type === "sequence"
@@ -171,7 +173,7 @@ const ApocalypseGame = ({ practice = false }) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [gameState.showQuestion, gameState.currentLevel],
+    [gameState.showQuestion, gameState.currentLevel, paused],
   );
 
   useEffect(() => {
@@ -198,6 +200,7 @@ const ApocalypseGame = ({ practice = false }) => {
     gameState.bootUp,
     handleKeyPress,
     addProgress,
+    paused,
   ]);
 
   useEffect(() => {
@@ -1565,7 +1568,12 @@ TIPS FOR THIS CHALLENGE:
           )}
         </div>
       </div>
-      <GameMenu />
+      {paused && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 text-green-400" data-testid="pause-overlay">
+          <div className="text-xl">PAUSED - Press P to resume</div>
+        </div>
+      )}
+      <GameMenu onTogglePause={() => setPaused((p) => !p)} paused={paused} />
     </div>
   );
 };
