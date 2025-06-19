@@ -6,13 +6,10 @@ import { tutorialMissions } from '../lib/tutorialSystem';
 import React from 'react';
 
 describe('useTutorial hook', () => {
-  test('resume starts first incomplete mission', () => {
-    console.log('[TUTORIAL TEST] ==> Running "resume" test...');
+  test('autoStart begins first mission', () => {
     const wrapper = ({ children }) => <TutorialProvider>{children}</TutorialProvider>;
     const { result } = renderHook(() => useTutorial(), { wrapper });
-    act(() => result.current.resume());
     expect(result.current.activeMission).toBe(tutorialMissions[0].id);
-    console.log('[TUTORIAL TEST] ==> Finished "resume" test.');
   });
 
   test('skipTutorial marks all missions complete', () => {
@@ -34,7 +31,7 @@ describe('useTutorial hook', () => {
       return <button id="target">Target</button>;
     };
     render(
-      <TutorialProvider>
+      <TutorialProvider autoStart={false}>
         <Test />
       </TutorialProvider>
     );
@@ -51,7 +48,7 @@ describe('useTutorial hook', () => {
       return <button id="target">Target</button>;
     };
     render(
-      <TutorialProvider>
+      <TutorialProvider autoStart={false}>
         <Test />
       </TutorialProvider>
     );
