@@ -49,6 +49,13 @@ const attacks = [
   },
 ];
 
+// Restrict which attacks appear based on the player's level
+const attackStages = [
+  ["ddos"],
+  ["ddos", "malware"],
+  ["ddos", "malware", "exploit"],
+];
+
 const levelUnlocks = {
   1: 'firewall',
   3: 'decryptor',
@@ -267,7 +274,14 @@ const ApocalypseGame = ({ practice = false }) => {
       return;
     }
     const timeout = setTimeout(() => {
-      const attack = attacks[Math.floor(Math.random() * attacks.length)];
+      const stage = Math.min(
+        attackStages.length - 1,
+        Math.floor(gameState.currentLevel / 2)
+      );
+      const allowedIds = attackStages[stage];
+      const possible = attacks.filter((a) => allowedIds.includes(a.id));
+      const attack =
+        possible[Math.floor(Math.random() * possible.length)];
       setGameState((prev) => ({
         ...prev,
         activeAttack: attack,
@@ -276,6 +290,18 @@ const ApocalypseGame = ({ practice = false }) => {
     }, Math.random() * 5000 + 5000);
     return () => clearTimeout(timeout);
   }, [practice, gameState.bootUp, gameState.gameCompleted, gameState.activeAttack]);
+
+  // When an attack starts, prompt the player to acquire the correct tool
+  useEffect(() => {
+    if (!gameState.activeAttack) return;
+    const required = gameState.activeAttack.tool;
+    if (!gameState.inventory?.[required]) {
+      setGameState((prev) => ({
+        ...prev,
+        showBuyCraft: required,
+      }));
+    }
+  }, [gameState.activeAttack, gameState.inventory]);
 
   useEffect(() => {
     if (practice || !gameState.activeAttack) {
