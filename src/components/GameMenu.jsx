@@ -157,6 +157,7 @@ const GameMenu = ({ onTogglePause, paused = false, unlockedApps = [] }) => {
       <button
         type="button"
         onClick={toggle}
+        id="menu-toggle"
         className="fixed top-2 right-2 z-40 p-1 bg-gray-800 text-green-400 rounded"
         data-testid="menu-toggle"
       >

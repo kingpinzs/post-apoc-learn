@@ -6,13 +6,13 @@ export const tutorialMissions = [
     name: 'First Boot',
     steps: [
       {
-        targetId: 'search-input',
-        message: 'This is your app search. Locate tools quickly.',
-        action: 'focus',
+        targetId: 'menu-toggle',
+        message: 'Open the quick menu to access your tools.',
+        action: 'click',
       },
       {
-        targetId: 'app-grid',
-        message: 'Tap an app icon to open it.',
+        targetId: 'app-icon-scanner',
+        message: 'Launch the Scanner to begin.',
         action: 'click',
       },
     ],
@@ -49,7 +49,7 @@ export const tutorialMissions = [
     name: 'Resource Management',
     steps: [
       {
-        targetId: 'status-widgets',
+        targetId: 'status-bar',
         message: 'Monitor CPU, RAM and bandwidth here.',
         action: 'click',
       },
