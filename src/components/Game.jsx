@@ -26,7 +26,6 @@ import {
   Binary,
 } from "lucide-react";
 
-import { useAppIntegration } from "./AppIntegration";
 import { appRegistry } from '../lib/appRegistry';
 import { useTutorial } from '../hooks/useTutorial';
 
@@ -106,7 +105,6 @@ const initialState = {
 };
 
 const ApocalypseGame = ({ practice = false }) => {
-  const { requestApp } = useAppIntegration() || {};
   const storageKey = practice ? "practiceState" : "gameState";
   const { addProgress } = useAchievements() || {};
   const [gameState, setGameState] = useState(() => {
