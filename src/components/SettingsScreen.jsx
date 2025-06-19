@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { loadSettings, saveSettings } from '../lib/settings';
 import { detectQuality } from '../hooks/usePerformance';
+import { resetGame, RESET_MODES } from '../lib/resetSystem';
 
 const Slider = ({ label, value, onChange, min = 0, max = 1, step = 0.01 }) => (
   <label className="flex items-center space-x-2">
@@ -66,11 +67,10 @@ const SettingsScreen = () => {
     reader.readAsText(file);
   };
 
-  const resetData = () => {
-    if (window.confirm('Erase all save data?')) {
-      localStorage.removeItem('survivos-save');
-      alert('Data reset');
-    }
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  const handleReset = (mode) => {
+    resetGame(mode);
   };
 
   const save = localStorage.getItem('survivos-save') || '{}';
@@ -186,7 +186,7 @@ const SettingsScreen = () => {
         <pre className="overflow-auto border border-green-500 p-2 text-xs max-h-32">{save}</pre>
         <button onClick={exportData} className="px-2 py-1 border border-green-500">Export</button>
         <input type="file" accept="application/json" onChange={importData} className="block" />
-        <button onClick={resetData} className="px-2 py-1 border border-red-500 text-red-400">Reset Data</button>
+        <button onClick={() => setConfirmReset(true)} className="px-2 py-1 border border-red-500 text-red-400">Reset Data</button>
       </section>
 
       <section className="space-y-2">
@@ -196,6 +196,19 @@ const SettingsScreen = () => {
         <a href="https://github.com/kingpinzs/post-apoc-learn" className="underline">Documentation</a>
         <button className="px-2 py-1 border border-green-500" onClick={() => window.open('https://github.com/kingpinzs/post-apoc-learn/issues/new')}>Report Bug</button>
       </section>
+
+      {confirmReset && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" data-testid="reset-confirm">
+          <div className="bg-gray-900 p-4 rounded space-y-2 text-center">
+            <p>Reset Progress? This will erase your current game.</p>
+            <div className="space-x-2">
+              <button onClick={() => setConfirmReset(false)} className="px-2 py-1 border border-green-500">Cancel</button>
+              <button onClick={() => { setConfirmReset(false); handleReset(RESET_MODES.SOFT); }} className="px-2 py-1 border border-yellow-500 text-yellow-400">Reset Game</button>
+              <button onClick={() => { setConfirmReset(false); handleReset(RESET_MODES.HARD); }} className="px-2 py-1 border border-red-500 text-red-400">Reset Everything</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
