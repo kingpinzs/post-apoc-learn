@@ -1,21 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Terminal, Radar, Server, Shield } from 'lucide-react';
+import * as Icons from 'lucide-react';
+import usePhoneState from '../hooks/usePhoneState';
+import { appRegistry } from '../lib/appRegistry';
 import NetworkScanner from './NetworkScanner';
 import PortScanner from './PortScanner';
 import FirewallApp from './FirewallApp';
 import TerminalScreen from './TerminalScreen';
+import TrophyRoomScreen from './TrophyRoomScreen';
+import StatsScreen from './StatsScreen';
+import SettingsScreen from './SettingsScreen';
 
-const APPS = {
-  terminal: { icon: Terminal, label: 'Terminal', Component: TerminalScreen },
-  networkScanner: { icon: Radar, label: 'Net Scan', Component: NetworkScanner },
-  portScanner: { icon: Server, label: 'Port Scan', Component: PortScanner },
-  firewall: { icon: Shield, label: 'Firewall', Component: FirewallApp },
+const COMPONENTS = {
+  NetworkScanner,
+  PortScanner,
+  FirewallApp,
+  TerminalScreen,
+  TrophyRoomScreen,
+  StatsScreen,
+  SettingsScreen,
 };
 
-const GameMenu = () => {
+const GameMenu = ({ onTogglePause, paused = false }) => {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(null);
   const [appProps, setAppProps] = useState({});
+  const [phoneState] = usePhoneState();
+
+  const availableApps = Object.values(appRegistry).filter(
+    (a) =>
+      a.category === 'tools' && (!a.isLocked || phoneState.unlockedApps.includes(a.id))
+  );
+  const APPS = Object.fromEntries(
+    availableApps.map((a) => [
+      a.id,
+      {
+        icon: Icons[a.icon] || Icons.Box,
+        label: a.name,
+        Component: COMPONENTS[a.launchScreen],
+      },
+    ])
+  );
+
+  APPS.achievements = {
+    icon: Icons.Award,
+    label: 'Achievements',
+    Component: TrophyRoomScreen,
+  };
+  APPS.stats = { icon: Icons.BarChart2, label: 'Stats', Component: StatsScreen };
+  APPS.settings = {
+    icon: Icons.Settings,
+    label: 'Settings',
+    Component: SettingsScreen,
+  };
 
   const toggle = () => setOpen((o) => !o);
 
@@ -36,29 +72,24 @@ const GameMenu = () => {
         if (e.key === 'Escape') closeApp();
         return;
       }
-      switch (e.key.toLowerCase()) {
-        case 'm':
-          toggle();
-          break;
-        case 't':
-          launchApp('terminal');
-          break;
-        case 'n':
-          launchApp('networkScanner');
-          break;
-        case 'p':
-          launchApp('portScanner');
-          break;
-        case 'f':
-          launchApp('firewall');
-          break;
-        default:
-          break;
+      const key = e.key.toLowerCase();
+      if (key === 'escape') {
+        toggle();
+        return;
       }
+      if (key === 'm') {
+        toggle();
+        return;
+      }
+      if (key === 'p') {
+        onTogglePause?.();
+        return;
+      }
+      if (key === 't') launchApp('terminal');
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [active]);
+  }, [active, onTogglePause]);
 
   const ActiveComp = active ? APPS[active]?.Component : null;
 
@@ -70,7 +101,7 @@ const GameMenu = () => {
         className="fixed top-2 right-2 z-40 p-1 bg-gray-800 text-green-400 rounded"
         data-testid="menu-toggle"
       >
-        {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        {open ? <Icons.X className="w-5 h-5" /> : <Icons.Menu className="w-5 h-5" />}
       </button>
       {open && (
         <div
@@ -97,13 +128,18 @@ const GameMenu = () => {
           data-testid="app-overlay"
         >
           <div className="relative bg-gray-900 p-4 rounded w-96 max-w-full">
+            <div className="text-xs mb-2 text-green-400 flex items-center space-x-1">
+              <span>Game</span>
+              <span>&gt;</span>
+              <span>{APPS[active]?.label}</span>
+            </div>
             <button
               type="button"
               onClick={closeApp}
               className="absolute top-2 right-2"
               data-testid="minimize-button"
             >
-              <X className="w-4 h-4" />
+              <Icons.X className="w-4 h-4" />
             </button>
             <ActiveComp {...appProps} onLaunchApp={launchApp} />
           </div>

@@ -10,6 +10,10 @@ test('toggle button shows menu', () => {
 });
 
 test('keyboard shortcut opens terminal', () => {
+  localStorage.setItem(
+    'survivos-save',
+    JSON.stringify({ version: 1, unlockedApps: ['terminal'], completedMissions: [] })
+  );
   render(<GameMenu />);
   fireEvent.keyDown(window, { key: 't' });
   expect(screen.getByTestId('terminal-screen')).toBeInTheDocument();

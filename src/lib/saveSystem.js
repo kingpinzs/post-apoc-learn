@@ -4,12 +4,11 @@ const VERSION = 1;
 /**
  * Saves relevant game data to localStorage.
  *
- * @param {{currentScreen:string, unlockedApps:string[], completedMissions:string[]}} state
+ * @param {{unlockedApps:string[], completedMissions:string[]}} state
  */
 export function saveGame(state) {
   const data = {
     version: VERSION,
-    currentScreen: state.currentScreen,
     unlockedApps: state.unlockedApps || [],
     completedMissions: state.completedMissions || [],
     installedApps: state.installedApps || [],
@@ -23,7 +22,7 @@ export function saveGame(state) {
 
 /**
  * Loads saved game data from localStorage.
- * @returns {{version:number, currentScreen:string, unlockedApps:string[], completedMissions:string[]}|null}
+ * @returns {{version:number, unlockedApps:string[], completedMissions:string[]}|null}
  */
 export function loadGame() {
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -34,7 +33,6 @@ export function loadGame() {
       !parsed ||
       typeof parsed !== 'object' ||
       parsed.version !== VERSION ||
-      typeof parsed.currentScreen !== 'string' ||
       !Array.isArray(parsed.unlockedApps) ||
       !Array.isArray(parsed.completedMissions) ||
       (parsed.installedApps && !Array.isArray(parsed.installedApps))

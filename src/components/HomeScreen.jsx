@@ -38,7 +38,7 @@ function loadDefaultGrid() {
 }
 
 const HomeScreen = ({ notifications = [], onLaunchApp }) => {
-  const [phoneState, setPhoneState] = usePhoneState();
+  const [phoneState] = usePhoneState();
   const [activeApp, setActiveApp] = useState(null);
   const [lockMessage, setLockMessage] = useState('');
 
@@ -146,13 +146,11 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
       onLaunchApp(appId, props);
     } else {
       setActiveApp(appId);
-      setPhoneState((s) => ({ ...s, currentScreen: 'active-app' }));
     }
   };
 
   const closeApp = () => {
     setActiveApp(null);
-    setPhoneState((s) => ({ ...s, currentScreen: 'home' }));
   };
 
   if (activeApp) {

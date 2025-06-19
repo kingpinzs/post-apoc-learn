@@ -4,13 +4,13 @@ import usePhoneState, { initialPhoneState } from '../hooks/usePhoneState';
 
 function TestComponent() {
   const [state] = usePhoneState();
-  return <div data-testid="screen">{state.currentScreen}</div>;
+  return <div data-testid="level">{state.batteryLevel}</div>;
 }
 
 test('usePhoneState falls back to defaults with invalid save data', () => {
   localStorage.setItem('survivos-save', '{bad json');
   const { getByTestId } = render(<TestComponent />);
-  expect(getByTestId('screen').textContent).toBe(initialPhoneState.currentScreen);
+  expect(getByTestId('level').textContent).toBe(String(initialPhoneState.batteryLevel));
 });
 
 test('network strength updates on offline event', async () => {
@@ -24,13 +24,12 @@ test('network strength updates on offline event', async () => {
 test('loads saved state from localStorage', () => {
   const saved = {
     version: 1,
-    currentScreen: 'home',
     unlockedApps: ['map'],
     completedMissions: [],
     installedApps: [],
   };
   localStorage.setItem('survivos-save', JSON.stringify(saved));
   const { result } = renderHook(() => usePhoneState());
-  expect(result.current[0].currentScreen).toBe('home');
+  expect(result.current[0].unlockedApps).toContain('map');
 });
 
