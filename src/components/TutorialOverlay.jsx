@@ -67,12 +67,12 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
       <div className="absolute inset-0 bg-black/70" />
       {hasRect && (
         <div
-          className="absolute border-2 border-blue-400 rounded-md pointer-events-none"
+          className="absolute border-2 border-blue-400 rounded-md pointer-events-none animate-pulse ring-2 ring-blue-400"
           style={highlight}
         />
       )}
       <div
-        className="absolute bg-white text-black p-2 rounded-md shadow pointer-events-auto"
+        className="absolute bg-white text-black p-2 rounded-md shadow pointer-events-none"
         style={tip}
       >
         {message}
