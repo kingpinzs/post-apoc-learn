@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { AlertOctagon, Bug, ServerCrash } from 'lucide-react';
-import { cn } from '../lib/utils';
 
 const icons = {
   ddos: AlertOctagon,
