@@ -1,4 +1,9 @@
-import React, { useEffect, useState, useLayoutEffect } from "react";
+import React, {
+  useEffect,
+  useState,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import PropTypes from "prop-types";
 
 // --- FIX START ---
@@ -10,6 +15,8 @@ const useIsomorphicLayoutEffect =
 const TutorialOverlay = ({ steps = [], onComplete }) => {
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState(null);
+  const tipRef = useRef(null);
+  const [tipSize, setTipSize] = useState({ width: 0, height: 0 });
 
   // update highlight rect on step change
   // We now use the "safe" hook instead of useLayoutEffect directly.
@@ -42,9 +49,19 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
     }
   }, [index, steps, onComplete]);
 
-  if (index >= steps.length) return null;
+  const message = index < steps.length ? steps[index].message : "";
 
-  const { message } = steps[index];
+  // Measure the tooltip size whenever the step changes
+  useIsomorphicLayoutEffect(() => {
+    if (tipRef.current) {
+      setTipSize({
+        width: tipRef.current.offsetWidth,
+        height: tipRef.current.offsetHeight,
+      });
+    }
+  }, [index, message]);
+
+  if (index >= steps.length) return null;
   let highlight = {};
   let tip = {};
   if (rect) {
@@ -54,9 +71,18 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
       width: rect.width + 8,
       height: rect.height + 8,
     };
+    let top = rect.top + window.scrollY + rect.height + 12;
+    let left = rect.left + window.scrollX;
+    if (left + tipSize.width > window.innerWidth - 8) {
+      left = window.innerWidth - tipSize.width - 8;
+    }
+    if (left < 8) left = 8;
+    if (top + tipSize.height > window.scrollY + window.innerHeight - 8) {
+      top = rect.top + window.scrollY - tipSize.height - 12;
+    }
     tip = {
-      top: rect.top + window.scrollY + rect.height + 12,
-      left: rect.left + window.scrollX,
+      top,
+      left,
     };
   }
 
@@ -74,6 +100,7 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
       <div
         className="absolute bg-white text-black p-2 rounded-md shadow pointer-events-none"
         style={tip}
+        ref={tipRef}
       >
         {message}
       </div>
