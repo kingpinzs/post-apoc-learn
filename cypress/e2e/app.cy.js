@@ -9,6 +9,7 @@ describe('SURVIV-OS', () => {
     cy.visit('/', {
       onBeforeLoad(win) {
         win.localStorage.setItem('survivos-game-state', JSON.stringify('READY'));
+        win.localStorage.setItem('survivos-story-progress', '6');
       },
     });
     cy.contains('INITIATE HACK');
