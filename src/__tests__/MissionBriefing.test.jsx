@@ -7,7 +7,7 @@ const sampleMission = {
   description: 'Infiltrate the central server.',
   objectives: ['Find credentials', 'Bypass firewall'],
   recommendedTools: ['nmap', 'metasploit'],
-  difficulty: 'Hard',
+  difficulty: 'Elite',
   timeLimit: '30m',
 };
 

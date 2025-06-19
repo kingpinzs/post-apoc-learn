@@ -7,6 +7,11 @@ import DropZone from "./drag/DropZone";
 import GameOver from "./GameOver";
 import VictoryScreen from "./VictoryScreen";
 import GameMenu from "./GameMenu";
+import QuickAccessBar from "./QuickAccessBar";
+import HUD from "./HUD";
+import DefenseMinigame from "./defense/DefenseMinigame";
+import ThreatPanel from "./ThreatPanel";
+import StorylineManager from "./StorylineManager";
 import useAchievements from "../hooks/useAchievements";
 import { addHighScore } from "../lib/highscores";
 import {
@@ -27,8 +32,10 @@ import {
 } from "lucide-react";
 
 import { appRegistry } from '../lib/appRegistry';
+import { DIFFICULTY_PRESETS } from '../lib/difficulties';
 import { useTutorial } from '../hooks/useTutorial';
 import { tutorialMissions } from '../lib/tutorialSystem';
+import { playSound } from '../lib/sound';
 
 const toolData = {
   firewall: { cost: 50 },
@@ -49,6 +56,8 @@ const attacks = [
     tool: "patch",
   },
 ];
+
+const SYSTEM_COMPONENTS = ["network", "database", "services", "kernel"];
 
 // Restrict which attacks appear based on the player's level
 const attackStages = [
@@ -97,12 +106,19 @@ const initialState = {
   gameCompleted: false,
   glitch: false,
   showParticles: false,
+  particleColor: '#00ff00',
   transitioning: false,
   credits: 100,
   inventory: { firewall: true },
+  cooldowns: { firewall: 0, antivirus: 0, patch: 0 },
   activeAttack: null,
+  attackTimeLeft: 0,
   showBuyCraft: null,
   damageTaken: 0,
+  combo: 0,
+  damageFlash: false,
+  successFlash: false,
+  showMinigame: false,
   threatsStopped: 0,
   startTime: Date.now(),
   actions: 0,
@@ -112,7 +128,8 @@ const initialState = {
   newUnlock: null,
 };
 
-const ApocalypseGame = ({ practice = false }) => {
+const ApocalypseGame = ({ practice = false, difficulty = 'Operative', hints: enableHints = true }) => {
+  const preset = DIFFICULTY_PRESETS[difficulty] || DIFFICULTY_PRESETS.Operative;
   const storageKey = practice ? "practiceState" : "gameState";
   const { addProgress } = useAchievements() || {};
   const [gameState, setGameState] = useState(() => {
@@ -121,6 +138,7 @@ const ApocalypseGame = ({ practice = false }) => {
       const parsed = JSON.parse(saved);
       return {
         ...initialState,
+        hintsAvailable: enableHints && preset.hints ? initialState.hintsAvailable : 0,
         ...parsed,
         inventory: {
           ...initialState.inventory,
@@ -132,6 +150,7 @@ const ApocalypseGame = ({ practice = false }) => {
     if (practice) {
       return {
         ...initialState,
+        hintsAvailable: enableHints && preset.hints ? initialState.hintsAvailable : 0,
         credits: 9999,
         inventory: Object.keys(toolData).reduce(
           (acc, t) => ({ ...acc, [t]: true }),
@@ -143,14 +162,24 @@ const ApocalypseGame = ({ practice = false }) => {
         ),
       };
     }
-    return initialState;
+    return { ...initialState, hintsAvailable: enableHints && preset.hints ? initialState.hintsAvailable : 0 };
   });
 
   const [showTools, setShowTools] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [selectedTool, setSelectedTool] = useState(null);
 
   const handleKeyPress = useCallback(
     (e) => {
+      if (e.key === 'F5') {
+        localStorage.setItem('survivos-quick', JSON.stringify(gameState));
+        return;
+      }
+      if (e.key === 'F9') {
+        const saved = localStorage.getItem('survivos-quick');
+        if (saved) setGameState(JSON.parse(saved));
+        return;
+      }
       if (paused) return;
       if (
         gameState.showQuestion &&
@@ -165,7 +194,7 @@ const ApocalypseGame = ({ practice = false }) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [gameState.showQuestion, gameState.currentLevel, paused],
+    [gameState.showQuestion, gameState.currentLevel, paused, gameState],
   );
 
   useEffect(() => {
@@ -216,6 +245,41 @@ const ApocalypseGame = ({ practice = false }) => {
       return () => clearTimeout(t);
     }
   }, [gameState.showParticles]);
+
+  useEffect(() => {
+    if (gameState.damageFlash) {
+      const t = setTimeout(() => {
+        setGameState((prev) => ({ ...prev, damageFlash: false }));
+      }, 500);
+      return () => clearTimeout(t);
+    }
+  }, [gameState.damageFlash]);
+
+  useEffect(() => {
+    if (gameState.successFlash) {
+      const t = setTimeout(() => {
+        setGameState((prev) => ({ ...prev, successFlash: false }));
+      }, 300);
+      return () => clearTimeout(t);
+    }
+  }, [gameState.successFlash]);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setGameState((prev) => {
+        const next = { ...prev.cooldowns };
+        let changed = false;
+        for (const k in next) {
+          if (next[k] > 0) {
+            next[k] = Math.max(0, next[k] - 1);
+            changed = true;
+          }
+        }
+        return changed ? { ...prev, cooldowns: next } : prev;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, []);
 
   const { showHelp, completed = [], activeMission } = useTutorial() || {};
   const tutorialDone = completed.length >= tutorialMissions.length && !activeMission;
@@ -283,14 +347,19 @@ const ApocalypseGame = ({ practice = false }) => {
       );
       const allowedIds = attackStages[stage];
       const possible = attacks.filter((a) => allowedIds.includes(a.id));
-      const attack =
-        possible[Math.floor(Math.random() * possible.length)];
+      const attack = possible[Math.floor(Math.random() * possible.length)];
+      const pattern = Array.from({ length: 4 }, () =>
+        String.fromCharCode(65 + Math.floor(Math.random() * 4))
+      );
+      const target =
+        SYSTEM_COMPONENTS[Math.floor(Math.random() * SYSTEM_COMPONENTS.length)];
       setGameState((prev) => ({
         ...prev,
-        activeAttack: attack,
+        activeAttack: { ...attack, pattern, target },
+        attackTimeLeft: Math.round(10 * preset.timeScale),
         message: `[ WARNING ] ${attack.message}`,
       }));
-    }, Math.random() * 5000 + 5000);
+    }, (Math.random() * 5000 + 5000) / preset.threatRate);
     return () => clearTimeout(timeout);
   }, [
     practice,
@@ -299,6 +368,8 @@ const ApocalypseGame = ({ practice = false }) => {
     gameState.activeAttack,
     gameState.currentLevel,
     tutorialDone,
+    preset.threatRate,
+    preset.timeScale,
   ]);
 
   // When an attack starts, prompt the player to acquire the correct tool
@@ -314,21 +385,21 @@ const ApocalypseGame = ({ practice = false }) => {
   }, [gameState.activeAttack, gameState.inventory]);
 
   useEffect(() => {
-    if (practice || !gameState.activeAttack) {
-      return;
+    if (!gameState.activeAttack) return;
+    const timer = setInterval(() => {
+      setGameState((prev) => ({
+        ...prev,
+        attackTimeLeft: Math.max(0, prev.attackTimeLeft - 1),
+      }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [gameState.activeAttack]);
+
+  useEffect(() => {
+    if (gameState.attackTimeLeft <= 0 && gameState.activeAttack) {
+      resolveFailure();
     }
-    const dmg = setInterval(() => {
-      setGameState((prev) => {
-        const newHealth = Math.max(0, prev.health - 5);
-        return {
-          ...prev,
-          health: newHealth,
-          damageTaken: prev.damageTaken + (prev.health - newHealth),
-        };
-      });
-    }, 5000);
-    return () => clearInterval(dmg);
-  }, [practice, gameState.activeAttack]);
+  }, [gameState.attackTimeLeft, gameState.activeAttack]);
 
   useEffect(() => {
     if (gameState.health <= 0) {
@@ -1004,6 +1075,7 @@ TIPS FOR THIS CHALLENGE:
   const handleAnswer = (selectedIndex) => {
     const currentLevel = levels[gameState.currentLevel];
     const hintsLeft = gameState.hintsAvailable;
+    playSound('type');
     let correct = false;
 
     switch (currentLevel.type) {
@@ -1044,9 +1116,12 @@ TIPS FOR THIS CHALLENGE:
         sequenceInput: "",
         blankInput: "",
         glitch: !correct,
-        showParticles: correct,
+        showParticles: true,
+        particleColor: correct ? '#00ff00' : '#ff0000',
       };
     });
+    if (correct) playSound('success');
+    else playSound('fail');
     if (correct && addProgress) {
       const achId = levelAchievements[currentLevel.id];
       if (achId) addProgress(achId, 100);
@@ -1114,26 +1189,65 @@ TIPS FOR THIS CHALLENGE:
     localStorage.removeItem(storageKey);
   };
 
+  const resolveSuccess = (toolId) => {
+    playSound('success');
+    setGameState((prev) => {
+      const stopped = prev.threatsStopped + 1;
+      return {
+        ...prev,
+        activeAttack: null,
+        attackTimeLeft: 0,
+        successFlash: true,
+        showParticles: true,
+        particleColor: '#00aaff',
+        combo: prev.combo + 1,
+        message: `[ DEFENSE DEPLOYED ] ${toolId.toUpperCase()} neutralized attack.`,
+        threatsStopped: stopped,
+        actions: prev.actions + 1,
+        successfulActions: prev.successfulActions + 1,
+        cooldowns: { ...prev.cooldowns, [toolId]: 5 },
+        hintsAvailable:
+          stopped >= 5 ? 0 : prev.hintsAvailable,
+      };
+    });
+    if (addProgress) {
+      addProgress('first-blood', 100);
+      addProgress('guardian', 10);
+      addProgress('shield-master', 4);
+      if (gameState.damageTaken === 0) {
+        addProgress('flawless-defense', 20);
+      }
+    }
+  };
+
+  const resolveFailure = () => {
+    playSound('fail');
+    setGameState((prev) => {
+      const newHealth = Math.max(0, prev.health - 10);
+      return {
+        ...prev,
+        health: newHealth,
+        damageTaken: prev.damageTaken + (prev.health - newHealth),
+        activeAttack: null,
+        attackTimeLeft: 0,
+        damageFlash: true,
+        showParticles: true,
+        particleColor: '#ff0000',
+        combo: 0,
+      };
+    });
+  };
+
   const handleUseTool = (toolId) => {
+    if (gameState.cooldowns[toolId] > 0) {
+      setGameState((prev) => ({ ...prev, message: `${toolId.toUpperCase()} recharging...` }));
+      return;
+    }
     if (!gameState.activeAttack) return;
+    playSound('alert');
     if (gameState.activeAttack.tool === toolId) {
       if (gameState.inventory?.[toolId]) {
-        setGameState((prev) => ({
-          ...prev,
-          activeAttack: null,
-          message: `[ DEFENSE DEPLOYED ] ${toolId.toUpperCase()} neutralized attack.`,
-          threatsStopped: prev.threatsStopped + 1,
-          actions: prev.actions + 1,
-          successfulActions: prev.successfulActions + 1,
-        }));
-        if (addProgress) {
-          addProgress('first-blood', 100);
-          addProgress('guardian', 10);
-          addProgress('shield-master', 4);
-          if (gameState.damageTaken === 0) {
-            addProgress('flawless-defense', 20);
-          }
-        }
+        resolveSuccess(toolId);
       } else {
         setGameState((prev) => ({
           ...prev,
@@ -1149,12 +1263,15 @@ TIPS FOR THIS CHALLENGE:
   const handleBuyTool = (toolId) => {
     const cost = toolData[toolId].cost;
     if (gameState.credits >= cost) {
+      playSound('success');
       setGameState((prev) => ({
         ...prev,
         credits: prev.credits - cost,
         inventory: { ...prev.inventory, [toolId]: true },
         showBuyCraft: null,
         message: `[ PURCHASED ] ${toolId.toUpperCase()} ready.`,
+        showParticles: true,
+        particleColor: '#00aaff',
         unlockedItems: prev.unlockedItems.includes(toolId)
           ? prev.unlockedItems
           : [...prev.unlockedItems, toolId],
@@ -1165,6 +1282,7 @@ TIPS FOR THIS CHALLENGE:
         addProgress('arsenal-master', 20);
       }
     } else {
+      playSound('fail');
       setGameState((prev) => ({
         ...prev,
         message: "Not enough credits to purchase " + toolId + ".",
@@ -1173,11 +1291,14 @@ TIPS FOR THIS CHALLENGE:
   };
 
   const handleCraftTool = (toolId) => {
+    playSound('success');
     setGameState((prev) => ({
       ...prev,
       inventory: { ...prev.inventory, [toolId]: true },
       showBuyCraft: null,
       message: `[ CRAFTED ] ${toolId.toUpperCase()} assembled.`,
+      showParticles: true,
+      particleColor: '#00aaff',
       unlockedItems: prev.unlockedItems.includes(toolId)
         ? prev.unlockedItems
         : [...prev.unlockedItems, toolId],
@@ -1318,10 +1439,12 @@ TIPS FOR THIS CHALLENGE:
   };
 
   return (
-    <div className="min-h-screen bg-black p-4 flex items-center justify-center">
+    <div
+      className={`min-h-screen bg-black p-4 flex items-center justify-center ${gameState.damageFlash ? 'screen-shake flash-red' : ''} ${gameState.successFlash ? 'flash-green' : ''}`}
+    >
       <div className="matrix-bg" />
       <div className="w-full relative max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl">
-        <Particles trigger={gameState.showParticles} />
+        <Particles trigger={gameState.showParticles} color={gameState.particleColor} />
         {gameState.newUnlock && (
           <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
             <div className="bg-black/80 text-green-400 p-4 rounded" data-testid="unlock-overlay">
@@ -1356,14 +1479,14 @@ TIPS FOR THIS CHALLENGE:
           </button>
         </div>
 
-        {gameState.activeAttack && (
-          <div className="bg-red-900/30 border-b border-red-500 text-red-400 text-center font-mono text-xs py-1 animate-pulse">
-            {gameState.activeAttack.message}
-          </div>
-        )}
+        <ThreatPanel
+          threat={gameState.activeAttack}
+          timeLeft={gameState.attackTimeLeft}
+          combo={gameState.combo}
+        />
 
         <div
-          className={`p-6 bg-black rounded-b-3xl transition-opacity duration-500 ${gameState.transitioning ? "opacity-0" : "opacity-100"}`}
+          className={`p-6 bg-black rounded-b-3xl fade-transition ${gameState.transitioning ? "opacity-0" : "opacity-100"}`}
         >
           {/* System Stats */}
           <div className="grid grid-cols-3 gap-4 mb-6">
@@ -1410,16 +1533,29 @@ TIPS FOR THIS CHALLENGE:
 
           {/* Tools */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {Object.keys(gameState.inventory || {}).map((tool) => (
-              <button
-                key={tool}
-                onClick={() => handleUseTool(tool)}
-                className="bg-black border border-green-500/30 text-green-400 font-mono px-3 py-1 rounded-lg hover:bg-green-900/30 text-xs"
-              >
-                {tool.toUpperCase()}
-              </button>
-            ))}
-          </div>
+        {Object.keys(gameState.inventory || {}).map((tool) => (
+          <button
+            key={tool}
+            onClick={() => handleUseTool(tool)}
+            className="bg-black border border-green-500/30 text-green-400 font-mono px-3 py-1 rounded-lg hover:bg-green-900/30 text-xs"
+          >
+            {tool.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
+      {gameState.activeAttack && (
+        <div className="mb-4">
+          <button
+            onClick={() =>
+              setGameState((prev) => ({ ...prev, showMinigame: true }))
+            }
+            className="bg-black border border-green-500/30 text-green-400 font-mono px-3 py-1 rounded-lg hover:bg-green-900/30 text-xs"
+          >
+            DEFEND MANUALLY
+          </button>
+        </div>
+      )}
 
           {gameState.showBuyCraft && (
             <div className="border border-blue-500/30 rounded-lg p-3 mb-4 bg-blue-900/10">
@@ -1622,11 +1758,49 @@ TIPS FOR THIS CHALLENGE:
           <div className="text-xl">PAUSED - Press P to resume</div>
         </div>
       )}
+      <HUD
+        objective={levels[gameState.currentLevel].objective || levels[gameState.currentLevel].question}
+        time={gameState.attackTimeLeft || null}
+        health={gameState.health}
+        buffs={[]}
+      />
+      <QuickAccessBar
+        health={gameState.health}
+        credits={gameState.credits}
+        activeAttack={gameState.activeAttack}
+        inventory={gameState.inventory}
+        cooldowns={gameState.cooldowns}
+        selectedTool={selectedTool}
+        onSelectTool={(t) => setSelectedTool(t)}
+        onDefend={(tool) => {
+          handleUseTool(tool);
+          setSelectedTool(null);
+        }}
+        onOpenMenu={() => window.dispatchEvent(new Event('open-menu'))}
+      />
+      <StorylineManager currentLevel={gameState.currentLevel} />
       <GameMenu
         onTogglePause={() => setPaused((p) => !p)}
         paused={paused}
         unlockedApps={gameState.unlockedApps}
       />
+
+      {gameState.showMinigame && gameState.activeAttack && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+          <DefenseMinigame
+            threatPattern={gameState.activeAttack.pattern}
+            timeLimit={gameState.attackTimeLeft}
+            onSuccess={() => {
+              resolveSuccess(gameState.activeAttack.tool);
+              setGameState((prev) => ({ ...prev, showMinigame: false }));
+            }}
+            onFailure={() => {
+              resolveFailure();
+              setGameState((prev) => ({ ...prev, showMinigame: false }));
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };
@@ -1635,4 +1809,6 @@ export default ApocalypseGame;
 
 ApocalypseGame.propTypes = {
   practice: PropTypes.bool,
+  difficulty: PropTypes.string,
+  hints: PropTypes.bool,
 };

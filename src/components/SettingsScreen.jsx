@@ -112,10 +112,10 @@ const SettingsScreen = () => {
         <label className="flex items-center space-x-2">
           <span className="w-32">Difficulty</span>
           <select className="bg-black border border-green-500" value={settings.gameplay.difficulty} onChange={(e) => update(['gameplay','difficulty'], e.target.value)}>
-            <option>Easy</option>
-            <option>Normal</option>
-            <option>Hard</option>
-            <option>Survivor</option>
+            <option>Rookie</option>
+            <option>Operative</option>
+            <option>Elite</option>
+            <option>Survival</option>
           </select>
         </label>
         <label className="flex items-center space-x-2">

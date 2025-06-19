@@ -25,7 +25,7 @@ const GameMenu = ({ onTogglePause, paused = false, unlockedApps = [] }) => {
   const [appProps, setAppProps] = useState({});
 
   const availableApps = Object.values(appRegistry).filter(
-    (a) => a.category === 'tools'
+    (a) => COMPONENTS[a.launchScreen]
   );
   const APPS = Object.fromEntries(
     availableApps.map((a) => [
@@ -63,6 +63,12 @@ const GameMenu = ({ onTogglePause, paused = false, unlockedApps = [] }) => {
     setActive(null);
     setAppProps({});
   };
+
+  useEffect(() => {
+    const openHandler = () => setOpen(true);
+    window.addEventListener('open-menu', openHandler);
+    return () => window.removeEventListener('open-menu', openHandler);
+  }, []);
 
   useEffect(() => {
     const handler = (e) => {
@@ -165,27 +171,32 @@ const GameMenu = ({ onTogglePause, paused = false, unlockedApps = [] }) => {
       </button>
       {open && (
         <div
-          className="fixed top-10 right-2 z-40 bg-black/80 p-2 rounded grid grid-cols-2 gap-2"
-          data-testid="game-menu"
+          className="fixed inset-0 z-40 bg-black/80 flex items-center justify-center animate-slide-in-right"
+          data-testid="menu-overlay"
         >
-          {Object.entries(APPS).map(([id, { icon: Icon, label, locked }]) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => !locked && launchApp(id)}
-              className={`flex flex-col items-center p-2 rounded hover:bg-gray-700 ${
-                locked ? 'opacity-40 cursor-not-allowed' : ''
-              }`}
-              id={`app-icon-${id}`}
-              data-testid={`menu-item-${id}`}
-            >
-              <Icon className="w-6 h-6" />
-              <span className="text-xs mt-1">{label}</span>
-              {locked && (
-                <span className="text-[10px] text-yellow-400 mt-1">LOCKED</span>
-              )}
-            </button>
-          ))}
+          <div
+            className="bg-gray-900 p-2 rounded grid grid-cols-2 gap-2"
+            data-testid="game-menu"
+          >
+            {Object.entries(APPS).map(([id, { icon: Icon, label, locked }]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => !locked && launchApp(id)}
+                className={`flex flex-col items-center p-2 rounded hover:bg-gray-700 ${
+                  locked ? 'opacity-40 cursor-not-allowed' : ''
+                }`}
+                id={`app-icon-${id}`}
+                data-testid={`menu-item-${id}`}
+              >
+                <Icon className="w-6 h-6" />
+                <span className="text-xs mt-1">{label}</span>
+                {locked && (
+                  <span className="text-[10px] text-yellow-400 mt-1">LOCKED</span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       )}
       {ActiveComp && (

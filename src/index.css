@@ -40,7 +40,7 @@ body {
   bottom: 0;
   width: 4px;
   height: 4px;
-  background: #00ff00;
+  background: var(--particle-color, #00ff00);
   border-radius: 50%;
   animation: particle-rise 0.8s linear forwards;
 }
@@ -136,4 +136,40 @@ body.reduce-motion * {
   animation-duration: 0s !important;
   transition-duration: 0s !important;
 }
+
+@keyframes shake {
+  0%,100% { transform: translate(0,0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(2px, -2px); }
+  60% { transform: translate(-2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+}
+
+.screen-shake {
+  animation: shake 0.5s;
+}
+
+@keyframes flash-red {
+  from { background: rgba(255,0,0,0.3); }
+  to { background: transparent; }
+}
+
+.flash-red {
+  animation: flash-red 0.3s;
+}
+
+@keyframes flash-green {
+  from { background: rgba(0,255,0,0.3); }
+  to { background: transparent; }
+}
+
+.flash-green {
+  animation: flash-green 0.3s;
+}
+
+
+@keyframes slide-in-right {from{transform:translateX(100%);} to{transform:translateX(0);}}
+.animate-slide-in-right{animation:slide-in-right 0.3s forwards;}
+@keyframes fade-out{from{opacity:1;}to{opacity:0;}}
+.fade-transition{transition:opacity 0.3s;}
 

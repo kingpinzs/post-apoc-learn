@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { cn } from '../../lib/utils';
 
@@ -14,26 +14,26 @@ const DefenseMinigame = ({ threatPattern = [], timeLimit = 10, onSuccess, onFail
     return () => clearInterval(timerRef.current);
   }, []);
 
-  const checkPattern = () => {
+  const checkPattern = useCallback(() => {
     const match = slots.join('') === threatPattern.join('');
     if (match) {
       if (onSuccess) onSuccess();
     } else if (onFailure) onFailure();
-  };
+  }, [slots, threatPattern, onSuccess, onFailure]);
 
   useEffect(() => {
     if (timeLeft <= 0) {
       clearInterval(timerRef.current);
       checkPattern();
     }
-  }, [timeLeft]);
+  }, [timeLeft, checkPattern]);
 
   useEffect(() => {
     if (slots.every(Boolean)) {
       clearInterval(timerRef.current);
       checkPattern();
     }
-  }, [slots]);
+  }, [slots, checkPattern]);
 
   const handleDragStart = (sym) => (e) => {
     e.dataTransfer.setData('text/plain', sym);

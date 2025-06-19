@@ -3,11 +3,10 @@ import '@testing-library/jest-dom';
 import App from '../App';
 
 /**
- * Ensure the game is shown inside the phone frame on load.
+ * Game should load immediately without the phone frame.
  */
-test('game renders within phone frame', () => {
-  const { getByTestId } = render(<App />);
-  const frame = getByTestId('phone-frame');
-  expect(frame).toBeInTheDocument();
-  expect(frame).toHaveTextContent(/INITIATING NEURAL INTERFACE/i);
+test('game renders directly without phone frame', () => {
+  const { queryByTestId, getByText } = render(<App />);
+  expect(queryByTestId('phone-frame')).toBeNull();
+  expect(getByText(/INITIATING NEURAL INTERFACE/i)).toBeInTheDocument();
 });
