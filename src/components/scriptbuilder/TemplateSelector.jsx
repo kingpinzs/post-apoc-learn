@@ -21,7 +21,11 @@ const LABELS = {
 const TemplateSelector = ({ onSelect }) => {
   return (
     <select
-      onChange={e => onSelect(TEMPLATES[e.target.value])}
+      onChange={e => {
+        const val = e.target.value;
+        if (!val) return;
+        onSelect(TEMPLATES[val]);
+      }}
       className="border rounded-md p-1 bg-black text-green-400"
       data-testid="template-selector"
     >

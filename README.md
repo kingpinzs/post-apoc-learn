@@ -10,8 +10,9 @@ Unlike traditional security training, SURVIV-OS uses intuitive drag-and-drop mec
 
 ## 🌟 Key Features
 
-### Interactive Phone Interface
-- **Realistic Mobile OS**: Complete with home screen, app drawer, and dock
+-### Integrated Game Interface
+- **Game-First Flow**: The game launches immediately with phone tools available through a quick menu
+- **Quick Menu Controls**: Swipe left or right more than 50&nbsp;px (the menu opens as soon as you cross the threshold), press `Escape` or `M`, or tap the menu icon
 - **Drag-and-Drop Apps**: Organize your security tools just like a real phone
 - **Resource Management**: Monitor CPU, RAM, and bandwidth usage
 - **Dynamic Notifications**: Real-time threat alerts and system updates

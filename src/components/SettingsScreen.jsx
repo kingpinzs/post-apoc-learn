@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { loadSettings, saveSettings, defaultSettings } from '../lib/settings';
+import { loadSettings, saveSettings } from '../lib/settings';
 import { detectQuality } from '../hooks/usePerformance';
 
 const Slider = ({ label, value, onChange, min = 0, max = 1, step = 0.01 }) => (

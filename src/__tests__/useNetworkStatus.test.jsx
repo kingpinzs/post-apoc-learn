@@ -18,4 +18,13 @@ test('updates when offline and online events fire', () => {
   expect(result.current).toBe(true);
 });
 
+test('defaults to true when navigator is undefined', () => {
+  const original = global.navigator;
+  // eslint-disable-next-line no-global-assign
+  navigator = undefined;
+  const { result } = renderHook(() => useNetworkStatus());
+  expect(result.current).toBe(true);
+  global.navigator = original;
+});
+
 

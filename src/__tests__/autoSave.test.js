@@ -11,7 +11,7 @@ describe('startAutoSave', () => {
 
   test('saves at interval and stops after cleanup', () => {
     const spy = jest.spyOn(Storage.prototype, 'setItem');
-    const stop = startAutoSave(() => ({ currentScreen: 'home', unlockedApps: [], completedMissions: [] }), 1000);
+    const stop = startAutoSave(() => ({ unlockedApps: [], completedMissions: [] }), 1000);
     jest.advanceTimersByTime(1000);
     expect(spy).toHaveBeenCalled();
     spy.mockClear();

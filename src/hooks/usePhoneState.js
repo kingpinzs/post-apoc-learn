@@ -21,7 +21,6 @@ import { loadGame, startAutoSave } from '../lib/saveSystem';
  * Initial state for the in-game phone interface.
  * @type {{
  *   isBootingUp: boolean,
- *   currentScreen: 'lock' | 'home' | 'app-drawer' | 'active-app',
  *   unlockedApps: string[],
  *   installedApps: string[],
  *   systemHealth: number,
@@ -33,7 +32,6 @@ import { loadGame, startAutoSave } from '../lib/saveSystem';
  */
 export const initialPhoneState = {
   isBootingUp: false,
-  currentScreen: 'lock',
   unlockedApps: [],
   installedApps: [],
   completedMissions: [],
@@ -60,7 +58,6 @@ export default function usePhoneState() {
 
   useEffect(() => {
     const stop = startAutoSave(() => ({
-      currentScreen: state.currentScreen,
       unlockedApps: state.unlockedApps,
       completedMissions: state.completedMissions,
     }));

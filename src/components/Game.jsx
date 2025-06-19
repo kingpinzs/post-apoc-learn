@@ -6,6 +6,7 @@ import DragCommandBlock from "./drag/DragCommandBlock";
 import DropZone from "./drag/DropZone";
 import GameOver from "./GameOver";
 import VictoryScreen from "./VictoryScreen";
+import GameMenu from "./GameMenu";
 import useAchievements from "../hooks/useAchievements";
 import { addHighScore } from "../lib/highscores";
 import {
@@ -24,6 +25,10 @@ import {
   Terminal,
   Binary,
 } from "lucide-react";
+
+import { appRegistry } from '../lib/appRegistry';
+import { useTutorial } from '../hooks/useTutorial';
+import { tutorialMissions } from '../lib/tutorialSystem';
 
 const toolData = {
   firewall: { cost: 50 },
@@ -44,6 +49,19 @@ const attacks = [
     tool: "patch",
   },
 ];
+
+// Restrict which attacks appear based on the player's level
+const attackStages = [
+  ["ddos"],
+  ["ddos", "malware"],
+  ["ddos", "malware", "exploit"],
+];
+
+const levelUnlocks = {
+  1: 'firewall',
+  3: 'decryptor',
+  5: 'networkScanner',
+};
 
 function recordFailure() {
   try {
@@ -90,6 +108,8 @@ const initialState = {
   actions: 0,
   successfulActions: 0,
   unlockedItems: [],
+  unlockedApps: ['scanner', 'terminal'],
+  newUnlock: null,
 };
 
 const ApocalypseGame = ({ practice = false }) => {
@@ -106,6 +126,7 @@ const ApocalypseGame = ({ practice = false }) => {
           ...initialState.inventory,
           ...(parsed.inventory || {}),
         },
+        unlockedApps: parsed.unlockedApps || initialState.unlockedApps,
       };
     }
     if (practice) {
@@ -117,13 +138,20 @@ const ApocalypseGame = ({ practice = false }) => {
           {}
         ),
         unlockedItems: Object.keys(toolData),
+        unlockedApps: Object.keys(appRegistry).filter(
+          (id) => appRegistry[id].category === 'tools'
+        ),
       };
     }
     return initialState;
   });
 
+  const [showTools, setShowTools] = useState(false);
+  const [paused, setPaused] = useState(false);
+
   const handleKeyPress = useCallback(
     (e) => {
+      if (paused) return;
       if (
         gameState.showQuestion &&
         levels[gameState.currentLevel].type === "sequence"
@@ -137,7 +165,7 @@ const ApocalypseGame = ({ practice = false }) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [gameState.showQuestion, gameState.currentLevel],
+    [gameState.showQuestion, gameState.currentLevel, paused],
   );
 
   useEffect(() => {
@@ -158,7 +186,14 @@ const ApocalypseGame = ({ practice = false }) => {
       clearTimeout(bootTimeout);
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [gameState.showQuestion, gameState.currentLevel, gameState.bootUp, handleKeyPress]);
+  }, [
+    gameState.showQuestion,
+    gameState.currentLevel,
+    gameState.bootUp,
+    handleKeyPress,
+    addProgress,
+    paused,
+  ]);
 
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(gameState));
@@ -182,11 +217,24 @@ const ApocalypseGame = ({ practice = false }) => {
     }
   }, [gameState.showParticles]);
 
+  const { showHelp, completed = [], activeMission } = useTutorial() || {};
+  const tutorialDone = completed.length >= tutorialMissions.length && !activeMission;
+
+  useEffect(() => {
+    if (gameState.newUnlock) {
+      showHelp?.(`app-icon-${gameState.newUnlock}`, `New app unlocked: ${appRegistry[gameState.newUnlock].name}`);
+      const t = setTimeout(() => {
+        setGameState((prev) => ({ ...prev, newUnlock: null }));
+      }, 2000);
+      return () => clearTimeout(t);
+    }
+  }, [gameState.newUnlock, showHelp]);
+
   useEffect(() => {
     if (gameState.gameCompleted && addProgress) {
       if (gameState.damageTaken === 0) addProgress('untouchable', 100);
     }
-  }, [gameState.gameCompleted, gameState.damageTaken]);
+  }, [gameState.gameCompleted, gameState.damageTaken, addProgress]);
 
   useEffect(() => {
     if (gameState.gameCompleted) {
@@ -202,26 +250,41 @@ const ApocalypseGame = ({ practice = false }) => {
         accuracy,
       });
     }
-  }, [gameState.gameCompleted]);
+  }, [
+    gameState.gameCompleted,
+    gameState.startTime,
+    gameState.actions,
+    gameState.successfulActions,
+    gameState.threatsStopped,
+    gameState.damageTaken,
+  ]);
 
   useEffect(() => {
     if (addProgress) {
       if (gameState.credits >= 500) addProgress('credit-hoarder', 100);
       if (gameState.credits >= 1000) addProgress('resource-tycoon', 100);
     }
-  }, [gameState.credits]);
+  }, [gameState.credits, addProgress]);
 
   useEffect(() => {
     if (
       practice ||
       gameState.bootUp ||
       gameState.gameCompleted ||
-      gameState.activeAttack !== null
+      gameState.activeAttack !== null ||
+      !tutorialDone
     ) {
       return;
     }
     const timeout = setTimeout(() => {
-      const attack = attacks[Math.floor(Math.random() * attacks.length)];
+      const stage = Math.min(
+        attackStages.length - 1,
+        Math.floor(gameState.currentLevel / 2)
+      );
+      const allowedIds = attackStages[stage];
+      const possible = attacks.filter((a) => allowedIds.includes(a.id));
+      const attack =
+        possible[Math.floor(Math.random() * possible.length)];
       setGameState((prev) => ({
         ...prev,
         activeAttack: attack,
@@ -229,7 +292,26 @@ const ApocalypseGame = ({ practice = false }) => {
       }));
     }, Math.random() * 5000 + 5000);
     return () => clearTimeout(timeout);
-  }, [practice, gameState.bootUp, gameState.gameCompleted, gameState.activeAttack]);
+  }, [
+    practice,
+    gameState.bootUp,
+    gameState.gameCompleted,
+    gameState.activeAttack,
+    gameState.currentLevel,
+    tutorialDone,
+  ]);
+
+  // When an attack starts, prompt the player to acquire the correct tool
+  useEffect(() => {
+    if (!gameState.activeAttack) return;
+    const required = gameState.activeAttack.tool;
+    if (!gameState.inventory?.[required]) {
+      setGameState((prev) => ({
+        ...prev,
+        showBuyCraft: required,
+      }));
+    }
+  }, [gameState.activeAttack, gameState.inventory]);
 
   useEffect(() => {
     if (practice || !gameState.activeAttack) {
@@ -980,17 +1062,26 @@ TIPS FOR THIS CHALLENGE:
     setGameState((prev) => ({ ...prev, transitioning: true }));
     setTimeout(() => {
       setGameState((prev) => {
+        const nextIndex = prev.currentLevel + 1;
+        const unlockId = levelUnlocks[nextIndex];
+        const willUnlock = unlockId && !prev.unlockedApps.includes(unlockId);
+        const unlockedApps = willUnlock
+          ? [...prev.unlockedApps, unlockId]
+          : prev.unlockedApps;
         if (prev.currentLevel < levels.length - 1) {
           return {
             ...prev,
-            currentLevel: prev.currentLevel + 1,
-            message: levels[prev.currentLevel + 1].scenario,
+            currentLevel: nextIndex,
+            message: levels[nextIndex].scenario,
             answeredCorrectly: false,
             showQuestion: false,
             inputCommand: "",
             sequenceInput: "",
             blankInput: "",
             transitioning: false,
+            unlockedApps,
+            newUnlock: willUnlock ? unlockId : null,
+            showParticles: willUnlock || prev.showParticles,
           };
         }
         return {
@@ -1001,6 +1092,7 @@ TIPS FOR THIS CHALLENGE:
           gameCompleted: true,
           transitioning: false,
           blankInput: "",
+          unlockedApps,
         };
       });
     }, 300);
@@ -1230,6 +1322,13 @@ TIPS FOR THIS CHALLENGE:
       <div className="matrix-bg" />
       <div className="w-full relative max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl">
         <Particles trigger={gameState.showParticles} />
+        {gameState.newUnlock && (
+          <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
+            <div className="bg-black/80 text-green-400 p-4 rounded" data-testid="unlock-overlay">
+              New App Unlocked: {appRegistry[gameState.newUnlock].name}
+            </div>
+          </div>
+        )}
         {/* Device Frame */}
         <div className="absolute inset-0 border-2 border-green-500 rounded-3xl pointer-events-none"></div>
 
@@ -1247,6 +1346,14 @@ TIPS FOR THIS CHALLENGE:
             CREDITS: {gameState.credits}
           </div>
           <Battery className="w-4 h-4 text-green-500" />
+          <button
+            type="button"
+            onClick={() => setShowTools((s) => !s)}
+            className="ml-2 px-2 py-1 border border-green-500 text-green-400 rounded text-xs"
+            data-testid="toggle-tools"
+          >
+            {showTools ? 'CLOSE' : 'TOOLS'}
+          </button>
         </div>
 
         {gameState.activeAttack && (
@@ -1414,7 +1521,7 @@ TIPS FOR THIS CHALLENGE:
                     <p className="text-blue-400 font-mono text-sm whitespace-pre-wrap">
                       {module.content}
                     </p>
-                    <p className="text-blue-400 font-mono text-xs mt-2 italic">
+                    <p className="text-blue-400 font-mono text-xs mt-2 italic">Task 2: Create Integrated Game Menu System
                       {module.example}
                     </p>
                     <a
@@ -1510,6 +1617,16 @@ TIPS FOR THIS CHALLENGE:
           )}
         </div>
       </div>
+      {paused && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 text-green-400" data-testid="pause-overlay">
+          <div className="text-xl">PAUSED - Press P to resume</div>
+        </div>
+      )}
+      <GameMenu
+        onTogglePause={() => setPaused((p) => !p)}
+        paused={paused}
+        unlockedApps={gameState.unlockedApps}
+      />
     </div>
   );
 };

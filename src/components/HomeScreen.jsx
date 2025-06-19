@@ -38,7 +38,7 @@ function loadDefaultGrid() {
 }
 
 const HomeScreen = ({ notifications = [], onLaunchApp }) => {
-  const [phoneState, setPhoneState] = usePhoneState();
+  const [phoneState] = usePhoneState();
   const [activeApp, setActiveApp] = useState(null);
   const [lockMessage, setLockMessage] = useState('');
 
@@ -146,13 +146,11 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
       onLaunchApp(appId, props);
     } else {
       setActiveApp(appId);
-      setPhoneState((s) => ({ ...s, currentScreen: 'active-app' }));
     }
   };
 
   const closeApp = () => {
     setActiveApp(null);
-    setPhoneState((s) => ({ ...s, currentScreen: 'home' }));
   };
 
   if (activeApp) {
@@ -198,7 +196,7 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
       </button>
       {showGrid && (
         <div className="flex-1 overflow-auto">
-          <div className="grid grid-cols-4 gap-2" data-testid="app-grid">
+          <div className="grid grid-cols-4 gap-2" id="app-grid" data-testid="app-grid">
             {gridSlots.map((appId, i) => {
               const def = appRegistry[appId];
               const Icon = def ? Icons[def.icon] : null;

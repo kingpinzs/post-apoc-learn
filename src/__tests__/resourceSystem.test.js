@@ -21,3 +21,10 @@ test('system crashes when usage reaches limit', () => {
   allocateResources('app2', { cpu: 100 });
   expect(systemCrashed()).toBe(true);
 });
+
+test('no allocation occurs after crash', () => {
+  allocateResources('app2', { cpu: 100 });
+  expect(systemCrashed()).toBe(true);
+  allocateResources('app3', { cpu: 10 });
+  expect(getUsage().cpu).toBe(100);
+});
