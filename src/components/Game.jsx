@@ -42,7 +42,6 @@ import {
   startGame as startGameState,
   completeTutorial as finishTutorial,
   bootComplete,
-  canStartGame,
   getState as getGameState,
   pauseGame,
   resumeGame,
