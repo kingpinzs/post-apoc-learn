@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Battery, Wifi, Shield, Menu, Monitor, Maximize2, Minimize2 } from 'lucide-react';
+import { Battery, Wifi, Shield, Menu, Cpu, Maximize2, Minimize2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { getUsage } from '../lib/resourceSystem';
 
@@ -21,6 +21,7 @@ const PhoneFrame = ({
   );
   const [usage, setUsage] = useState(getUsage());
   const [fullscreen, setFullscreen] = useState(false);
+  const progress = Math.min(100, ((level - 1) / totalLevels) * 100);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -71,17 +72,22 @@ const PhoneFrame = ({
       )}
       {gameMode && (
         <div
-          className="flex items-center justify-between text-xs px-2 py-1 bg-gray-900 border-b border-green-500/30"
+          className="flex items-center justify-between text-xs px-2 py-1 bg-gray-900 border-b border-green-500/40"
           data-testid="game-status-bar"
         >
           <div className="flex items-center space-x-3">
-            <span>Lvl {level}/{totalLevels}</span>
+            <div className="flex items-center space-x-2">
+              <span className="whitespace-nowrap">LV {level}/{totalLevels}</span>
+              <div className="w-20 h-2 bg-gray-700 rounded">
+                <div className="bg-green-500 h-full" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
             <div className="flex items-center space-x-1">
               <Shield className="w-4 h-4" />
               <span>{threatLevel}</span>
             </div>
             <div className="flex space-x-2">
-              <span>CPU {usage.cpu}%</span>
+              <span className="flex items-center space-x-1"><Cpu className="w-3 h-3" /> <span>{usage.cpu}%</span></span>
               <span>RAM {usage.ram}%</span>
               <span>BW {usage.bandwidth}%</span>
             </div>

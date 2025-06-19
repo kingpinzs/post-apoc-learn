@@ -21,6 +21,7 @@ const App = () => {
         batteryLevel={phoneState.batteryLevel}
         networkStrength={phoneState.networkStrength}
         threatLevel={phoneState.activeThreats.length}
+        gameMode={true}
       >
         <AppIntegration>
           <ApocalypseGame practice={practiceMode} />
