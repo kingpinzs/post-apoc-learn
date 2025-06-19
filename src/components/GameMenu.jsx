@@ -25,7 +25,7 @@ const GameMenu = ({ onTogglePause, paused = false, unlockedApps = [] }) => {
   const [appProps, setAppProps] = useState({});
 
   const availableApps = Object.values(appRegistry).filter(
-    (a) => a.category === 'tools'
+    (a) => COMPONENTS[a.launchScreen]
   );
   const APPS = Object.fromEntries(
     availableApps.map((a) => [
@@ -63,6 +63,12 @@ const GameMenu = ({ onTogglePause, paused = false, unlockedApps = [] }) => {
     setActive(null);
     setAppProps({});
   };
+
+  useEffect(() => {
+    const openHandler = () => setOpen(true);
+    window.addEventListener('open-menu', openHandler);
+    return () => window.removeEventListener('open-menu', openHandler);
+  }, []);
 
   useEffect(() => {
     const handler = (e) => {
