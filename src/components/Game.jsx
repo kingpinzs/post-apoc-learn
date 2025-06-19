@@ -289,7 +289,13 @@ const ApocalypseGame = ({ practice = false }) => {
       }));
     }, Math.random() * 5000 + 5000);
     return () => clearTimeout(timeout);
-  }, [practice, gameState.bootUp, gameState.gameCompleted, gameState.activeAttack]);
+  }, [
+    practice,
+    gameState.bootUp,
+    gameState.gameCompleted,
+    gameState.activeAttack,
+    gameState.currentLevel,
+  ]);
 
   // When an attack starts, prompt the player to acquire the correct tool
   useEffect(() => {
