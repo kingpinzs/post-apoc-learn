@@ -20,11 +20,11 @@ export const TutorialProvider = ({ children, autoStart = true }) => {
     setState({ completed: tutorialMissions.map((m) => m.id), activeMission: null });
   }, []);
 
-  const resume = () => {
+  const resume = useCallback(() => {
     if (state.activeMission) return;
     const next = tutorialMissions.find((m) => !state.completed.includes(m.id));
     if (next) setState({ ...state, activeMission: next.id });
-  };
+  }, [state]);
 
   const showHelp = useCallback((targetId, message) => {
     setHelpSteps([{ targetId, message, action: 'click' }]);
@@ -34,7 +34,7 @@ export const TutorialProvider = ({ children, autoStart = true }) => {
     if (autoStart) {
       resume();
     }
-  }, [autoStart]);
+  }, [autoStart, resume]);
 
   const activeMission = tutorialMissions.find((m) => m.id === state.activeMission);
 
