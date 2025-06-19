@@ -1,4 +1,9 @@
 describe('Tutorial system', () => {
+  beforeEach(() => {
+    // Ensure no previous progress interferes with the tests
+    cy.clearLocalStorage();
+  });
+
   it('highlights menu and scanner', () => {
     cy.visit('/');
     cy.get('[data-tutorial="menu-toggle"]').should('exist');
