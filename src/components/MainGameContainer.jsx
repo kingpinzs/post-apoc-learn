@@ -8,14 +8,14 @@ import PerformanceOverlay from './PerformanceOverlay';
 import AppIntegration from './AppIntegration';
 import usePhoneState from '../hooks/usePhoneState';
 
-const MainGameContainer = ({ practiceMode = false, showPerformance = false }) => {
+const MainGameContainer = ({ practiceMode = false, showPerformance = false, difficulty = 'Operative', hints = true }) => {
   const [phoneOpen, setPhoneOpen] = useState(false);
   const [phoneState] = usePhoneState();
 
   return (
     <div className="relative w-full h-full">
       <AppIntegration>
-        <ApocalypseGame practice={practiceMode} />
+        <ApocalypseGame practice={practiceMode} difficulty={difficulty} hints={hints} />
         <PerformanceOverlay show={showPerformance} />
       </AppIntegration>
       <button
@@ -59,6 +59,8 @@ const MainGameContainer = ({ practiceMode = false, showPerformance = false }) =>
 MainGameContainer.propTypes = {
   practiceMode: PropTypes.bool,
   showPerformance: PropTypes.bool,
+  difficulty: PropTypes.string,
+  hints: PropTypes.bool,
 };
 
 export default MainGameContainer;
