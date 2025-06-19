@@ -31,6 +31,8 @@ import PortScanner from "./PortScanner";
 import FirewallApp from "./FirewallApp";
 import TerminalScreen from "./TerminalScreen";
 import { useAppIntegration } from "./AppIntegration";
+import { appRegistry } from '../lib/appRegistry';
+import { useTutorial } from '../hooks/useTutorial';
 
 const toolData = {
   firewall: { cost: 50 },
@@ -51,6 +53,12 @@ const attacks = [
     tool: "patch",
   },
 ];
+
+const levelUnlocks = {
+  1: 'firewall',
+  3: 'decryptor',
+  5: 'networkScanner',
+};
 
 function recordFailure() {
   try {
@@ -97,6 +105,8 @@ const initialState = {
   actions: 0,
   successfulActions: 0,
   unlockedItems: [],
+  unlockedApps: ['scanner', 'terminal'],
+  newUnlock: null,
 };
 
 const ApocalypseGame = ({ practice = false }) => {
@@ -114,6 +124,7 @@ const ApocalypseGame = ({ practice = false }) => {
           ...initialState.inventory,
           ...(parsed.inventory || {}),
         },
+        unlockedApps: parsed.unlockedApps || initialState.unlockedApps,
       };
     }
     if (practice) {
@@ -125,6 +136,9 @@ const ApocalypseGame = ({ practice = false }) => {
           {}
         ),
         unlockedItems: Object.keys(toolData),
+        unlockedApps: Object.keys(appRegistry).filter(
+          (id) => appRegistry[id].category === 'tools'
+        ),
       };
     }
     return initialState;
@@ -224,6 +238,18 @@ const ApocalypseGame = ({ practice = false }) => {
       return () => clearTimeout(t);
     }
   }, [gameState.showParticles]);
+
+  const { showHelp } = useTutorial() || {};
+
+  useEffect(() => {
+    if (gameState.newUnlock) {
+      showHelp?.(`app-icon-${gameState.newUnlock}`, `New app unlocked: ${appRegistry[gameState.newUnlock].name}`);
+      const t = setTimeout(() => {
+        setGameState((prev) => ({ ...prev, newUnlock: null }));
+      }, 2000);
+      return () => clearTimeout(t);
+    }
+  }, [gameState.newUnlock, showHelp]);
 
   useEffect(() => {
     if (gameState.gameCompleted && addProgress) {
@@ -1030,17 +1056,26 @@ TIPS FOR THIS CHALLENGE:
     setGameState((prev) => ({ ...prev, transitioning: true }));
     setTimeout(() => {
       setGameState((prev) => {
+        const nextIndex = prev.currentLevel + 1;
+        const unlockId = levelUnlocks[nextIndex];
+        const willUnlock = unlockId && !prev.unlockedApps.includes(unlockId);
+        const unlockedApps = willUnlock
+          ? [...prev.unlockedApps, unlockId]
+          : prev.unlockedApps;
         if (prev.currentLevel < levels.length - 1) {
           return {
             ...prev,
-            currentLevel: prev.currentLevel + 1,
-            message: levels[prev.currentLevel + 1].scenario,
+            currentLevel: nextIndex,
+            message: levels[nextIndex].scenario,
             answeredCorrectly: false,
             showQuestion: false,
             inputCommand: "",
             sequenceInput: "",
             blankInput: "",
             transitioning: false,
+            unlockedApps,
+            newUnlock: willUnlock ? unlockId : null,
+            showParticles: willUnlock || prev.showParticles,
           };
         }
         return {
@@ -1051,6 +1086,7 @@ TIPS FOR THIS CHALLENGE:
           gameCompleted: true,
           transitioning: false,
           blankInput: "",
+          unlockedApps,
         };
       });
     }, 300);
@@ -1280,6 +1316,13 @@ TIPS FOR THIS CHALLENGE:
       <div className="matrix-bg" />
       <div className="w-full relative max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl">
         <Particles trigger={gameState.showParticles} />
+        {gameState.newUnlock && (
+          <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
+            <div className="bg-black/80 text-green-400 p-4 rounded" data-testid="unlock-overlay">
+              New App Unlocked: {appRegistry[gameState.newUnlock].name}
+            </div>
+          </div>
+        )}
         {/* Device Frame */}
         <div className="absolute inset-0 border-2 border-green-500 rounded-3xl pointer-events-none"></div>
 
@@ -1573,7 +1616,11 @@ TIPS FOR THIS CHALLENGE:
           <div className="text-xl">PAUSED - Press P to resume</div>
         </div>
       )}
-      <GameMenu onTogglePause={() => setPaused((p) => !p)} paused={paused} />
+      <GameMenu
+        onTogglePause={() => setPaused((p) => !p)}
+        paused={paused}
+        unlockedApps={gameState.unlockedApps}
+      />
     </div>
   );
 };
