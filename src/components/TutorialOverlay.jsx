@@ -62,6 +62,22 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
     return () => element.removeEventListener(action, handler);
   }, [element, index, steps]);
 
+  // detect element removal after it was found
+  useEffect(() => {
+    if (!element) return undefined;
+    let frame;
+    const check = () => {
+      if (!document.contains(element)) {
+        setElement(null);
+        setMissing(true);
+      } else {
+        frame = requestAnimationFrame(check);
+      }
+    };
+    frame = requestAnimationFrame(check);
+    return () => cancelAnimationFrame(frame);
+  }, [element]);
+
   // fire completion callback
   useEffect(() => {
     if (index === steps.length && onComplete) {
