@@ -42,6 +42,12 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
   const [activeApp, setActiveApp] = useState(null);
   const [lockMessage, setLockMessage] = useState('');
 
+  useEffect(() => {
+    const handler = () => setActiveApp(null);
+    window.addEventListener('popstate', handler);
+    return () => window.removeEventListener('popstate', handler);
+  }, []);
+
   const [gridSlots, setGridSlots] = useState(() => {
     const saved = localStorage.getItem(GRID_KEY);
     if (saved) {
@@ -145,12 +151,16 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
     if (onLaunchApp) {
       onLaunchApp(appId, props);
     } else {
+      window.history.pushState({ app: appId }, '');
       setActiveApp(appId);
     }
   };
 
   const closeApp = () => {
-    setActiveApp(null);
+    if (activeApp) {
+      window.history.back();
+      setActiveApp(null);
+    }
   };
 
   if (activeApp) {
@@ -158,6 +168,11 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
     const Screen = screenMap[def.launchScreen];
     return (
       <div className="flex flex-col h-full" data-testid="active-app">
+        <div className="flex items-center text-xs text-green-400 space-x-1 m-2" data-testid="breadcrumbs">
+          <span>Tools</span>
+          <span>&gt;</span>
+          <span>{def.name}</span>
+        </div>
         <button
           type="button"
           onClick={closeApp}
