@@ -6,7 +6,6 @@ import DragCommandBlock from "./drag/DragCommandBlock";
 import DropZone from "./drag/DropZone";
 import GameOver from "./GameOver";
 import VictoryScreen from "./VictoryScreen";
-import GameMenu from "./GameMenu";
 import QuickAccessBar from "./QuickAccessBar";
 import HUD from "./HUD";
 import DefenseMinigame from "./defense/DefenseMinigame";
@@ -1811,21 +1810,8 @@ TIPS FOR THIS CHALLENGE:
           handleUseTool(tool);
           setSelectedTool(null);
         }}
-        onOpenMenu={() => window.dispatchEvent(new Event('open-menu'))}
       />
       <StorylineManager currentLevel={gameState.currentLevel} />
-      <GameMenu
-        onTogglePause={() => {
-          setPaused((p) => {
-            const next = !p;
-            if (next) pauseGame(); else resumeGame();
-            return next;
-          });
-        }}
-        paused={paused}
-        unlockedApps={gameState.unlockedApps}
-      />
-
       {gameState.showMinigame && gameState.activeAttack && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
           <DefenseMinigame

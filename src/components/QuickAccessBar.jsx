@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Menu, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { getUsage } from '../lib/resourceSystem';
 
 const toolList = ['firewall', 'antivirus', 'patch'];
@@ -14,7 +14,6 @@ const QuickAccessBar = ({
   selectedTool = null,
   onSelectTool,
   onDefend,
-  onOpenMenu,
 }) => {
   const [usage, setUsage] = useState(getUsage());
 
@@ -47,9 +46,6 @@ const QuickAccessBar = ({
         <div className="flex items-center space-x-1">
           <span>CR {credits}</span>
         </div>
-        <button type="button" onClick={onOpenMenu} className="p-1">
-          <Menu className="w-4 h-4" />
-        </button>
       </div>
       <div className="flex justify-center space-x-2 px-2 pb-1">
         {toolList.map((tool) =>
@@ -86,7 +82,6 @@ QuickAccessBar.propTypes = {
   selectedTool: PropTypes.string,
   onSelectTool: PropTypes.func,
   onDefend: PropTypes.func,
-  onOpenMenu: PropTypes.func,
 };
 
 export default QuickAccessBar;

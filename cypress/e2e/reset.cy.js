@@ -8,8 +8,7 @@ describe('Game Reset', () => {
       },
     });
     cy.contains('INITIATE HACK');
-    cy.get('#menu-toggle').click();
-    cy.get('[data-testid="menu-item-settings"]').click();
+    cy.get('[data-testid="tab-menu"]').click();
     cy.contains('Reset Data').click();
     cy.get('[data-testid="reset-confirm"]').within(() => {
       cy.contains('Reset Game').click();
