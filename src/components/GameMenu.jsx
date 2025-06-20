@@ -8,6 +8,7 @@ import TerminalScreen from './TerminalScreen';
 import TrophyRoomScreen from './TrophyRoomScreen';
 import StatsScreen from './StatsScreen';
 import SettingsScreen from './SettingsScreen';
+import ScannerScreen from './ScannerScreen';
 
 const COMPONENTS = {
   NetworkScanner,
@@ -17,6 +18,7 @@ const COMPONENTS = {
   TrophyRoomScreen,
   StatsScreen,
   SettingsScreen,
+  ScannerScreen,
 };
 
 const GameMenu = ({ onTogglePause, paused = false, unlockedApps = [] }) => {
