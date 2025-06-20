@@ -6,7 +6,6 @@ import DragCommandBlock from "./drag/DragCommandBlock";
 import DropZone from "./drag/DropZone";
 import GameOver from "./GameOver";
 import VictoryScreen from "./VictoryScreen";
-import GameMenu from "./GameMenu";
 import QuickAccessBar from "./QuickAccessBar";
 import HUD from "./HUD";
 import DefenseMinigame from "./defense/DefenseMinigame";
@@ -36,6 +35,21 @@ import { DIFFICULTY_PRESETS } from '../lib/difficulties';
 import { useTutorial } from '../hooks/useTutorial';
 import { tutorialMissions } from '../lib/tutorialSystem';
 import { playSound } from '../lib/sound';
+import {
+  GameStates,
+  initGameState,
+  startGame as startGameState,
+  completeTutorial as finishTutorial,
+  bootComplete,
+  canStartGame,
+  getState as getGameState,
+  pauseGame,
+  resumeGame,
+  resetState,
+  gameOver as setGameOverState,
+} from '../lib/gameStateManager';
+
+initGameState();
 
 const toolData = {
   firewall: { cost: 50 },
@@ -98,7 +112,7 @@ const initialState = {
   message: "INITIATING NEURAL INTERFACE...",
   showQuestion: false,
   answeredCorrectly: false,
-  bootUp: true,
+  phase: GameStates.BOOTING,
   inputCommand: "",
   sequenceInput: "",
   blankInput: "",
@@ -145,6 +159,7 @@ const ApocalypseGame = ({ practice = false, difficulty = 'Operative', hints: ena
           ...(parsed.inventory || {}),
         },
         unlockedApps: parsed.unlockedApps || initialState.unlockedApps,
+        phase: getGameState(),
       };
     }
     if (practice) {
@@ -152,6 +167,7 @@ const ApocalypseGame = ({ practice = false, difficulty = 'Operative', hints: ena
         ...initialState,
         hintsAvailable: enableHints && preset.hints ? initialState.hintsAvailable : 0,
         credits: 9999,
+        phase: GameStates.READY,
         inventory: Object.keys(toolData).reduce(
           (acc, t) => ({ ...acc, [t]: true }),
           {}
@@ -162,7 +178,7 @@ const ApocalypseGame = ({ practice = false, difficulty = 'Operative', hints: ena
         ),
       };
     }
-    return { ...initialState, hintsAvailable: enableHints && preset.hints ? initialState.hintsAvailable : 0 };
+    return { ...initialState, hintsAvailable: enableHints && preset.hints ? initialState.hintsAvailable : 0, phase: getGameState() };
   });
 
   const [showTools, setShowTools] = useState(false);
@@ -199,13 +215,14 @@ const ApocalypseGame = ({ practice = false, difficulty = 'Operative', hints: ena
 
   useEffect(() => {
     let bootTimeout;
-    if (gameState.bootUp) {
+    if (gameState.phase === GameStates.BOOTING) {
       bootTimeout = setTimeout(() => {
         setGameState((prev) => ({
           ...prev,
           message: "Welcome to SURVIV-OS v2.0. Commence hacking training...",
-          bootUp: false,
+          phase: GameStates.TUTORIAL,
         }));
+        bootComplete();
         if (addProgress) addProgress('boot-sequence', 100);
       }, 2000);
     }
@@ -218,7 +235,7 @@ const ApocalypseGame = ({ practice = false, difficulty = 'Operative', hints: ena
   }, [
     gameState.showQuestion,
     gameState.currentLevel,
-    gameState.bootUp,
+    gameState.phase,
     handleKeyPress,
     addProgress,
     paused,
@@ -285,6 +302,14 @@ const ApocalypseGame = ({ practice = false, difficulty = 'Operative', hints: ena
   const tutorialDone = completed.length >= tutorialMissions.length && !activeMission;
 
   useEffect(() => {
+    if (tutorialDone && gameState.phase === GameStates.TUTORIAL) {
+      if (finishTutorial()) {
+        setGameState((prev) => ({ ...prev, phase: GameStates.READY }));
+      }
+    }
+  }, [tutorialDone, gameState.phase]);
+
+  useEffect(() => {
     if (gameState.newUnlock) {
       showHelp?.(`app-icon-${gameState.newUnlock}`, `New app unlocked: ${appRegistry[gameState.newUnlock].name}`);
       const t = setTimeout(() => {
@@ -333,10 +358,9 @@ const ApocalypseGame = ({ practice = false, difficulty = 'Operative', hints: ena
   useEffect(() => {
     if (
       practice ||
-      gameState.bootUp ||
+      gameState.phase !== GameStates.PLAYING ||
       gameState.gameCompleted ||
-      gameState.activeAttack !== null ||
-      !tutorialDone
+      gameState.activeAttack !== null
     ) {
       return;
     }
@@ -363,11 +387,10 @@ const ApocalypseGame = ({ practice = false, difficulty = 'Operative', hints: ena
     return () => clearTimeout(timeout);
   }, [
     practice,
-    gameState.bootUp,
+    gameState.phase,
     gameState.gameCompleted,
     gameState.activeAttack,
     gameState.currentLevel,
-    tutorialDone,
     preset.threatRate,
     preset.timeScale,
   ]);
@@ -410,6 +433,7 @@ const ApocalypseGame = ({ practice = false, difficulty = 'Operative', hints: ena
           unlockedItems: [...prev.unlockedItems, ...extras],
         }));
       }
+      setGameOverState();
     }
   }, [gameState.health]);
 
@@ -1159,7 +1183,7 @@ TIPS FOR THIS CHALLENGE:
             showParticles: willUnlock || prev.showParticles,
           };
         }
-        return {
+        const endState = {
           ...prev,
           message:
             "[ AI TERMINATED ]\nMainframe disabled and network restored.",
@@ -1169,6 +1193,8 @@ TIPS FOR THIS CHALLENGE:
           blankInput: "",
           unlockedApps,
         };
+        setGameOverState();
+        return endState;
       });
     }, 300);
   };
@@ -1187,6 +1213,7 @@ TIPS FOR THIS CHALLENGE:
       : initialState;
     setGameState(baseState);
     localStorage.removeItem(storageKey);
+    resetState();
   };
 
   const resolveSuccess = (toolId) => {
@@ -1672,11 +1699,18 @@ TIPS FOR THIS CHALLENGE:
 
             {!gameState.showQuestion &&
               !gameState.answeredCorrectly &&
-              !gameState.bootUp && (
+              canStartGame() &&
+              gameState.phase === GameStates.READY && (
                 <button
-                  onClick={() =>
-                    setGameState((prev) => ({ ...prev, showQuestion: true }))
-                  }
+                  onClick={() => {
+                    if (canStartGame() && startGameState()) {
+                      setGameState((prev) => ({
+                        ...prev,
+                        showQuestion: true,
+                        phase: GameStates.PLAYING,
+                      }));
+                    }
+                  }}
                   className="w-full bg-green-900/30 border border-green-500 text-green-400 font-mono py-2 px-4 rounded-lg hover:bg-green-900/50 transition-colors"
                 >
                   INITIATE HACK
@@ -1776,15 +1810,8 @@ TIPS FOR THIS CHALLENGE:
           handleUseTool(tool);
           setSelectedTool(null);
         }}
-        onOpenMenu={() => window.dispatchEvent(new Event('open-menu'))}
       />
       <StorylineManager currentLevel={gameState.currentLevel} />
-      <GameMenu
-        onTogglePause={() => setPaused((p) => !p)}
-        paused={paused}
-        unlockedApps={gameState.unlockedApps}
-      />
-
       {gameState.showMinigame && gameState.activeAttack && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
           <DefenseMinigame

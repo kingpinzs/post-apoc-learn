@@ -42,17 +42,34 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
   const [activeApp, setActiveApp] = useState(null);
   const [lockMessage, setLockMessage] = useState('');
 
+  useEffect(() => {
+    const handler = () => setActiveApp(null);
+    window.addEventListener('popstate', handler);
+    return () => window.removeEventListener('popstate', handler);
+  }, []);
+
   const [gridSlots, setGridSlots] = useState(() => {
     const saved = localStorage.getItem(GRID_KEY);
+    let slots;
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length === 20) return parsed;
+        if (Array.isArray(parsed) && parsed.length === 20) {
+          slots = parsed;
+        }
       } catch {
         /* ignore */
       }
     }
-    return loadDefaultGrid();
+    if (!slots) {
+      slots = loadDefaultGrid();
+    }
+    if (!slots.includes('scanner')) {
+      const idx = slots.indexOf(null);
+      if (idx !== -1) slots[idx] = 'scanner';
+      else slots[0] = 'scanner';
+    }
+    return slots;
   });
 
   useEffect(() => {
@@ -145,12 +162,16 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
     if (onLaunchApp) {
       onLaunchApp(appId, props);
     } else {
+      window.history.pushState({ app: appId }, '');
       setActiveApp(appId);
     }
   };
 
   const closeApp = () => {
-    setActiveApp(null);
+    if (activeApp) {
+      window.history.back();
+      setActiveApp(null);
+    }
   };
 
   if (activeApp) {
@@ -158,6 +179,11 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
     const Screen = screenMap[def.launchScreen];
     return (
       <div className="flex flex-col h-full" data-testid="active-app">
+        <div className="flex items-center text-xs text-green-400 space-x-1 m-2" data-testid="breadcrumbs">
+          <span>Tools</span>
+          <span>&gt;</span>
+          <span>{def.name}</span>
+        </div>
         <button
           type="button"
           onClick={closeApp}

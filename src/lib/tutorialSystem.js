@@ -6,12 +6,12 @@ export const tutorialMissions = [
     name: 'First Boot',
     steps: [
       {
-        targetId: 'menu-toggle',
-        message: 'Open the quick menu to access your tools.',
+        target: 'phone-toggle',
+        message: 'Open your phone to access your tools.',
         action: 'click',
       },
       {
-        targetId: 'app-icon-scanner',
+        target: 'app-icon-scanner',
         message: 'Launch the Scanner to begin.',
         action: 'click',
       },
@@ -22,12 +22,12 @@ export const tutorialMissions = [
     name: 'Threat Defense 101',
     steps: [
       {
-        targetId: 'threat-indicator',
+        target: 'threat-indicator',
         message: 'Watch for incoming attacks here.',
         action: 'click',
       },
       {
-        targetId: 'app-icon-firewall',
+        target: 'app-icon-firewall',
         message: 'Launch the Firewall to repel threats.',
         action: 'click',
       },
@@ -38,7 +38,7 @@ export const tutorialMissions = [
     name: 'App Mastery',
     steps: [
       {
-        targetId: 'app-icon-scriptBuilder',
+        target: 'app-icon-scriptBuilder',
         message: 'Drag blocks to build scripts.',
         action: 'click',
       },
@@ -49,7 +49,7 @@ export const tutorialMissions = [
     name: 'Resource Management',
     steps: [
       {
-        targetId: 'status-bar',
+        target: 'status-bar',
         message: 'Monitor CPU, RAM and bandwidth here.',
         action: 'click',
       },

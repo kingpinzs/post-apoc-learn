@@ -28,7 +28,7 @@ describe('useTutorial hook', () => {
       React.useEffect(() => {
         showHelp('target', 'Help message');
       }, [showHelp]);
-      return <button id="target">Target</button>;
+      return <button data-tutorial="target">Target</button>;
     };
     render(
       <TutorialProvider autoStart={false}>
@@ -45,7 +45,7 @@ describe('useTutorial hook', () => {
       React.useEffect(() => {
         showHelp('target', 'Help message');
       }, [showHelp]);
-      return <button id="target">Target</button>;
+      return <button data-tutorial="target">Target</button>;
     };
     render(
       <TutorialProvider autoStart={false}>

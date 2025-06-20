@@ -15,32 +15,71 @@ const useIsomorphicLayoutEffect =
 const TutorialOverlay = ({ steps = [], onComplete }) => {
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState(null);
+  const [element, setElement] = useState(null);
+  const [missing, setMissing] = useState(false);
   const tipRef = useRef(null);
   const [tipSize, setTipSize] = useState({ width: 0, height: 0 });
 
-  // update highlight rect on step change
-  // We now use the "safe" hook instead of useLayoutEffect directly.
-  useIsomorphicLayoutEffect(() => {
-    if (index >= steps.length) return;
-    const el = document.getElementById(steps[index].targetId);
-    if (el) setRect(el.getBoundingClientRect());
+  const debug =
+    typeof window !== 'undefined' &&
+    window.localStorage.getItem('tutorial-debug') === '1';
+
+  // find target element with retries
+  useEffect(() => {
+    if (index >= steps.length) return undefined;
+    setMissing(false);
+    setElement(null);
+    const start = Date.now();
+    const selector = `[data-tutorial="${steps[index].target}"]`;
+    let frame;
+    const search = () => {
+      const el = document.querySelector(selector);
+      if (el) {
+        setElement(el);
+      } else if (Date.now() - start < 12000) {
+        frame = requestAnimationFrame(search);
+      } else {
+        setMissing(true);
+      }
+    };
+    const observer = new MutationObserver(search);
+    observer.observe(document.body, { childList: true, subtree: true });
+    search();
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
   }, [index, steps]);
+
+  // update highlight rect when element changes
+  useIsomorphicLayoutEffect(() => {
+    if (element) setRect(element.getBoundingClientRect());
+  }, [element]);
 
   // handle progression
   useEffect(() => {
-    if (index >= steps.length) {
-      return;
-    }
-    const { targetId, action } = steps[index];
-    const el = document.getElementById(targetId);
-    if (!el) return;
-
+    if (!element || index >= steps.length) return;
+    const { action } = steps[index];
     const handler = () => setIndex((i) => i + 1);
-    el.addEventListener(action, handler);
-    return () => {
-      el.removeEventListener(action, handler);
+    element.addEventListener(action, handler);
+    return () => element.removeEventListener(action, handler);
+  }, [element, index, steps]);
+
+  // detect element removal after it was found
+  useEffect(() => {
+    if (!element) return undefined;
+    let frame;
+    const check = () => {
+      if (!document.contains(element)) {
+        setElement(null);
+        setMissing(true);
+      } else {
+        frame = requestAnimationFrame(check);
+      }
     };
-  }, [index, steps]);
+    frame = requestAnimationFrame(check);
+    return () => cancelAnimationFrame(frame);
+  }, [element]);
 
   // fire completion callback
   useEffect(() => {
@@ -89,10 +128,7 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
   const hasRect = !!rect;
 
   return (
-    <div
-      className="fixed inset-0 z-50 pointer-events-none"
-      data-tutorial={steps[index]?.targetId}
-    >
+    <div className="fixed inset-0 z-[1000] pointer-events-none">
       <div className="absolute inset-0 bg-black/70" />
       {hasRect && (
         <div
@@ -106,7 +142,21 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
         ref={tipRef}
       >
         {message}
+        {missing && (
+          <button
+            type="button"
+            onClick={() => setIndex((i) => i + 1)}
+            className="ml-2 text-xs underline text-blue-600 pointer-events-auto"
+          >
+            Skip Step
+          </button>
+        )}
       </div>
+      {debug && (
+        <div className="absolute bottom-2 left-2 text-xs bg-black/70 text-white p-1 rounded pointer-events-auto">
+          Step {index + 1}/{steps.length}: {steps[index].target}
+        </div>
+      )}
     </div>
   );
 };
@@ -114,7 +164,7 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
 TutorialOverlay.propTypes = {
   steps: PropTypes.arrayOf(
     PropTypes.shape({
-      targetId: PropTypes.string.isRequired,
+      target: PropTypes.string.isRequired,
       message: PropTypes.string.isRequired,
       action: PropTypes.string.isRequired,
     })

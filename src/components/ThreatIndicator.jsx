@@ -43,6 +43,7 @@ const ThreatIndicator = ({ threats = [], onThreatClick }) => {
   return (
     <div
       data-testid="threat-indicator"
+      data-tutorial="threat-indicator"
       onClick={onThreatClick}
       className={cn(
         'border p-2 rounded text-green-400 cursor-pointer select-none',
