@@ -1,6 +1,6 @@
 describe('Game Reset', () => {
   it('clears save data from settings screen', () => {
-    cy.visit('/', {
+    cy.visit('/post-apoc-learn', {
       onBeforeLoad(win) {
         win.localStorage.setItem('survivos-save', 'foo');
         win.localStorage.setItem('survivos-game-state', JSON.stringify('READY'));
