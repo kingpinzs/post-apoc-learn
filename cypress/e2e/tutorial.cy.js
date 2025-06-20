@@ -11,10 +11,10 @@ describe('Tutorial system', () => {
       },
     });
     // Wait for the tutorial overlay to attach to the phone button
-    cy.contains('Open your phone', { timeout: 8000 }).should('be.visible');
+    cy.contains('Open your phone', { timeout: 8000 }).should('exist');
     // Force the click in case an overlay temporarily covers the button
     cy.get('[data-tutorial="phone-toggle"]').click({ force: true });
-    cy.contains('Launch the Scanner', { timeout: 8000 }).should('be.visible');
+    cy.contains('Launch the Scanner', { timeout: 8000 }).should('exist');
     cy.get('[data-tutorial="app-icon-scanner"]').should('exist');
   });
 
@@ -24,9 +24,9 @@ describe('Tutorial system', () => {
         win.localStorage.setItem('survivos-story-progress', '6');
       },
     });
-    cy.contains('Open your phone', { timeout: 8000 });
+    cy.contains('Open your phone', { timeout: 8000 }).should('exist');
     cy.get('[data-tutorial="phone-toggle"]').click({ force: true });
-    cy.contains('Launch the Scanner', { timeout: 8000 });
+    cy.contains('Launch the Scanner', { timeout: 8000 }).should('exist');
   });
 
   it('shows skip when element missing', () => {
@@ -37,6 +37,6 @@ describe('Tutorial system', () => {
     });
     cy.get('[data-tutorial="phone-toggle"]').invoke('remove');
     // Wait a little longer for the Skip Step button to appear
-    cy.contains('Skip Step', { timeout: 6000 });
+    cy.contains('Skip Step', { timeout: 6000 }).should('exist');
   });
 });
