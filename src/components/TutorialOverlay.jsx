@@ -30,7 +30,8 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
     setMissing(false);
     setElement(null);
     // Increase retries to better handle slower renders
-    const delays = [0, 100, 500, 1000, 2000];
+    // Extend retry window to better handle sluggish renders
+    const delays = [0, 100, 500, 1000, 2000, 4000];
     let attempt = 0;
     let timer;
     function search() {
