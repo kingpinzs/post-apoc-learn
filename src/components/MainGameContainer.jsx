@@ -23,6 +23,7 @@ const MainGameContainer = ({ practiceMode = false, showPerformance = false, diff
         onClick={() => setPhoneOpen(true)}
         className="fixed bottom-2 right-2 z-30 p-1 bg-gray-800 text-green-400 rounded"
         data-testid="phone-toggle"
+        data-tutorial="phone-toggle"
         aria-label="Open phone"
       >
         <Smartphone className="w-5 h-5" />

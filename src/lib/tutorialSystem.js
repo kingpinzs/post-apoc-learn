@@ -6,8 +6,8 @@ export const tutorialMissions = [
     name: 'First Boot',
     steps: [
       {
-        target: 'tools-tab',
-        message: 'Open the Tools tab to access your apps.',
+        target: 'phone-toggle',
+        message: 'Open your phone to access your tools.',
         action: 'click',
       },
       {
