@@ -89,7 +89,10 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
   const hasRect = !!rect;
 
   return (
-    <div className="fixed inset-0 z-50 pointer-events-none">
+    <div
+      className="fixed inset-0 z-50 pointer-events-none"
+      data-tutorial={steps[index]?.targetId}
+    >
       <div className="absolute inset-0 bg-black/70" />
       {hasRect && (
         <div
