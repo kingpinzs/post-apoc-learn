@@ -63,7 +63,11 @@ const PhoneFrame = ({
               <Wifi className="w-4 h-4" />
               <span className={networkStrength === 0 ? 'text-red-500' : ''}>{networkStrength}</span>
             </div>
-            <div id="threat-indicator" className="flex items-center space-x-1">
+            <div
+              id="threat-indicator"
+              data-tutorial="threat-indicator"
+              className="flex items-center space-x-1"
+            >
               <Shield className="w-4 h-4" />
               <span>{threatLevel}</span>
             </div>

@@ -207,7 +207,12 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
         className="w-full px-2 py-1 rounded bg-gray-800 text-green-400"
         id="search-input" data-testid="search-bar"
       />
-      <div className="text-xs text-green-400 flex justify-around border border-gray-700 rounded p-1" id="status-widgets" data-testid="status-widgets">
+      <div
+        className="text-xs text-green-400 flex justify-around border border-gray-700 rounded p-1"
+        id="status-widgets"
+        data-testid="status-widgets"
+        data-tutorial="status-bar"
+      >
         <div>CPU {usage.cpu}%</div>
         <div>RAM {usage.ram}%</div>
         <div>BW {usage.bandwidth}%</div>
