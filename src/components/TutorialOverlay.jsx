@@ -127,7 +127,7 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
   const hasRect = !!rect;
 
   return (
-    <div className="fixed inset-0 z-50 pointer-events-none">
+    <div className="fixed inset-0 z-[1000] pointer-events-none">
       <div className="absolute inset-0 bg-black/70" />
       {hasRect && (
         <div
