@@ -39,4 +39,73 @@ describe('Tutorial system', () => {
     // Wait a little longer for the Skip Step button to appear
     cy.contains('Skip Step', { timeout: 6000 }).should('exist');
   });
+
+  it('shows skip if target removed after highlight', () => {
+    cy.visit('/post-apoc-learn', {
+      onBeforeLoad(win) {
+        win.localStorage.setItem('survivos-story-progress', '6');
+      },
+    });
+    cy.contains('Open your phone', { timeout: 8000 }).should('exist');
+    cy.get('[data-tutorial="phone-toggle"]').then(($btn) => {
+      $btn.remove();
+    });
+    cy.contains('Skip Step', { timeout: 8000 }).should('exist');
+  });
+
+  it('completes mission after clicking scanner', () => {
+    cy.visit('/post-apoc-learn', {
+      onBeforeLoad(win) {
+        win.localStorage.setItem('survivos-story-progress', '6');
+      },
+    });
+    cy.contains('Open your phone', { timeout: 8000 }).should('exist');
+    cy.get('[data-tutorial="phone-toggle"]').click({ force: true });
+    cy.contains('Launch the Scanner', { timeout: 8000 }).should('exist');
+    cy.get('[data-tutorial="app-icon-scanner"]').click({ force: true });
+    cy.contains('Launch the Scanner').should('not.exist');
+  });
+
+  it('persists current step after reload', () => {
+    cy.visit('/post-apoc-learn', {
+      onBeforeLoad(win) {
+        win.localStorage.setItem('survivos-story-progress', '6');
+      },
+    });
+    cy.contains('Open your phone', { timeout: 8000 }).should('exist');
+    cy.reload();
+    cy.contains('Open your phone', { timeout: 8000 }).should('exist');
+  });
+
+  it('skip button advances to next step', () => {
+    cy.visit('/post-apoc-learn', {
+      onBeforeLoad(win) {
+        win.localStorage.setItem('survivos-story-progress', '6');
+      },
+    });
+    cy.get('[data-tutorial="phone-toggle"]').invoke('remove');
+    cy.contains('Skip Step', { timeout: 8000 }).click();
+    cy.contains('Launch the Scanner', { timeout: 8000 }).should('exist');
+  });
+
+  it('does not show tutorial when all missions completed', () => {
+    cy.visit('/post-apoc-learn', {
+      onBeforeLoad(win) {
+        win.localStorage.setItem(
+          'survivos-tutorial',
+          JSON.stringify({
+            completed: [
+              'firstBoot',
+              'threatDefense',
+              'appMastery',
+              'resourceMgmt',
+            ],
+            activeMission: null,
+          })
+        );
+        win.localStorage.setItem('survivos-story-progress', '6');
+      },
+    });
+    cy.contains('Open your phone').should('not.exist');
+  });
 });
