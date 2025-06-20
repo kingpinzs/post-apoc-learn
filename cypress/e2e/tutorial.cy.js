@@ -10,10 +10,23 @@ describe('Tutorial system', () => {
         win.localStorage.setItem('survivos-story-progress', '6');
       },
     });
-    cy.get('[data-tutorial="tools-tab"]').should('exist');
+    // Wait for the tutorial overlay to attach to the Tools tab
+    cy.contains('Open the Tools tab', { timeout: 8000 }).should('be.visible');
     // Force the click in case an overlay temporarily covers the button
     cy.get('[data-tutorial="tools-tab"]').click({ force: true });
+    cy.contains('Launch the Scanner', { timeout: 8000 }).should('be.visible');
     cy.get('[data-tutorial="app-icon-scanner"]').should('exist');
+  });
+
+  it('advances to next step after clicking tools tab', () => {
+    cy.visit('/post-apoc-learn', {
+      onBeforeLoad(win) {
+        win.localStorage.setItem('survivos-story-progress', '6');
+      },
+    });
+    cy.contains('Open the Tools tab', { timeout: 8000 });
+    cy.get('[data-tutorial="tools-tab"]').click({ force: true });
+    cy.contains('Launch the Scanner', { timeout: 8000 });
   });
 
   it('shows skip when element missing', () => {
