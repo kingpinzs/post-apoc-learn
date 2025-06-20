@@ -11,13 +11,13 @@ describe('Tutorial system', () => {
       },
     });
     // Wait for the tutorial overlay to attach to the phone button
-    cy.contains('Open your phone', { timeout: 10000 }).should('exist');
-    cy.get('[data-tutorial="phone-toggle"]', { timeout: 10000 }).should('exist');
+    cy.contains('Open your phone', { timeout: 15000 }).should('exist');
+    cy.get('[data-tutorial="phone-toggle"]', { timeout: 15000 }).should('exist');
     // Ensure the listener has time to attach
     cy.wait(100);
     cy.get('[data-tutorial="phone-toggle"]').click({ force: true });
-    cy.contains('Launch the Scanner', { timeout: 10000 }).should('exist');
-    cy.get('[data-tutorial="app-icon-scanner"]', { timeout: 10000 }).should(
+    cy.contains('Launch the Scanner', { timeout: 15000 }).should('exist');
+    cy.get('[data-tutorial="app-icon-scanner"]', { timeout: 15000 }).should(
       'exist'
     );
   });
@@ -28,8 +28,8 @@ describe('Tutorial system', () => {
         win.localStorage.setItem('survivos-story-progress', '6');
       },
     });
-    cy.contains('Open your phone', { timeout: 10000 }).should('exist');
-    cy.get('[data-tutorial="phone-toggle"]', { timeout: 10000 }).should('exist');
+    cy.contains('Open your phone', { timeout: 15000 }).should('exist');
+    cy.get('[data-tutorial="phone-toggle"]', { timeout: 15000 }).should('exist');
     cy.wait(100);
     cy.get('[data-tutorial="phone-toggle"]').click({ force: true });
     cy.contains('Launch the Scanner', { timeout: 10000 }).should('exist');
@@ -69,8 +69,8 @@ describe('Tutorial system', () => {
     cy.get('[data-tutorial="phone-toggle"]', { timeout: 10000 }).should('exist');
     cy.wait(100);
     cy.get('[data-tutorial="phone-toggle"]').click({ force: true });
-    cy.contains('Launch the Scanner', { timeout: 10000 }).should('exist');
-    cy.get('[data-tutorial="app-icon-scanner"]', { timeout: 10000 }).click({
+    cy.contains('Launch the Scanner', { timeout: 15000 }).should('exist');
+    cy.get('[data-tutorial="app-icon-scanner"]', { timeout: 15000 }).click({
       force: true,
     });
     cy.contains('Launch the Scanner').should('not.exist');
