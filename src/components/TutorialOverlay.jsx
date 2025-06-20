@@ -26,28 +26,29 @@ const TutorialOverlay = ({ steps = [], onComplete }) => {
 
   // find target element with retries
   useEffect(() => {
-    if (index >= steps.length) return;
+    if (index >= steps.length) return undefined;
     setMissing(false);
     setElement(null);
-    // Increase retries to better handle slower renders
-    // Extend retry window to better handle sluggish renders
-    const delays = [0, 100, 500, 1000, 2000, 4000];
-    let attempt = 0;
-    let timer;
-    function search() {
-      const el = document.querySelector(
-        `[data-tutorial="${steps[index].target}"]`
-      );
+    const start = Date.now();
+    const selector = `[data-tutorial="${steps[index].target}"]`;
+    let frame;
+    const search = () => {
+      const el = document.querySelector(selector);
       if (el) {
         setElement(el);
-      } else if (attempt < delays.length - 1) {
-        timer = setTimeout(search, delays[++attempt]);
+      } else if (Date.now() - start < 12000) {
+        frame = requestAnimationFrame(search);
       } else {
         setMissing(true);
       }
-    }
+    };
+    const observer = new MutationObserver(search);
+    observer.observe(document.body, { childList: true, subtree: true });
     search();
-    return () => clearTimeout(timer);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
   }, [index, steps]);
 
   // update highlight rect when element changes
