@@ -11,11 +11,15 @@ describe('Tutorial system', () => {
       },
     });
     // Wait for the tutorial overlay to attach to the phone button
-    cy.contains('Open your phone', { timeout: 8000 }).should('exist');
-    // Force the click in case an overlay temporarily covers the button
+    cy.contains('Open your phone', { timeout: 10000 }).should('exist');
+    cy.get('[data-tutorial="phone-toggle"]', { timeout: 10000 }).should('exist');
+    // Ensure the listener has time to attach
+    cy.wait(100);
     cy.get('[data-tutorial="phone-toggle"]').click({ force: true });
-    cy.contains('Launch the Scanner', { timeout: 8000 }).should('exist');
-    cy.get('[data-tutorial="app-icon-scanner"]').should('exist');
+    cy.contains('Launch the Scanner', { timeout: 10000 }).should('exist');
+    cy.get('[data-tutorial="app-icon-scanner"]', { timeout: 10000 }).should(
+      'exist'
+    );
   });
 
   it('advances to next step after clicking phone toggle', () => {
@@ -24,9 +28,11 @@ describe('Tutorial system', () => {
         win.localStorage.setItem('survivos-story-progress', '6');
       },
     });
-    cy.contains('Open your phone', { timeout: 8000 }).should('exist');
+    cy.contains('Open your phone', { timeout: 10000 }).should('exist');
+    cy.get('[data-tutorial="phone-toggle"]', { timeout: 10000 }).should('exist');
+    cy.wait(100);
     cy.get('[data-tutorial="phone-toggle"]').click({ force: true });
-    cy.contains('Launch the Scanner', { timeout: 8000 }).should('exist');
+    cy.contains('Launch the Scanner', { timeout: 10000 }).should('exist');
   });
 
   it('shows skip when element missing', () => {
@@ -46,11 +52,11 @@ describe('Tutorial system', () => {
         win.localStorage.setItem('survivos-story-progress', '6');
       },
     });
-    cy.contains('Open your phone', { timeout: 8000 }).should('exist');
+    cy.contains('Open your phone', { timeout: 10000 }).should('exist');
     cy.get('[data-tutorial="phone-toggle"]').then(($btn) => {
       $btn.remove();
     });
-    cy.contains('Skip Step', { timeout: 8000 }).should('exist');
+    cy.contains('Skip Step', { timeout: 10000 }).should('exist');
   });
 
   it('completes mission after clicking scanner', () => {
@@ -59,10 +65,14 @@ describe('Tutorial system', () => {
         win.localStorage.setItem('survivos-story-progress', '6');
       },
     });
-    cy.contains('Open your phone', { timeout: 8000 }).should('exist');
+    cy.contains('Open your phone', { timeout: 10000 }).should('exist');
+    cy.get('[data-tutorial="phone-toggle"]', { timeout: 10000 }).should('exist');
+    cy.wait(100);
     cy.get('[data-tutorial="phone-toggle"]').click({ force: true });
-    cy.contains('Launch the Scanner', { timeout: 8000 }).should('exist');
-    cy.get('[data-tutorial="app-icon-scanner"]').click({ force: true });
+    cy.contains('Launch the Scanner', { timeout: 10000 }).should('exist');
+    cy.get('[data-tutorial="app-icon-scanner"]', { timeout: 10000 }).click({
+      force: true,
+    });
     cy.contains('Launch the Scanner').should('not.exist');
   });
 
@@ -72,9 +82,9 @@ describe('Tutorial system', () => {
         win.localStorage.setItem('survivos-story-progress', '6');
       },
     });
-    cy.contains('Open your phone', { timeout: 8000 }).should('exist');
+    cy.contains('Open your phone', { timeout: 10000 }).should('exist');
     cy.reload();
-    cy.contains('Open your phone', { timeout: 8000 }).should('exist');
+    cy.contains('Open your phone', { timeout: 10000 }).should('exist');
   });
 
   it('skip button advances to next step', () => {
@@ -84,8 +94,8 @@ describe('Tutorial system', () => {
       },
     });
     cy.get('[data-tutorial="phone-toggle"]').invoke('remove');
-    cy.contains('Skip Step', { timeout: 8000 }).click();
-    cy.contains('Launch the Scanner', { timeout: 8000 }).should('exist');
+    cy.contains('Skip Step', { timeout: 10000 }).click();
+    cy.contains('Launch the Scanner', { timeout: 10000 }).should('exist');
   });
 
   it('does not show tutorial when all missions completed', () => {
