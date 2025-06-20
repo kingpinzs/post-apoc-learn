@@ -5,7 +5,7 @@ describe('Tutorial system', () => {
   });
 
   it('highlights menu and scanner', () => {
-    cy.visit('/', {
+    cy.visit('/post-apoc-learn', {
       onBeforeLoad(win) {
         win.localStorage.setItem('survivos-story-progress', '6');
       },
@@ -17,7 +17,7 @@ describe('Tutorial system', () => {
   });
 
   it('shows skip when element missing', () => {
-    cy.visit('/', {
+    cy.visit('/post-apoc-learn', {
       onBeforeLoad(win) {
         win.localStorage.setItem('survivos-story-progress', '6');
       },

@@ -1,6 +1,6 @@
 describe('Bottom navigation', () => {
   const visitWithoutStory = () =>
-    cy.visit('/', {
+    cy.visit('/post-apoc-learn', {
       onBeforeLoad(win) {
         win.localStorage.setItem('survivos-story-progress', '6');
       },
