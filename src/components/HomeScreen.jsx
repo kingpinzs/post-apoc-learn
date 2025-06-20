@@ -50,15 +50,26 @@ const HomeScreen = ({ notifications = [], onLaunchApp }) => {
 
   const [gridSlots, setGridSlots] = useState(() => {
     const saved = localStorage.getItem(GRID_KEY);
+    let slots;
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length === 20) return parsed;
+        if (Array.isArray(parsed) && parsed.length === 20) {
+          slots = parsed;
+        }
       } catch {
         /* ignore */
       }
     }
-    return loadDefaultGrid();
+    if (!slots) {
+      slots = loadDefaultGrid();
+    }
+    if (!slots.includes('scanner')) {
+      const idx = slots.indexOf(null);
+      if (idx !== -1) slots[idx] = 'scanner';
+      else slots[0] = 'scanner';
+    }
+    return slots;
   });
 
   useEffect(() => {
